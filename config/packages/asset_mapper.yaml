@@ -3,6 +3,8 @@ framework:
         # The paths to make available to the asset mapper.
         paths:
             - assets/
+            - public/uploads/ # 👈 Ajoute cette ligne pour mapper les fichiers uploadés
+
         missing_import_mode: strict
 
 when@prod:

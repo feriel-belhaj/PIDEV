@@ -7,14 +7,55 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PartenariatRepository::class)]
 class Partenariat
 {
+    #[ORM\OneToMany(mappedBy: 'partenariat', targetEntity: Candidature::class, cascade: ['remove'])]
+    private Collection $candidatures;
+
+    public function __construct()
+    {
+        $this->candidatures = new ArrayCollection();
+    }
+
+    public function getCandidatures(): Collection
+    {
+        return $this->candidatures;
+    }
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: "Le nom est obligatoire.")]
+    #[Assert\Length(max: 50, maxMessage: "Le nom ne peut pas dépasser 50 caractères.")]
+    #[Assert\Regex(
+        pattern: "/^[A-Z][a-zA-Z]+$/",
+        message: "Le nom doit commencer par une majuscule et contenir uniquement des lettres."
+    )]
+    private ?string $Nom = null;
+
+    #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: "Le type est obligatoire.")]
+    #[Assert\Length(max: 50, maxMessage: "Le type ne peut pas dépasser 50 caractères.")]
+    #[Assert\Regex(
+        pattern: "/^[A-Z][a-zA-Z]+$/",
+        message: "Le type doit commencer par une majuscule et contenir uniquement des lettres."
+    )]
+    private ?string $Type = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $description = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $statut = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $image = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $dateDebut = null;
@@ -22,68 +63,30 @@ class Partenariat
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $dateFin = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $statut = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $description = null;
-
-    /**
-     * @var Collection<int, Candidature>
-     */
-    #[ORM\OneToMany(targetEntity: Candidature::class, mappedBy: 'partenariat')]
-    private Collection $candidature;
-
-    /**
-     * @var Collection<int, Utilisateur>
-     */
-    #[ORM\ManyToMany(targetEntity: Utilisateur::class, mappedBy: 'partenariats')]
-    private Collection $utilisateurs;
-
-    public function __construct()
-    {
-        $this->candidature = new ArrayCollection();
-        $this->utilisateurs = new ArrayCollection();
-    }
-
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getDateDebut(): ?\DateTimeInterface
+    public function getNom(): ?string
     {
-        return $this->dateDebut;
+        return $this->Nom;
     }
 
-    public function setDateDebut(\DateTimeInterface $dateDebut): static
+    public function setNom(string $Nom): static
     {
-        $this->dateDebut = $dateDebut;
-
+        $this->Nom = $Nom;
         return $this;
     }
 
-    public function getDateFin(): ?\DateTimeInterface
+    public function getType(): ?string
     {
-        return $this->dateFin;
+        return $this->Type;
     }
 
-    public function setDateFin(\DateTimeInterface $dateFin): static
+    public function setType(string $Type): static
     {
-        $this->dateFin = $dateFin;
-
-        return $this;
-    }
-
-    public function getStatut(): ?string
-    {
-        return $this->statut;
-    }
-
-    public function setStatut(string $statut): static
-    {
-        $this->statut = $statut;
-
+        $this->Type = $Type;
         return $this;
     }
 
@@ -95,64 +98,50 @@ class Partenariat
     public function setDescription(string $description): static
     {
         $this->description = $description;
-
         return $this;
     }
 
-    /**
-     * @return Collection<int, Candidature>
-     */
-    public function getCandidature(): Collection
+    public function getStatut(): ?string
     {
-        return $this->candidature;
+        return $this->statut;
     }
 
-    public function addCandidature(Candidature $candidature): static
+    public function setStatut(string $statut): static
     {
-        if (!$this->candidature->contains($candidature)) {
-            $this->candidature->add($candidature);
-            $candidature->setPartenariat($this);
-        }
-
+        $this->statut = $statut;
         return $this;
     }
 
-    public function removeCandidature(Candidature $candidature): static
+    public function getImage(): ?string
     {
-        if ($this->candidature->removeElement($candidature)) {
-            // set the owning side to null (unless already changed)
-            if ($candidature->getPartenariat() === $this) {
-                $candidature->setPartenariat(null);
-            }
-        }
+        return $this->image;
+    }
 
+    public function setImage(string $image): static
+    {
+        $this->image = $image;
         return $this;
     }
 
-    /**
-     * @return Collection<int, Utilisateur>
-     */
-    public function getUtilisateurs(): Collection
+    public function getDateDebut(): ?\DateTimeInterface
     {
-        return $this->utilisateurs;
+        return $this->dateDebut;
     }
 
-    public function addUtilisateur(Utilisateur $utilisateur): static
+    public function setDateDebut(\DateTimeInterface $dateDebut): static
     {
-        if (!$this->utilisateurs->contains($utilisateur)) {
-            $this->utilisateurs->add($utilisateur);
-            $utilisateur->addPartenariat($this);
-        }
-
+        $this->dateDebut = $dateDebut;
         return $this;
     }
 
-    public function removeUtilisateur(Utilisateur $utilisateur): static
+    public function getDateFin(): ?\DateTimeInterface
     {
-        if ($this->utilisateurs->removeElement($utilisateur)) {
-            $utilisateur->removePartenariat($this);
-        }
+        return $this->dateFin;
+    }
 
+    public function setDateFin(\DateTimeInterface $dateFin): static
+    {
+        $this->dateFin = $dateFin;
         return $this;
     }
 }

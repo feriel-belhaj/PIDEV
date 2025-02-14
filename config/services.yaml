@@ -22,3 +22,7 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+parameters:
+    partenariat_images_directory: '%kernel.project_dir%/public/uploads/partenariats'
+    uploads_directory: '%kernel.project_dir%/public/uploads/candidatures'

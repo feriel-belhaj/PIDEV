@@ -1,41 +1,123 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Partenariat index{% endblock %}
+{% block title %}Listes Des Partenariat{% endblock %}
 
 {% block body %}
-    <h1>Partenariat index</h1>
+    <div class="container mt-5">
+        <div class="text-center wow bounceInUp" data-wow-delay="0.1s">
+            <h1 class="mb-4">Listes Des Partenariats</h1>
+        </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>DateDebut</th>
-                <th>DateFin</th>
-                <th>Statut</th>
-                <th>Description</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for partenariat in partenariats %}
-            <tr>
-                <td>{{ partenariat.id }}</td>
-                <td>{{ partenariat.dateDebut ? partenariat.dateDebut|date('Y-m-d') : '' }}</td>
-                <td>{{ partenariat.dateFin ? partenariat.dateFin|date('Y-m-d') : '' }}</td>
-                <td>{{ partenariat.statut }}</td>
-                <td>{{ partenariat.description }}</td>
-                <td>
-                    <a href="{{ path('app_partenariat_show', {'id': partenariat.id}) }}">show</a>
-                    <a href="{{ path('app_partenariat_edit', {'id': partenariat.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-    <a href="{{ path('app_partenariat_new') }}">Create new</a>
+            <a href="{{ path('app_partenariat_new') }}" class="btn btn-custom-maj border-0 rounded-pill py-2 px-3 mb-3 wow bounceInUp" data-wow-delay="0.2s">
+             <i class="fas fa-edit fa-1.5x"></i>
+                </a>
+
+   
+
+        <div class="row">
+            
+            {% for partenariat in partenariats %}
+                <div class="col-md-4">
+                    <div class="card service-item shadow-lg rounded-lg mb-4 position-relative wow bounceInUp" 
+                            data-wow-delay="0.{{ loop.index }}s"
+                            onclick="window.location.href='{{ path('app_partenariat_show', {'id': partenariat.id}) }}';"
+                            style="cursor: pointer;">                     
+                               <!-- Statut en haut à droite -->
+                            <span class="badge position-absolute top-0 end-0 m-2 px-3 py-2 text-white 
+                        {% if partenariat.statut|trim|lower == 'actif' %} bg-success
+                        {% elseif partenariat.statut|trim|lower == 'en cours' %} bg-warning
+                        {% elseif partenariat.statut|trim|lower == 'expiré' %} bg-danger
+                        {% else %} bg-secondary {% endif %}">
+                        {{ partenariat.statut }}
+                    </span>
+
+>
+
+                        <!-- Image du partenariat -->
+                        {% if partenariat.image %}
+                            <img src="{{ asset('uploads/partenariats/' ~ partenariat.image) }}" class="card-img-top" alt="{{ partenariat.nom }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                            <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 200px;">
+                                <p class="text-muted">Aucune image</p>
+                            </div>
+                        {% endif %}
+
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-dark">{{ partenariat.nom }}</h5>
+                            <p class="card-text text-muted"><strong>Type:</strong> {{ partenariat.type }}</p>
+                            <p class="card-text">{{ partenariat.description }}</p>
+                            <p class="text-secondary"><strong>Début:</strong> {{ partenariat.dateDebut ? partenariat.dateDebut|date('Y-m-d') : 'Non défini' }}</p>
+                            <p class="text-secondary"><strong>Fin:</strong> {{ partenariat.dateFin ? partenariat.dateFin|date('Y-m-d') : 'Non défini' }}</p>
+
+                            <!-- Boutons d'actions -->
+                            <a href="{{ path('app_partenariat_edit', {'id': partenariat.id}) }}" class="btn btn-primary border-0 rounded-pill py-2 px-5 me-5 animated bounceInLeft" style="font-family: 'Open Sans', sans-serif;"> Modifier</a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-center">Aucun partenariat trouvé.</p>
+          
+           
+{% endfor %}
+
+
+
+<style>
+    
+    /* Animation au survol */
+    .service-item {
+        background-color: ##FFFCF8; /* Couleur de fond par défaut */
+        border: none;
+        transition: all 0.3s ease-in-out;
+    }
+.service-item:hover .btn-primary {
+    background-color: white; /* Bouton devient blanc */
+    color: #D4A762; /* Texte du bouton devient doré */
+    border: 1px solid #D4A762;
+}
+
+    .service-item:hover {
+        background-color: #D4A762; /* Jaune doré comme dans l'exemple */
+        color: white;
+        transform: scale(1.05);
+    }
+
+    .service-item:hover .card-title {
+        color: white;
+    }
+
+    .service-item:hover .card-text {
+        color: #333;
+    }
+
+    .service-item:hover .action-btn {
+        background-color: white;
+        color: #D4A762;
+        border: 1px solid #D4A762;
+    }
+
+    .service-item:hover .action-btn:hover {
+        background-color: #D4A762; /* Jaune plus foncé au survol */
+        color: white;
+    }
+
+    .badge {
+        font-size: 0.8rem;
+        border-radius: 50px;
+    }
+    .btn-custom-maj {
+    background-color: #D4A762; /* Même couleur que Mettre à jour */
+    color: white;
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-custom-maj:hover {
+    background-color: beige;
+    color: #D4A762;
+    border: 1px solid #D4A762;
+}
+
+</style>
+
 {% endblock %}
