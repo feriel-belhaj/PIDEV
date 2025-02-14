@@ -1,0 +1,64 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Gestion des Commandes{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1 class="my-4 text-center">Liste des Commandes</h1>
+
+        <!-- Tableau des commandes -->
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Produit</th>
+                    <th>Quantité</th>
+                    <th>Prix</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set commandesAffichees = 0 %}
+                {% for commande in commandes %}
+                    {% if commande.produit|length > 0 %}
+                        {% set commandesAffichees = commandesAffichees + 1 %}
+                        <tr>
+                            <td>{{ commande.id }}</td>
+                            <td>
+                                {% for produit in commande.produit %}
+                                    {{ produit.nom }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                            {% for produit in commande.produit %}
+                               {{ commande.getQuantiteProduit(produit) }}{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                            </td>
+                            <td>{{ commande.prix }} dt</td>
+                            <td>{{ commande.datecmd ? commande.datecmd|date('Y-m-d') : 'N/A' }}</td>
+                            <td>{{ commande.statut }}</td>
+                            <td>
+                                <a href="{{ path('app_commande_show', {'id': commande.id}) }}" class="btn btn-info btn-sm">Afficher</a>
+                                <a href="{{ path('admin_commande_edit', {'id': commande.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
+
+                                <!-- Formulaire de suppression pour le back-office -->
+                                <form method="post" action="{{ path('admin_commande_delete', {'id': commande.id}) }}" class="d-inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ commande.id) }}">
+                                    <button class="btn btn-danger btn-sm" type="submit">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+
+                {% if commandesAffichees == 0 %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">Aucune commande trouvée.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

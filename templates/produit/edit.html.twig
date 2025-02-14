@@ -1,13 +1,59 @@
-{% extends 'base.html.twig' %}
+{% extends 'baseBack.html.twig' %}
 
-{% block title %}Edit Produit{% endblock %}
+{% block title %}Modifier Produit{% endblock %}
 
 {% block body %}
-    <h1>Edit Produit</h1>
+<div class="container">
+    <h1 class="my-4 text-center">Modifier le Produit</h1>
 
-    {{ include('produit/_form.html.twig', {'button_label': 'Update'}) }}
+    <div class="p-5 bg-light rounded contact-form">
+        {{ form_start(form, {'attr': {'id': 'produitForm', 'enctype': 'multipart/form-data', 'novalidate': 'novalidate'}}) }}
 
-    <a href="{{ path('app_produit_index') }}">back to list</a>
+        <div class="mb-3">
+            {{ form_label(form.nom) }}
+            {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': 'Nom du Produit'}}) }}
+            <div class="text-danger">{{ form_errors(form.nom) }}</div>
+        </div>
 
-    {{ include('produit/_delete_form.html.twig') }}
+        <div class="mb-3">
+            {{ form_label(form.description) }}
+            {{ form_widget(form.description, {'attr': {'class': 'form-control', 'placeholder': 'Description'}}) }}
+            <div class="text-danger">{{ form_errors(form.description) }}</div>
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.prix) }}
+            {{ form_widget(form.prix, {'attr': {'class': 'form-control', 'placeholder': 'Prix'}}) }}
+            <div class="text-danger">{{ form_errors(form.prix) }}</div>
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.quantitestock) }}
+            {{ form_widget(form.quantitestock, {'attr': {'class': 'form-control', 'placeholder': 'Quantité en stock'}}) }}
+            <div class="text-danger">{{ form_errors(form.quantitestock) }}</div>
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.image) }}
+            {{ form_widget(form.image, {'attr': {'class': 'form-control'}}) }}
+            <div class="text-danger">{{ form_errors(form.image) }}</div>
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.categorie) }}
+            {{ form_widget(form.categorie, {'attr': {'class': 'form-control'}}) }}
+            <div class="text-danger">{{ form_errors(form.categorie) }}</div>
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.datecreation) }}
+            {{ form_widget(form.datecreation, {'attr': {'class': 'form-control'}}) }}
+            <div class="text-danger">{{ form_errors(form.datecreation) }}</div>
+        </div>
+
+        <button type="submit" class="btn btn-success w-100">Modifier</button>
+
+        {{ form_end(form) }}
+    </div>
+</div>
 {% endblock %}

@@ -1,41 +1,64 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Commande index{% endblock %}
+{% block title %}Gestion des Commandes{% endblock %}
 
 {% block body %}
-    <h1>Commande index</h1>
+    <div class="container">
+        <h1 class="my-4 text-center">Liste des Commandes</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Quantitecmd</th>
-                <th>Prix</th>
-                <th>Datecmd</th>
-                <th>Statut</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for commande in commandes %}
-            <tr>
-                <td>{{ commande.id }}</td>
-                <td>{{ commande.quantitecmd }}</td>
-                <td>{{ commande.prix }}</td>
-                <td>{{ commande.datecmd ? commande.datecmd|date('Y-m-d') : '' }}</td>
-                <td>{{ commande.statut }}</td>
-                <td>
-                    <a href="{{ path('app_commande_show', {'id': commande.id}) }}">show</a>
-                    <a href="{{ path('app_commande_edit', {'id': commande.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        <!-- Tableau des commandes -->
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Produit</th>
+                    <th>Quantité</th>
+                    <th>Prix</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for commande in commandes %}
+                    <tr>
+                        <td>{{ commande.id }}</td>
+                        <td>
+                            {% for produit in commande.produit %}
+                                {{ produit.nom }}{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for produit in commande.produit %}
+                               {{ commande.getQuantiteProduit(produit) }}{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
+                      
+                        <td>{{ commande.prix }} dt</td>
+                        <td>{{ commande.datecmd ? commande.datecmd|date('Y-m-d') : 'N/A' }}</td>
+                        <td>{{ commande.statut }}</td>
+                        <td>
+                            <a href="{{ path('app_commande_show', {'id': commande.id}) }}" class="btn btn-info btn-sm">Afficher</a>
+                            <a href="{{ path('app_commande_edit', {'id': commande.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
 
-    <a href="{{ path('app_commande_new') }}">Create new</a>
+                            {% if commande.statut == 'En attente' %}
+                                <!-- Formulaire de suppression avec confirmation -->
+                                <form method="post" action="{{ path('app_commande_delete', {'id': commande.id}) }}" class="d-inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ commande.id) }}">
+                                    <button class="btn btn-danger btn-sm" type="submit">Supprimer</button>
+                                </form>
+                            {% else %}
+                                <!-- Bouton de suppression désactivé ou caché -->
+                                <button class="btn btn-danger btn-sm" type="button" disabled>Supprimer</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">Aucune commande trouvée.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
