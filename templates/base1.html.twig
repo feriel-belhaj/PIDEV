@@ -48,7 +48,11 @@
         {% endblock %}
     </head>
 
-<div class="container-fluid nav-bar">
+
+
+    <body>
+    <!-- **************************NAVBAR***************************** -->
+            <div class="container-fluid nav-bar">
             <div class="container">
                 <nav class="navbar navbar-light navbar-expand-lg py-4">
                     <a href="{{asset('index.html')}}" class="navbar-brand">
@@ -63,7 +67,7 @@
                             <a href="{{asset('about.html')}}" class="nav-item nav-link">About</a>
                             <a href="{{asset('service.html')}}" class="nav-item nav-link">Services</a>
                             <a href="{{asset('event.html')}}" class="nav-item nav-link">Events</a>
-                            <a href="{{asset('produit')}}" class="nav-item nav-link">produit</a>
+                            <a href="{{asset('produit')}}" class="nav-item nav-link">Produit</a>
                             <div class="nav-item dropdown">
                                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
                                 <div class="dropdown-menu bg-light">
@@ -78,43 +82,10 @@
                         </div>
                         <button class="btn-search btn btn-primary btn-md-square me-4 rounded-circle d-none d-lg-inline-flex" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fas fa-search"></i></button>
                         <a href="" class="btn btn-primary py-2 px-4 d-none d-xl-inline-block rounded-pill">Book Now</a>
-                        
-                        
-                        <!-- User Profile Dropdown -->
-                        <div class="dropdown d-inline-block ms-3">
-                            <button class="btn btn-light rounded-circle p-0 border-0" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="" alt="User" class="rounded-circle" width="40" height="40">
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li>
-                                    <a class="dropdown-item" href="{{ path('app_utilisateur_edit', {id: 1}) }}">
-                                        <i class="fas fa-cog me-2"></i> Paramètres Profil
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item text-danger" href="{{ path('app_utilisateur_edit', {id: 1}) }}">
-                                        <i class="fas fa-sign-out-alt me-2"></i> Se Déconnecter
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                        <!-- FIN User Profile Dropdown -->
-                    
-                    
                     </div>
                 </nav>
             </div>
         </div>
-
-    
-        <!-- **************************BLOCK BODY***************************** -->
-        {% block body %}
-        
-        
-        
-        <body>
-    <!-- **************************NAVBAR***************************** -->
-            
         <!-- **************************END NAVBAR***************************** -->
 
 
@@ -1546,13 +1517,11 @@
             </div>
         </div>
 
-        </body>
-        
-        
-        
-        {% endblock %}
+
+        <!-- **************************BLOCK BODY***************************** -->
+        {% block body %}{% endblock %}
         <!-- **************************END BLOCK BODY***************************** -->
-    
+    </body>
 
 
 
