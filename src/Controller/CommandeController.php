@@ -222,37 +222,25 @@ public function edit(Request $request, Commande $commande, EntityManagerInterfac
                 'expanded' => false,
                 'multiple' => false,
                 'attr' => [
-                    'class' => 'form-control', 
+                    'class' => 'form-control',
                 ]
             ])
-            ->add('prix', NumberType::class, [
-                'attr' => [
-                    'class' => 'form-control',
-                    'step' => '0.01',
-                    'min' => '0',
-                ],
-                'constraints' => [
-                    new Assert\Positive(message: 'Le prix doit être un nombre positif.'),
-                    new Assert\LessThanOrEqual([
-                        'value' => $commande->getPrix(),
-                        'message' => 'Le prix ne peut pas être supérieur au prix initial.',
-                    ]),
-                ],
-            ])
+            // Le champ prix est supprimé
             ->getForm();
-
+    
         $form->handleRequest($request);
-
+    
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-
+    
             $this->addFlash('success', 'Statut de la commande mis à jour avec succès.');
             return $this->redirectToRoute('admin_commande_index'); 
         }
-
+    
         return $this->render('commande/admin_commande_edit.html.twig', [
             'form' => $form->createView(),
             'commande' => $commande,
         ]);
     }
+    
 }

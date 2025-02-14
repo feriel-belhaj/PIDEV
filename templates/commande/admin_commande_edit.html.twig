@@ -1,14 +1,14 @@
 {% extends 'baseBack.html.twig' %}
 
-{% block title %}Modifier le statut et le prix de la commande{% endblock %}
+{% block title %}Modifier le statut de la commande{% endblock %}
 
 {% block body %}
     <div class="container my-5">
-        <h1 class="text-center mb-4">Modifier le statut et le prix de la commande #{{ commande.id }}</h1>
+        <h1 class="text-center mb-4">Modifier le statut de la commande #{{ commande.id }}</h1>
 
         <div class="card shadow-sm">
             <div class="card-body">
-                <!-- Formulaire de modification du statut et prix avec novalidate -->
+                <!-- Formulaire de modification du statut avec novalidate -->
                 {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
 
                     <!-- Champ Statut -->
@@ -20,23 +20,8 @@
                         </div>
                     </div>
 
-                    <!-- Champ Prix -->
-                    <div class="form-group mb-3">
-                        {{ form_label(form.prix, 'Prix de la commande', {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(form.prix, {
-                            'attr': {
-                                'class': 'form-control',
-                                'step': '0.01',
-                                'min': '0'
-                            }
-                        }) }}
-                        <div class="text-danger">
-                            {{ form_errors(form.prix) }}
-                        </div>
-                    </div>
-
                     <!-- Bouton de soumission -->
-                    <button type="submit" class="btn btn-success w-100">Mettre à jour le statut et le prix</button>
+                    <button type="submit" class="btn btn-success w-100">Mettre à jour le statut</button>
 
                 {{ form_end(form) }}
             </div>
