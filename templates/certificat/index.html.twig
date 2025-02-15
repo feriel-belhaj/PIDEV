@@ -1,41 +1,111 @@
-{% extends 'base.html.twig' %}
+{% extends 'baseBack.html.twig' %}
 
-{% block title %}Certificat index{% endblock %}
+{% block title %}Liste des Certificats{% endblock %}
 
 {% block body %}
-    <h1>Certificat index</h1>
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Liste des Certificats</h6>
+            <a href="{{ path('app_certificat_new') }}" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus"></i> Ajouter un certificat
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Prénom</th>
+                            <th>Date d'obtention</th>
+                            <th>Niveau</th>
+                            <th>Nom organisme</th>
+                            <th>Formation</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for certificat in certificats %}
+                            <tr>
+                                <td>{{ certificat.id }}</td>
+                                <td>{{ certificat.nom }}</td>
+                                <td>{{ certificat.prenom }}</td>
+                                <td>{{ certificat.dateobt ? certificat.dateobt|date('d/m/Y') : '' }}</td>
+                                <td>
+                                    {% if certificat.niveau == 'debutant' %}
+                                        <span class="badge bg-success">Débutant</span>
+                                    {% elseif certificat.niveau == 'intermediaire' %}
+                                        <span class="badge bg-warning">Intermédiaire</span>
+                                    {% elseif certificat.niveau == 'avance' %}
+                                        <span class="badge bg-danger">Avancé</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ certificat.nomorganisme }}</td>
+                                <td>{{ certificat.formation.titre }}</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ path('app_certificat_show', {'id': certificat.id}) }}" class="btn btn-info btn-sm" title="Voir">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ path('app_certificat_edit', {'id': certificat.id}) }}" class="btn btn-warning btn-sm" title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form method="post" action="{{ path('app_certificat_delete', {'id': certificat.id}) }}" style="display: inline-block" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce certificat ?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ certificat.id) }}">
+                                            <button class="btn btn-danger btn-sm" title="Supprimer">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center">Aucun certificat trouvé</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nom</th>
-                <th>Dateobt</th>
-                <th>Niveau</th>
-                <th>Nomorganisme</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for certificat in certificats %}
-            <tr>
-                <td>{{ certificat.id }}</td>
-                <td>{{ certificat.nom }}</td>
-                <td>{{ certificat.dateobt ? certificat.dateobt|date('Y-m-d') : '' }}</td>
-                <td>{{ certificat.niveau }}</td>
-                <td>{{ certificat.nomorganisme }}</td>
-                <td>
-                    <a href="{{ path('app_certificat_show', {'id': certificat.id}) }}">show</a>
-                    <a href="{{ path('app_certificat_edit', {'id': certificat.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+<style>
+    .badge {
+        padding: 0.5em 1em;
+        font-size: 0.875em;
+        border-radius: 0.25rem;
+    }
+    .bg-success { background-color: #28a745 !important; color: white; }
+    .bg-warning { background-color: #ffc107 !important; color: black; }
+    .bg-danger { background-color: #dc3545 !important; color: white; }
+    
+    .btn-group .btn {
+        margin: 0 2px;
+    }
+    
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0,0,0,.05);
+    }
+    
+    .card-header {
+        background-color: #f8f9fc;
+        border-bottom: 1px solid #e3e6f0;
+    }
+</style>
 
-    <a href="{{ path('app_certificat_new') }}">Create new</a>
+{% block javascripts %}
+<script>
+    $(document).ready(function() {
+        $('#dataTable').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/French.json"
+            }
+        });
+    });
+</script>
+{% endblock %}
 {% endblock %}

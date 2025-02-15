@@ -6,6 +6,7 @@
 parameters:
     uploads_directory: '%kernel.project_dir%/public/uploads'
     partenariat_images_directory: '%kernel.project_dir%/public/uploads/partenariats'
+    formation_images_directory: '%kernel.project_dir%/public/uploads/formation_images'
 
 services:
     Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator: '@security.authenticator.form_login.main'

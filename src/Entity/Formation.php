@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FormationRepository::class)]
 class Formation
@@ -22,11 +23,11 @@ class Formation
     #[ORM\Column(length: 255)]
     private ?string $description = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $datedeb = null;
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: false)]
+    private ?\DateTimeInterface $datedeb;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $datefin = null;
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: false)]
+    private ?\DateTimeInterface $datefin;
 
     #[ORM\Column(length: 255)]
     private ?string $niveau = null;
@@ -49,18 +50,27 @@ class Formation
     #[ORM\Column(length: 255)]
     private ?string $duree = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $image = null;
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $image;
 
     /**
      * @var Collection<int, Utilisateur>
      */
-    #[ORM\ManyToMany(targetEntity: Utilisateur::class, mappedBy: 'formation')]
+    #[ORM\ManyToMany(targetEntity: Utilisateur::class, mappedBy: 'formations')]
     private Collection $utilisateurs;
+
+     /**
+     * @var Collection<int, Certificat>
+     */
+    #[ORM\OneToMany(targetEntity: Certificat::class, mappedBy: 'formation', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $certificats;
 
     public function __construct()
     {
         $this->utilisateurs = new ArrayCollection();
+        $this->certificats = new ArrayCollection();
+        $this->datedeb = new \DateTime();
+        $this->datefin = new \DateTime();
     }
 
     public function getId(): ?int
@@ -205,10 +215,9 @@ class Formation
         return $this->image;
     }
 
-    public function setImage(string $image): static
+    public function setImage(?string $image): self
     {
         $this->image = $image;
-
         return $this;
     }
 

@@ -30,7 +30,7 @@ class Don
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?evenement $evenement = null;
+    private ?Evenement $evenement = null;
 
     public function getId(): ?int
     {

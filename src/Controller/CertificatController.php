@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Controller;
-
+use App\Entity\Formation;
 use App\Entity\Certificat;
 use App\Form\CertificatType;
 use App\Repository\CertificatRepository;
@@ -26,6 +26,8 @@ final class CertificatController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $certificat = new Certificat();
+        $certificat->setDateobt(new \DateTime());
+        
         $form = $this->createForm(CertificatType::class, $certificat);
         $form->handleRequest($request);
 
@@ -53,6 +55,23 @@ final class CertificatController extends AbstractController
     #[Route('/{id}/edit', name: 'app_certificat_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Certificat $certificat, EntityManagerInterface $entityManager): Response
     {
+        // Vérifier et initialiser les champs si null
+        if ($certificat->getNom() === null) {
+            $certificat->setNom('');
+        }
+        if ($certificat->getPrenom() === null) {
+            $certificat->setPrenom('');
+        }
+        if ($certificat->getDateobt() === null) {
+            $certificat->setDateobt(new \DateTime());
+        }
+        if ($certificat->getNiveau() === null) {
+            $certificat->setNiveau('');
+        }
+        if ($certificat->getNomorganisme() === null) {
+            $certificat->setNomorganisme('');
+        }
+
         $form = $this->createForm(CertificatType::class, $certificat);
         $form->handleRequest($request);
 

@@ -1,4 +1,201 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .form-label {
+        color: #000;
+        font-weight: bold;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-error {
+        color: #dc3545;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+        font-style: italic;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+
+    .btn-submit {
+        background-color: #dc3545;
+        border: none;
+        padding: 0.75rem 2rem;
+        color: white;
+        border-radius: 5px;
+        font-weight: bold;
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        background-color: #c82333;
+        transform: translateY(-2px);
+    }
+</style>
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+{% endblock %}
+
+{{ form_start(form, {'attr': {'class': 'form-container', 'novalidate': 'novalidate'}}) }}
+<table class="table">
+    <tr>
+        <td>{{ form_label(form.nom, "Nom", {'label_attr': {'class': 'form-label'}}) }}</td>
+        <td>{{ form_widget(form.nom, {
+            'attr': {
+                'class': 'form-control' ~ (form_errors(form.nom) ? ' is-invalid' : ''),
+                'placeholder': 'Entrez le nom'
+            }
+        }) }}</td>
+        <td><div class="form-error">{{ form_errors(form.nom) }}</div></td>
+    </tr>
+    <tr>
+        <td>{{ form_label(form.prenom, "Prénom", {'label_attr': {'class': 'form-label'}}) }}</td>
+        <td>{{ form_widget(form.prenom, {
+            'attr': {
+                'class': 'form-control' ~ (form_errors(form.prenom) ? ' is-invalid' : ''),
+                'placeholder': 'Entrez le prénom'
+            }
+        }) }}</td>
+        <td><div class="form-error">{{ form_errors(form.prenom) }}</div></td>
+    </tr>
+    <tr>
+        <td>{{ form_label(form.dateobt, "Date d'obtention", {'label_attr': {'class': 'form-label'}}) }}</td>
+        <td>{{ form_widget(form.dateobt, {
+            'attr': {
+                'class': 'form-control js-datepicker' ~ (form_errors(form.dateobt) ? ' is-invalid' : ''),
+                'autocomplete': 'off'
+            }
+        }) }}</td>
+        <td><div class="form-error">{{ form_errors(form.dateobt) }}</div></td>
+    </tr>
+    <tr>
+        <td>{{ form_label(form.niveau, "Niveau", {'label_attr': {'class': 'form-label'}}) }}</td>
+        <td>
+            {{ form_widget(form.niveau, {
+                'attr': {
+                    'class': 'form-select' ~ (form_errors(form.niveau) ? ' is-invalid' : '')
+                }
+            }) }}
+        </td>
+        <td><div class="form-error">{{ form_errors(form.niveau) }}</div></td>
+    </tr>
+    <tr>
+        <td>{{ form_label(form.nomorganisme, "Nom de l'organisme", {'label_attr': {'class': 'form-label'}}) }}</td>
+        <td>{{ form_widget(form.nomorganisme, {
+            'attr': {
+                'class': 'form-control' ~ (form_errors(form.nomorganisme) ? ' is-invalid' : ''),
+                'placeholder': 'Entrez le nom de l\'organisme'
+            }
+        }) }}</td>
+        <td><div class="form-error">{{ form_errors(form.nomorganisme) }}</div></td>
+    </tr>
+    <tr>
+        <td>{{ form_label(form.formation, "Formation", {'label_attr': {'class': 'form-label'}}) }}</td>
+        <td>{{ form_widget(form.formation, {
+            'attr': {
+                'class': 'form-select' ~ (form_errors(form.formation) ? ' is-invalid' : '')
+            }
+        }) }}</td>
+        <td><div class="form-error">{{ form_errors(form.formation) }}</div></td>
+    </tr>
+</table>
+
+<div class="text-center mt-4">
+    {{ form_widget(form.save, {'attr': {'class': 'btn-submit'}}) }}
+</div>
+
 {{ form_end(form) }}
+
+{% block javascripts %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <script>
+        // Datepicker initialization
+        $(document).ready(function() {
+            $('.js-datepicker').datepicker({
+                dateFormat: 'dd/mm/yy',
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "-100:+0",
+                firstDay: 1,
+                dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+                dayNamesMin: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
+                monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+                monthNamesShort: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
+            });
+        });
+
+        // Form validation
+        document.addEventListener('DOMContentLoaded', function() {
+            function validateField(field) {
+                const value = field.value;
+                const fieldName = field.getAttribute('name').replace('certificat[', '').replace(']', '');
+                
+                const rules = {
+                    'nom': /^[a-zA-ZÀ-ÿ\s]{3,}$/.test(value), // Lettres uniquement, min 3 caractères
+                    'prenom': /^[a-zA-ZÀ-ÿ\s]{3,}$/.test(value), // Lettres uniquement, min 3 caractères
+                    'niveau': value !== '',
+                    'nomorganisme': value.length >= 3,
+                    'formation': value !== ''
+                };
+
+                const errorMessages = {
+                    'nom': 'Le nom doit contenir au moins 3 lettres et ne peut contenir que des lettres.',
+                    'prenom': 'Le prénom doit contenir au moins 3 lettres et ne peut contenir que des lettres.',
+                    'niveau': 'Veuillez sélectionner un niveau.',
+                    'nomorganisme': 'Le nom de l\'organisme doit contenir au moins 3 caractères.',
+                    'formation': 'Veuillez sélectionner une formation.'
+                };
+
+                const errorContainer = field.closest('tr').querySelector('.form-error');
+                
+                if (rules[fieldName] !== undefined) {
+                    if (rules[fieldName]) {
+                        field.classList.remove('is-invalid');
+                        field.classList.add('is-valid');
+                        if (errorContainer) {
+                            errorContainer.textContent = '';
+                        }
+                    } else {
+                        field.classList.remove('is-valid');
+                        field.classList.add('is-invalid');
+                        if (errorContainer) {
+                            errorContainer.textContent = errorMessages[fieldName];
+                        }
+                    }
+                }
+            }
+
+            const form = document.querySelector('form');
+            const inputs = form.querySelectorAll('input, select');
+            
+            inputs.forEach(input => {
+                ['input', 'change'].forEach(eventType => {
+                    input.addEventListener(eventType, function() {
+                        validateField(this);
+                    });
+                });
+            });
+        });
+    </script>
+{% endblock %}
