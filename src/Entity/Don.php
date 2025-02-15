@@ -25,11 +25,11 @@ class Don
     #[ORM\Column(length: 255)]
     private ?string $paymentref = null;
 
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(length: 500, nullable: true)]
     private ?string $message = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'dons')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Evenement $evenement = null;
 
     public function getId(): ?int
@@ -86,12 +86,12 @@ class Don
         return $this;
     }
 
-    public function getEvenement(): ?evenement
+    public function getEvenement(): ?Evenement
     {
         return $this->evenement;
     }
 
-    public function setEvenement(?evenement $evenement): static
+    public function setEvenement(?Evenement $evenement): static
     {
         $this->evenement = $evenement;
 
