@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'baseBack.html.twig' %}
 
 {% block title %}Gestion des Commandes{% endblock %}
 
@@ -39,9 +39,9 @@
                                     <td rowspan="{{ rowCount }}">{{ commande.datecmd ? commande.datecmd|date('Y-m-d') : 'N/A' }}</td>
                                     <td rowspan="{{ rowCount }}">{{ commande.statut }}</td>
                                     <td rowspan="{{ rowCount }}">
-                                        <a href="{{ path('app_commande_edit', {'id': commande.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
+                                        <a href="{{ path('admin_commande_edit', {'id': commande.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
 
-                                        <form method="post" action="{{ path('app_commande_delete', {'id': commande.id}) }}" class="d-inline">
+                                        <form method="post" action="{{ path('admin_commande_delete', {'id': commande.id}) }}" class="d-inline">
                                             <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ commande.id) }}">
                                             <button class="btn btn-danger btn-sm" type="submit">Supprimer</button>
                                         </form>
