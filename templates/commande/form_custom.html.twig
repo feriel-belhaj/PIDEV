@@ -1,0 +1,67 @@
+{% block form_widget %}
+ 
+ 
+
+ <!-- Formulaire d'ajout de commande -->
+        <div class="card mt-5 shadow-lg">
+            <div class="card-header bg-primary text-white text-center">
+                <h2>Passer une nouvelle commande</h2>
+            </div>
+            <div class="card-body">
+                <form action="{{ path('app_commande_new') }}" method="post">
+                    <div id="produits-container">
+                        <div class="row g-3 produit-row">
+                            <!-- Catégorie -->
+                            <div class="col-lg-4">
+                                <label class="form-label">Catégorie</label>
+                                {{ dump(categories) }}
+                                <select name="categorie[]" class="form-select categorie">
+                                    <option selected disabled>Choisissez une catégorie</option>
+                                    {% for categorie in categories2 %}
+                                        <option value="{{ categorie }}">{{ categorie }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+{{ dump(produits) }}
+                            <!-- Produit -->
+                            <div class="col-lg-4">
+                                <label class="form-label">Produit</label>
+                                <select name="produit[]" class="form-select produit">
+                                    <option selected disabled>Choisissez un produit</option>
+
+                                    {% for produit in produits %}
+                                        <option value="{{ produit.id }}" data-categorie="{{ produit.categorie }}">
+                                            {{ produit.nom }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Quantité -->
+                            <div class="col-lg-3">
+                                <label class="form-label">Quantité</label>
+                                <input type="number" name="quantite[]" class="form-control" min="1" required>
+                            </div>
+
+                            <div class="col-lg-1 d-flex align-items-end">
+                                <button type="button" class="btn btn-danger remove-product" style="display:none;">✖</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bouton d'ajout d'un produit -->
+                    <div class="text-center mt-3">
+                        <button type="button" id="add-product" class="btn btn-secondary">+ Ajouter un autre produit</button>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <a href="{{ path('app_commande_index') }}" class="btn btn-secondary">Back to list</a>
+                        <button type="submit" class="btn btn-success btn-lg">Valider la commande</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+{% endblock %}

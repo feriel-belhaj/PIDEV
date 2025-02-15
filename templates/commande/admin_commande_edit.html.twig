@@ -1,0 +1,35 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Modifier le statut de la commande{% endblock %}
+
+{% block body %}
+    <div class="container my-5">
+        <h1 class="text-center mb-4">Modifier le statut de la commande #{{ commande.id }}</h1>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <!-- Formulaire de modification du statut avec novalidate -->
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+                    <!-- Champ Statut -->
+                    <div class="form-group mb-3">
+                        {{ form_label(form.statut, 'Statut de la commande', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.statut, {'attr': {'class': 'form-control custom-select'}}) }}
+                        <div class="text-danger">
+                            {{ form_errors(form.statut) }}
+                        </div>
+                    </div>
+
+                    <!-- Bouton de soumission -->
+                    <button type="submit" class="btn btn-success w-100">Mettre à jour le statut</button>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+        
+        <!-- Retour à la liste des commandes -->
+        <div class="mt-4 text-center">
+            <a href="{{ path('admin_commande_index') }}" class="btn btn-outline-primary">Retour à la liste</a>
+        </div>
+    </div>
+{% endblock %}

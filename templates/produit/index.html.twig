@@ -3,45 +3,83 @@
 {% block title %}Produit index{% endblock %}
 
 {% block body %}
-    <h1>Produit index</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nom</th>
-                <th>Description</th>
-                <th>Prix</th>
-                <th>Quantitestock</th>
-                <th>Image</th>
-                <th>Categorie</th>
-                <th>Datecreation</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for produit in produits %}
-            <tr>
-                <td>{{ produit.id }}</td>
-                <td>{{ produit.nom }}</td>
-                <td>{{ produit.description }}</td>
-                <td>{{ produit.prix }}</td>
-                <td>{{ produit.quantitestock }}</td>
-                <td>{{ produit.image }}</td>
-                <td>{{ produit.categorie }}</td>
-                <td>{{ produit.datecreation ? produit.datecreation|date('Y-m-d') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_produit_show', {'id': produit.id}) }}">show</a>
-                    <a href="{{ path('app_produit_edit', {'id': produit.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="9">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    
 
-    <a href="{{ path('app_produit_new') }}">Create new</a>
+    <!-- Menu Start -->
+    <div class="container-fluid menu bg-light py-6 my-6">
+        <div class="container">
+            <div class="text-center wow bounceInUp" data-wow-delay="0.1s">
+                <small class="d-inline-block fw-bold text-dark text-uppercase bg-light border border-primary rounded-pill px-4 py-1 mb-3">notre catalogue</small>
+                <h1 class="display-5 mb-5">Most Popular artistic products </h1>
+            </div>
+
+            <div class="tab-class text-center">
+                <!-- Formulaire unique pour commander plusieurs produits -->
+                <form action="{{ path('app_commande_new') }}" method="post">
+                    
+                    <!-- Navigation par catégories -->
+                    <ul class="nav nav-pills d-inline-flex justify-content-center mb-5 wow bounceInUp" data-wow-delay="0.1s">
+                        {% for categorie in categories %}
+                            <li class="nav-item p-2">
+                                <a class="d-flex py-2 mx-2 border border-primary bg-white rounded-pill {% if loop.index == 1 %} active {% endif %}" 
+                                   data-bs-toggle="pill" href="#{{ categorie }}">
+                                    <span class="text-dark" style="width: 150px;">{{ categorie }}</span>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                    <!-- Contenu des catégories -->
+                    <div class="tab-content">
+                        {% for categorie in categories %}
+                            <div id="{{ categorie }}" class="tab-pane fade show p-0 {% if loop.index == 1 %} active {% endif %}">
+                                <div class="row g-4">
+                                    {% for produit in produits %}
+                                        {% if produit.categorie == categorie %}
+                                            <div class="col-lg-6 wow bounceInUp" data-wow-delay="0.1s">
+                                                <div class="menu-item d-flex align-items-center">
+                                                    <img class="flex-shrink-0 img-fluid rounded-circle" 
+                                                         src="{{ asset('uploads/' ~ produit.image) }}" 
+                                                         alt="{{ produit.nom }}" 
+                                                         style="width: 100px; height: 100px; object-fit: cover;">
+                                                    <div class="w-100 d-flex flex-column text-start ps-4">
+                                                        <div class="d-flex justify-content-between border-bottom border-primary pb-2 mb-2">
+                                                            <h4>{{ produit.nom }}</h4>
+                                                            <h4 class="text-primary">{{ produit.prix }}dt</h4>
+                                                        </div>
+                                                        <p class="mb-0">{{ produit.description }}</p>
+
+                                                        <!-- Champ pour sélectionner la quantité -->
+                                                        <div class="input-group mt-2">
+                                                            <input type="hidden" name="produits[{{ produit.id }}][id]" value="{{ produit.id }}">
+                                                            <input type="number" name="produits[{{ produit.id }}][quantite]" class="form-control" placeholder="Quantité" min="0">
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Bouton global pour commander tous les produits sélectionnés -->
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-lg btn-primary">Commander</button>
+                    </div>
+
+                    <!-- Nouveau bouton pour rediriger vers la liste des commandes juste en dessous du bouton "Commander" -->
+                    <div class="text-center mt-2">
+                        <a href="{{ path('app_commande_index') }}" class="btn btn-secondary btn-sm">Voir mes commandes</a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Menu End -->
+
 {% endblock %}
