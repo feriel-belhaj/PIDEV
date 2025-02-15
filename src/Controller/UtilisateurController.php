@@ -17,10 +17,11 @@ final class UtilisateurController extends AbstractController
     #[Route(name: 'app_utilisateur_index', methods: ['GET'])]
     public function index(UtilisateurRepository $utilisateurRepository): Response
     {
-        return $this->render('baseBack.html.twig', [
+        return $this->render('base.html.twig', [
             'utilisateurs' => $utilisateurRepository->findAll(),
         ]);
-    }
+    } 
+    
 
     #[Route('/new', name: 'app_utilisateur_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
@@ -39,6 +40,14 @@ final class UtilisateurController extends AbstractController
         return $this->render('utilisateur/new.html.twig', [
             'utilisateur' => $utilisateur,
             'form' => $form,
+        ]);
+    }
+
+    #[Route('/back', name: 'app_utilisateurback_index', methods: ['GET'])]
+    public function indexbackback(UtilisateurRepository $utilisateurRepository): Response
+    {
+        return $this->render('baseBack.html.twig', [
+            'utilisateurs' => $utilisateurRepository->findAll(),
         ]);
     }
 
