@@ -1,0 +1,102 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Utilisateur{% endblock %}
+{% block javascripts %}
+<script src="{{ asset('js/app.js') }}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+        setTimeout(function() {
+            const passwordField = document.getElementById('utilisateur_password_first');
+            const confirmPasswordField = document.getElementById('utilisateur_password_second');
+            const passwordMatchMessage = document.getElementById('password-match');
+            
+            
+
+            confirmPasswordField.addEventListener('input', function() {
+                if (confirmPasswordField.value === passwordField.value) {
+                    passwordMatchMessage.textContent = 'Les mots de passe correspondent';
+                    passwordMatchMessage.style.color = 'green';
+                } else {
+                    passwordMatchMessage.textContent = 'Les mots de passe ne correspondent pas';
+                    passwordMatchMessage.style.color = 'red';
+                }
+            });
+        }, 100);  
+    });
+    
+</script>
+{% endblock %}
+
+{% block body %}
+
+    <div class="d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+            {% if utilisateur.image %}
+                <img src="{{ asset('uploads/' ~ utilisateur.image) }}" alt="User Photo" class="img-fluid" style="max-width: 60px; height: auto; margin-right: 10px;">
+            {% else %}
+                <p>No photo available</p>
+            {% endif %}
+            <h1>{{ utilisateur.prenom }}</h1>
+            <h1 style="margin-left: 10px;">{{ utilisateur.nom }}</h1>
+        </div>
+
+        <div class="d-flex align-items-center">
+            
+
+            <div class="action-line">
+                <form action="{{ path('app_utilisateur_delete', {'id': utilisateur.id}) }}" method="POST" style="display:inline;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ utilisateur.id) }}">
+                    <button type="submit">
+                        <img src="{{ asset('img/avatars/delete.png') }}" width="25px" height="25px" alt="Supprimer">
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+                        {{ form_widget(form.nom, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Nom'}, 'label': false}) }}
+                        {{ form_errors(form.nom) }}
+
+                        {{ form_widget(form.prenom, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Prénom'}, 'label': false}) }}
+                        {{ form_errors(form.prenom) }}
+
+                        {{ form_widget(form.email, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Email'}, 'label': false}) }}
+                        {{ form_errors(form.email) }}
+
+
+                        {{ form_widget(form.password.first, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Mot de passe'}, 'label': false}) }}
+                        {{ form_errors(form.password.first) }}
+
+                        {{ form_widget(form.password.second, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Confirmer le mot de passe'}, 'label': false}) }}
+                        {{ form_errors(form.password.second) }}
+                        <div id="password-match"></div>
+
+
+                        {{ form_widget(form.adresse, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Adresse'}, 'label': false}) }}
+                        {{ form_errors(form.adresse) }}
+
+                        {{ form_widget(form.telephone, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Téléphone'}, 'label': false}) }}
+                        {{ form_errors(form.telephone) }}
+                        
+                        {{ form_widget(form.sexe, {'attr': {'class': 'sexe-options'}}) }}
+                        {{ form_errors(form.sexe) }}
+                        <br>
+                        {{ form_widget(form.role, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Role'}, 'label': false}) }}
+                        {{ form_errors(form.role) }}
+
+                        {{ form_widget(form.imageFile, {'attr': {'class': 'form-control mb-4', 'label': false}}) }}
+                        {{ form_errors(form.imageFile) }}
+
+
+                        <button type="submit" class="btn btn-primary mt-3">Mettre à jour</button>
+
+                        {{ form_end(form) }}
+
+
+
+
+    <a href="{{ path('app_utilisateur_back') }}">back to list</a>
+
+
+{% endblock %}

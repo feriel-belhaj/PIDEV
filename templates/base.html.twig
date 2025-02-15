@@ -32,6 +32,12 @@
         <link href="{{asset('css/style.css')}}" rel="stylesheet">
         
         {% block stylesheets %}
+        <style>
+            .logo {
+                height: 90px; /* Ajuste la hauteur de l'image */
+                width: auto; /* Garde les proportions */
+            }
+        </style>
         {% endblock %}
 
         {% block javascripts %}
@@ -47,17 +53,27 @@
             <script src="{{asset('js/main.js')}}"></script>
         {% endblock %}
     </head>
+<style>
+    .logo {
+        height: 90px; /* Ajuste la hauteur de l'image */
+        width: auto; /* Garde les proportions */
+    }
+</style>
 
-
-
-    <body>
-    <!-- **************************NAVBAR***************************** -->
-            <div class="container-fluid nav-bar">
+<div class="container-fluid nav-bar">
             <div class="container">
                 <nav class="navbar navbar-light navbar-expand-lg py-4">
-                    <a href="{{asset('index.html')}}" class="navbar-brand">
-                        <h1 class="text-primary fw-bold mb-0">Cater<span class="text-dark">Serv</span> </h1>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('app_utilisateur_back') }}" class="btn btn-success position-fixed bottom-0 end-0 m-3" style="width: 70px; height: 70px; font-size: 35px; border-radius: 50%; text-align: center; display: flex; justify-content: center; align-items: center;">
+                            <i class="fas fa-cogs"></i>
+                        </a>
+                    {% endif %}
+
+                    <a href="{{ path('app_home') }}" class="navbar-brand">
+                        
+                        <h1 class="text-primary fw-bold mb-0">Arti<span class="text-dark">Zina</span> </h1>
                     </a>
+
                     <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                         <span class="fa fa-bars text-primary"></span>
                     </button>
@@ -66,14 +82,15 @@
                             <a href="{{asset('index.html')}}" class="nav-item nav-link active">Home</a>
                             <a href="{{asset('about.html')}}" class="nav-item nav-link">About</a>
                             <a href="{{asset('service.html')}}" class="nav-item nav-link">Services</a>
+                            <a href="{{ path('app_partenariat_index')}}" class="nav-item nav-link">Partenariats</a>
+
                             <a href="{{asset('event.html')}}" class="nav-item nav-link">Events</a>
                             <a href="{{asset('menu.html')}}" class="nav-item nav-link">Menu</a>
                             <div class="nav-item dropdown">
                                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
                                 <div class="dropdown-menu bg-light">
-                                    <a href="{{asset('book.html')}}" class="dropdown-item">Booking</a>
                                     <a href="{{asset('blog.html')}}" class="dropdown-item">Our Blog</a>
-                                    <a href="{{asset('team.html')}}" class="dropdown-item">Our Team</a>
+                                    <a href="{{ path('app_candidature_index') }}" class="dropdown-item">Candidature</a>
                                     <a href="{{asset('testimonial.html')}}" class="dropdown-item">Testimonial</a>
                                     <a href="{{asset('404.html')}}" class="dropdown-item">404 Page</a>
                                 </div>
@@ -82,10 +99,50 @@
                         </div>
                         <button class="btn-search btn btn-primary btn-md-square me-4 rounded-circle d-none d-lg-inline-flex" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fas fa-search"></i></button>
                         <a href="" class="btn btn-primary py-2 px-4 d-none d-xl-inline-block rounded-pill">Book Now</a>
+                        
+                        
+                        <!-- User Profile Dropdown -->
+                        {% if app.user %}
+                        <div class="dropdown d-inline-block ms-3">
+                            <button class="btn btn-light rounded-circle p-0 border-0" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                 <h5 class=" animated bounceInDown">{{ app.user.prenom }}</h5>
+                                <img src="{{ asset('uploads/' ~ app.user.image) }}" alt="User" class="rounded-circle" width="40" height="40">
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="{{ path('app_utilisateur_edit', {id: app.user.id}) }}">
+                                        <i class="fas fa-cog me-2"></i> Paramètres Profil
+                                    </a>
+                                </li>
+                                <li>
+                                    <form action="{{ path('app_logout') }}" method="POST" style="display: inline;">
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="fas fa-sign-out-alt me-2"></i> Se Déconnecter
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{{ path('app_login') }}" class="btn btn-primary py-2 px-4 d-none d-xl-inline-block rounded-pill">Se Connecter</a>
+                    {% endif %}
+                        <!-- FIN User Profile Dropdown -->
+                    
+                    
                     </div>
                 </nav>
             </div>
         </div>
+
+    
+        <!-- **************************BLOCK BODY***************************** -->
+        {% block body %}
+        
+        
+        
+        <body>
+    <!-- **************************NAVBAR***************************** -->
+            
         <!-- **************************END NAVBAR***************************** -->
 
 
@@ -1517,11 +1574,13 @@
             </div>
         </div>
 
-
-        <!-- **************************BLOCK BODY***************************** -->
-        {% block body %}{% endblock %}
+        </body>
+        
+        
+        
+        {% endblock %}
         <!-- **************************END BLOCK BODY***************************** -->
-    </body>
+    
 
 
 
@@ -1531,8 +1590,8 @@
                 <div class="row">
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-item">
-                            <h1 class="text-primary">Cater<span class="text-dark">Serv</span></h1>
-                            <p class="lh-lg mb-4">There cursus massa at urnaaculis estieSed aliquamellus vitae ultrs condmentum leo massamollis its estiegittis miristum.</p>
+                            <h1 class="text-primary">Arti<span class="text-dark">Zina</span></h1>
+                            <p class="lh-lg mb-4">Artizina est une plateforme web dédiée à l'artisanat tunisien, où tradition et modernité se rencontrent.</p>
                             <div class="footer-icon d-flex">
                                 <a class="btn btn-primary btn-sm-square me-2 rounded-circle" href=""><i class="fab fa-facebook-f"></i></a>
                                 <a class="btn btn-primary btn-sm-square me-2 rounded-circle" href=""><i class="fab fa-twitter"></i></a>
@@ -1541,53 +1600,32 @@
                             </div>
                         </div>
                     </div>
+                    
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-item">
-                            <h4 class="mb-4">Special Facilities</h4>
+                            <h4 class="mb-4">Nos Valeurs</h4>
                             <div class="d-flex flex-column align-items-start">
-                                <a class="text-body mb-3" href=""><i class="fa fa-check text-primary me-2"></i>Cheese Burger</a>
-                                <a class="text-body mb-3" href=""><i class="fa fa-check text-primary me-2"></i>Sandwich</a>
-                                <a class="text-body mb-3" href=""><i class="fa fa-check text-primary me-2"></i>Panner Burger</a>
-                                <a class="text-body mb-3" href=""><i class="fa fa-check text-primary me-2"></i>Special Sweets</a>
-                            </div>
+                                <a class="text-body mb-3" href=""><i class="fa fa-check text-primary me-2"></i>Innovation </a>
+                                <a class="text-body mb-3" href=""><i class="fa fa-check text-primary me-2"></i>Transmission</a>
+                                <a class="text-body mb-3" href=""><i class="fa fa-check text-primary me-2"></i>Accessibilité</a>
+                                <a class="text-body mb-3" href=""><i class="fa fa-check text-primary me-2"></i>Collaboration</a>
+                                <a class="text-body mb-3" href=""><i class="fa fa-check text-primary me-2"></i>Responsabilité</a>
+                                <a class="text-body mb-3" href=""><i class="fa fa-check text-primary me-2"></i>Visibilité</a>
+
+                           </div>
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-item">
-                            <h4 class="mb-4">Contact Us</h4>
+                            <h4 class="mb-4">Contacter nous</h4>
                             <div class="d-flex flex-column align-items-start">
-                                <p><i class="fa fa-map-marker-alt text-primary me-2"></i> 123 Street, New York, USA</p>
-                                <p><i class="fa fa-phone-alt text-primary me-2"></i> (+012) 3456 7890 123</p>
-                                <p><i class="fas fa-envelope text-primary me-2"></i> info@example.com</p>
-                                <p><i class="fa fa-clock text-primary me-2"></i> 26/7 Hours Service</p>
+                                <p><i class="fa fa-map-marker-alt text-primary me-2"></i> 1, 2 rue André Ampère - 2083 - Pôle Technologique - El Ghazala</p>
+                                <p><i class="fa fa-phone-alt text-primary me-2"></i> (+216) 31 548 795</p>
+                                <p><i class="fas fa-envelope text-primary me-2"></i> ArtiZina@gmail.com</p>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="footer-item">
-                            <h4 class="mb-4">Social Gallery</h4>
-                            <div class="row g-2">
-                                <div class="col-4">
-                                     <img src="{{asset('img/menu-01.jpg')}}" class="img-fluid rounded-circle border border-primary p-2" alt="">
-                                </div>
-                                <div class="col-4">
-                                     <img src="{{asset('img/menu-02.jpg')}}" class="img-fluid rounded-circle border border-primary p-2" alt="">
-                                </div>
-                                <div class="col-4">
-                                     <img src="{{asset('img/menu-03.jpg')}}" class="img-fluid rounded-circle border border-primary p-2" alt="">
-                                </div>
-                                <div class="col-4">
-                                     <img src="{{asset('img/menu-04.jpg')}}" class="img-fluid rounded-circle border border-primary p-2" alt="">
-                                </div>
-                                <div class="col-4">
-                                     <img src="{{asset('img/menu-05.jpg')}}" class="img-fluid rounded-circle border border-primary p-2" alt="">
-                                </div>
-                                <div class="col-4">
-                                     <img src="{{asset('img/menu-06.jpg')}}" class="img-fluid rounded-circle border border-primary p-2" alt="">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
         </div>

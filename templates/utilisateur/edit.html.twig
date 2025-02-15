@@ -1,13 +1,114 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Utilisateur{% endblock %}
+{% block title %}Modifier Profil{% endblock %}
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-{% block body %}
-    <h1>Edit Utilisateur</h1>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+        setTimeout(function() {
+            const passwordField = document.getElementById('utilisateur_password_first');
+            const confirmPasswordField = document.getElementById('utilisateur_password_second');
+            const passwordMatchMessage = document.getElementById('password-match');
+            
+            
 
-    {{ include('utilisateur/_form.html.twig', {'button_label': 'Update'}) }}
-
-    <a href="{{ path('app_utilisateur_index') }}">back to list</a>
-
-    {{ include('utilisateur/_delete_form.html.twig') }}
+            confirmPasswordField.addEventListener('input', function() {
+                if (confirmPasswordField.value === passwordField.value) {
+                    passwordMatchMessage.textContent = 'Les mots de passe correspondent';
+                    passwordMatchMessage.style.color = 'green';
+                } else {
+                    passwordMatchMessage.textContent = 'Les mots de passe ne correspondent pas';
+                    passwordMatchMessage.style.color = 'red';
+                }
+            });
+        }, 100);  
+    });
+    
+</script>
 {% endblock %}
+{% block body %}
+
+    <div class="container-fluid contact py-6 wow bounceInUp" data-wow-delay="0.1s">
+        <div class="container">
+            <div class="p-5 bg-light rounded contact-form">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <small class="d-inline-block fw-bold text-dark text-uppercase bg-light border border-primary rounded-pill px-4 py-1 mb-3">Modification</small>
+                        <h1 class="display-5 mb-0">Modifier votre profil, {{ utilisateur.prenom }}</h1>
+                    </div>
+                    <div class="col-md-6 col-lg-7">
+                        <p class="mb-4">Mettez à jour vos informations personnelles en remplissant le formulaire ci-dessous.</p>
+                        
+                        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+                        {{ form_widget(form.nom, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Nom'}, 'label': false}) }}
+                        {{ form_errors(form.nom) }}
+
+                        {{ form_widget(form.prenom, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Prénom'}, 'label': false}) }}
+                        {{ form_errors(form.prenom) }}
+
+                        {{ form_widget(form.email, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Email'}, 'label': false}) }}
+                        {{ form_errors(form.email) }}
+
+
+                        {{ form_widget(form.password.first, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Mot de passe'}, 'label': false}) }}
+                        {{ form_errors(form.password.first) }}
+
+                        {{ form_widget(form.password.second, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Confirmer le mot de passe'}, 'label': false}) }}
+                        {{ form_errors(form.password.second) }}
+                        <div id="password-match"></div>
+
+
+                        {{ form_widget(form.adresse, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Adresse'}, 'label': false}) }}
+                        {{ form_errors(form.adresse) }}
+
+                        {{ form_widget(form.telephone, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Téléphone'}, 'label': false}) }}
+                        {{ form_errors(form.telephone) }}
+                        
+                        {{ form_widget(form.sexe, {'attr': {'class': 'sexe-options'}}) }}
+                        {{ form_errors(form.sexe) }}
+                        <br>
+                        {{ form_widget(form.role, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Role'}, 'label': false}) }}
+                        {{ form_errors(form.role) }}
+
+                        {{ form_widget(form.imageFile, {'attr': {'class': 'form-control mb-4', 'label': false}}) }}
+                        {{ form_errors(form.imageFile) }}
+
+
+                        <button type="submit" class="btn btn-primary mt-3">Mettre à jour</button>
+
+                        {{ form_end(form) }}
+
+
+                        
+                    </div>
+                    <div class="col-md-6 col-lg-5">
+                        <div>
+                            <div class="d-inline-flex w-100 border border-primary p-4 rounded mb-4" style="max-width: 280px; height: auto;">
+                            <i class="fas fa-image fa-2x text-primary me-4"></i>
+                            <div>
+                                {% if utilisateur.image %}
+                                    <img src="{{ asset('uploads/' ~ utilisateur.image) }}" alt="User Photo" class="img-fluid" style="max-width: 180px; height: auto;">
+                                {% else %}
+                                    <p>No photo available</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        </div>
+                            
+                            
+                        </div>
+                    </div>
+                </div>
+                
+                
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+

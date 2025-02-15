@@ -1,37 +1,122 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Candidature index{% endblock %}
+{% block title %}Listes des Candidatures{% endblock %}
 
 {% block body %}
-    <h1>Candidature index</h1>
+    <div class="container py-5">
+        <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+            <h1 class="display-5 mb-4">Listes des Candidatures</h1>
+        </div>
+        
+        <div class="row g-4">
+            {% for candidature in candidatures %}
+                <div class="col-lg-4 col-md-6 fadeInUp" style="animation: fadeInUp 0.6s ease-out {{ loop.index * 0.2 }}s forwards;">
+                    <div class="team-item rounded overflow-hidden position-relative shadow-lg card-effect">
+                        <div class="team-img position-relative">
+                            {% if candidature.partenariat.image %}
+                                <img src="{{ asset('uploads/partenariats/' ~ candidature.partenariat.image) }}" 
+                                     class="img-fluid w-100" 
+                                     alt="Logo du partenariat">
+                            {% endif %}
+                            <div class="team-social d-flex flex-column position-absolute top-0 end-0 m-3">
+                                {% if candidature.cv %}
+                                        <div class="mt-4 text-center">
+                                            <a class="btn icon-bg btn-sm rounded-circle mb-2" href="{{ asset('uploads/candidatures/' ~ candidature.cv) }}" target="_blank" data-bs-toggle="tooltip" title="Voir CV">
+                                                <i class="fas fa-file-alt"></i>
+                                            </a>
+                                        </div>
+                                    {% else %}
+                                        <p class="text-muted text-center mt-4">Pas de CV fourni</p>
+                                    {% endif %}
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>DatePostulation</th>
-                <th>Status</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for candidature in candidatures %}
-            <tr>
-                <td>{{ candidature.id }}</td>
-                <td>{{ candidature.datePostulation ? candidature.datePostulation|date('Y-m-d') : '' }}</td>
-                <td>{{ candidature.status }}</td>
-                <td>
-                    <a href="{{ path('app_candidature_show', {'id': candidature.id}) }}">show</a>
-                    <a href="{{ path('app_candidature_edit', {'id': candidature.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                                <a class="btn icon-bg btn-sm rounded-circle" href="#" data-bs-toggle="tooltip" title="{{ candidature.datePostulation|date('d/m/Y') }}">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="text-center p-4">
+                            <h5 class="text-custom">{{ candidature.typeCollab }}</h5>
+                            <p class="text-white">{{ candidature.motivation }}</p>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="{{ path('app_candidature_show', {'id': candidature.id}) }}" class="btn btn-outline-custom btn-sm rounded-pill text-custom border-custom">
+                                    Voir Détails
+                                </a>
+                                <a href="{{ path('app_candidature_edit', {'id': candidature.id}) }}" class="btn btn-outline-custom btn-sm rounded-pill text-custom border-custom">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-center">Aucune collaboration n'a été réalisée.</p>
+            {% endfor %}
+        </div>
+    </div>
 
-    <a href="{{ path('app_candidature_new') }}">Create new</a>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+
+    <style>
+        .fadeInUp {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-effect {
+            background-color: #D4A762;
+            color: white;
+            border: 2px solid transparent;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .card-effect:hover {
+            background-color: #050709;
+            color: black;
+        }
+
+        .icon-bg {
+            background-color: #D4A762;
+            color: #050709 ;
+        }
+        .icon-bg:hover {
+            background-color: #050709;
+            color: #D4A762;
+        }
+
+        .text-custom {
+            color: #050709 !important;
+            transition: color 0.3s;
+        }
+        .card-effect:hover .text-custom {
+            color: #D4A762 !important;
+        }
+
+        .btn-outline-custom {
+            color: #050709;
+            border-color: #050709;
+            transition: color 0.3s, border-color 0.3s;
+        }
+        .card-effect:hover .btn-outline-custom {
+            color: #D4A762 !important;
+            border-color: #D4A762 !important;
+        }
+    </style>
 {% endblock %}

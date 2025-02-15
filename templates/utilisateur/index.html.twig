@@ -1,43 +1,80 @@
-{% extends 'base.html.twig' %}
+{% extends 'baseBack.html.twig' %}
 
 {% block title %}Utilisateur index{% endblock %}
 
 {% block body %}
-    <h1>Utilisateur index</h1>
+    
+    <div class="card flex-fill">
+    <div class="card-header">
 
-    <table class="table">
+        <h5 class="card-title mb-0">Liste des utilisateurs</h5>
+    </div>
+    <table class="table table-hover my-0">
         <thead>
-            <tr>
+            <tr >
                 <th>Id</th>
+                <th>Photo de profil</th>
                 <th>Nom</th>
-                <th>Prenom</th>
+                <th>Prénom</th>
                 <th>Email</th>
-                <th>Mdp</th>
                 <th>Adresse</th>
                 <th>Telephone</th>
-                <th>DateInscription</th>
-                <th>Image</th>
+                <th>Date d'inscription</th>
+                <th>Sexe</th>
                 <th>Role</th>
-                <th>actions</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-        {% for utilisateur in utilisateurs %}
-            <tr>
+        {% for utilisateur in utilisateurs.items %}
+            <tr {% if app.user and app.user.id == utilisateur.id %} class="table-warning" {% endif %}>
                 <td>{{ utilisateur.id }}</td>
+                <td >
+                {% if utilisateur.image %}
+                    <img src="{{ asset('uploads/' ~ utilisateur.image) }}" alt="User Photo" class="img-fluid" style="max-width: 60px; height: auto;">
+                {% else %}
+                    <p>No photo available</p>
+                {% endif %}
+                </td>
                 <td>{{ utilisateur.nom }}</td>
                 <td>{{ utilisateur.prenom }}</td>
                 <td>{{ utilisateur.email }}</td>
-                <td>{{ utilisateur.mdp }}</td>
                 <td>{{ utilisateur.adresse }}</td>
                 <td>{{ utilisateur.telephone }}</td>
                 <td>{{ utilisateur.dateInscription ? utilisateur.dateInscription|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ utilisateur.image }}</td>
-                <td>{{ utilisateur.role }}</td>
                 <td>
-                    <a href="{{ path('app_utilisateur_show', {'id': utilisateur.id}) }}">show</a>
-                    <a href="{{ path('app_utilisateur_edit', {'id': utilisateur.id}) }}">edit</a>
+                    {% if utilisateur.sexe == 'male' %}
+                        <span class="badge bg-dark">Homme</span>
+                    {% elseif utilisateur.sexe == 'femelle' %}
+                        <span class="badge bg-danger">Femme</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Inconnu</span>
+                    {% endif %}
                 </td>
+                <td>
+                    {% if utilisateur.role == 'ROLE_ADMIN' %}
+                        <span class="badge bg-danger">Admin</span>
+                    {% elseif utilisateur.role == 'ROLE_CLIENT' %}
+                        <span class="badge bg-warning">Client</span>
+                         <a href="{{ path('app_utilisateur_make_admin', {'id': utilisateur.id}) }}" class="btn btn-link text-dark p-0"> Rendre Admin </a>
+                    {% elseif utilisateur.role == 'ROLE_ARTISAN' %}
+                        <span class="badge bg-success">Artisan</span>
+                         <a href="{{ path('app_utilisateur_make_admin', {'id': utilisateur.id}) }}" class="btn btn-link text-dark p-0"> Rendre Admin </a>
+                    {% else %}
+                        <span class="badge bg-secondary">Inconnu</span>
+                         <a href="{{ path('app_utilisateur_make_admin', {'id': utilisateur.id}) }}" class="btn btn-link text-dark p-0"> Rendre Admin </a>
+                    {% endif %}
+                </td>
+                <td>
+    <div class="action-line">
+        <a href="{{ path('app_utilisateur_show', {'id': utilisateur.id}) }}" class="action-btn">
+            <img src="{{ asset('img/avatars/show.png') }}" width="25px" height="25px" alt="Voir">
+        </a>
+    </div>
+    
+    
+</td>
+
             </tr>
         {% else %}
             <tr>
@@ -46,6 +83,10 @@
         {% endfor %}
         </tbody>
     </table>
+    <div class="pagination">
+    {{ knp_pagination_render(utilisateurs, '@KnpPaginator/Pagination/sliding.html.twig') }}
+</div>
+</div>
 
-    <a href="{{ path('app_utilisateur_new') }}">Create new</a>
+    <a href="{{ path('app_utilisateur_newBack') }}">Create new</a>
 {% endblock %}

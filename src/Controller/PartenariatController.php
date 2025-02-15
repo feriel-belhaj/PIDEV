@@ -9,12 +9,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 #[Route('/partenariat')]
 final class PartenariatController extends AbstractController
 {
-    #[Route(name: 'app_partenariat_index', methods: ['GET'])]
+    #[Route('/', name: 'app_partenariat_index', methods: ['GET'])]
     public function index(PartenariatRepository $partenariatRepository): Response
     {
         return $this->render('partenariat/index.html.twig', [
@@ -26,19 +27,28 @@ final class PartenariatController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $partenariat = new Partenariat();
-        $form = $this->createForm(PartenariatType::class, $partenariat);
+        $form = $this->createForm(PartenariatType::class, $partenariat, ['is_edit' => false]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $imageFile */
+            $imageFile = $form->get('image')->getData();
+
+            if ($imageFile) {
+                $newFilename = uniqid().'.'.$imageFile->guessExtension();
+                $imageFile->move($this->getParameter('partenariat_images_directory'), $newFilename);
+                $partenariat->setImage($newFilename);
+            }
+
             $entityManager->persist($partenariat);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_partenariat_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'Partenariat ajouté avec succès.');
+            return $this->redirectToRoute('app_partenariat_index');
         }
 
         return $this->render('partenariat/new.html.twig', [
-            'partenariat' => $partenariat,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -53,13 +63,26 @@ final class PartenariatController extends AbstractController
     #[Route('/{id}/edit', name: 'app_partenariat_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Partenariat $partenariat, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(PartenariatType::class, $partenariat);
+        $originalImage = $partenariat->getImage();
+        $form = $this->createForm(PartenariatType::class, $partenariat, ['is_edit' => true]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+            /** @var UploadedFile $imageFile */
+            $imageFile = $form->get('image')->getData();
 
-            return $this->redirectToRoute('app_partenariat_index', [], Response::HTTP_SEE_OTHER);
+            if ($imageFile) {
+                $newFilename = uniqid().'.'.$imageFile->guessExtension();
+                $imageFile->move($this->getParameter('partenariat_images_directory'), $newFilename);
+                $partenariat->setImage($newFilename);
+            } else {
+                $partenariat->setImage($originalImage);
+            }
+
+            $entityManager->flush();
+            $this->addFlash('success', 'Partenariat mis à jour avec succès.');
+
+            return $this->redirectToRoute('app_partenariat_index');
         }
 
         return $this->render('partenariat/edit.html.twig', [
@@ -71,11 +94,21 @@ final class PartenariatController extends AbstractController
     #[Route('/{id}', name: 'app_partenariat_delete', methods: ['POST'])]
     public function delete(Request $request, Partenariat $partenariat, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$partenariat->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$partenariat->getId(), $request->request->get('_token'))) {
+            // Supprimer les candidatures associées
+            foreach ($partenariat->getCandidatures() as $candidature) {
+                $entityManager->remove($candidature);
+            }
+
+            // Supprimer le partenariat
             $entityManager->remove($partenariat);
             $entityManager->flush();
+
+            $this->addFlash('success', 'Partenariat supprimé avec succès.');
+        } else {
+            $this->addFlash('error', 'Token CSRF invalide.');
         }
 
-        return $this->redirectToRoute('app_partenariat_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_partenariat_index');
     }
 }
