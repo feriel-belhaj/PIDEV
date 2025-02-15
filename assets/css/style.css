@@ -22,12 +22,12 @@
     z-index: 99;
 }
 
-h1, h2, h3, .h1, .h2, .h3 {
+h1, h2, h3, h5, .h1, .h2, .h3, .h5 {
     font-weight: 400 !important;
     font-family: 'Playball', cursive !important;
 }
 
-h4, h5, h6, .h4, .h5, .h6 {
+h4, h6, .h4, .h6 {
     font-weight: 600 !important;
     font-family: 'Open Sans', sans-serif !important;
 }

@@ -1,0 +1,65 @@
+
+
+{% block title %}{% endblock %}
+
+{% block stylesheets %}
+		<link rel="stylesheet" href="{{ asset('css/SignUpForm.css') }}">
+        {% endblock %}
+{% block body %}
+    <h1>ArtiZina — Rejoignez notre équipe d'artistes !</h1>
+
+    {#{{ include('utilisateur/_form.html.twig') }}#}
+
+    {#<a href="{{ path('app_utilisateur_index') }}">back to list</a>#}
+	<br>
+    <div class="container" id="container">
+
+		<div class="form-container sign-up-container">
+			
+			
+			<form method="post">
+                {% if error %}
+                    <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {% endif %}
+                
+                <h1>Se connecter</h1>
+                <span>Utilisez vos informations de connexion</span>
+                
+                <input type="email" value="{{ last_username }}" name="_username" placeholder="Email" required>
+                <input type="password" name="_password" placeholder="Mot de passe" required>
+                
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                
+                <button type="submit">Connexion</button>
+            </form>
+
+	</div>
+<div>
+    <img src="{{ asset('img/logo.png') }}"  width="400" height="auto">
+    <br>
+
+</div>
+	
+	<div class="overlay-container">
+		<div class="overlay">
+			<div class="overlay-panel overlay-left">
+				<h1>Bienvenue de nouveau !</h1>
+				<p>Pour rester connecté avec nous, veuillez vous connecter avec vos informations personnelles</p>
+				<h5> Vous avez déja un compte ?</h5>
+				<button class="ghost" id="signIn" onclick="window.location.href='{{ path('app_utilisateur_new') }}'">S'inscrire</button>
+			</div>
+			<div class="overlay-panel overlay-right">
+				<h1>Bonjour, Artiste !</h1>
+				<p>Entrez vos informations personnelles et commencez votre aventure avec nous</p>
+				<button class="ghost" id="signUp" >Se connecter</button>
+				
+			</div>
+		</div>
+		</div>
+	</div>
+{% endblock %}
+
+ {% block javascripts %}
+            <script src="{{ asset('js/signUp.js') }}"></script>
+
+{% endblock %}
