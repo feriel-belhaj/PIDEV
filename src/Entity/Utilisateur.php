@@ -7,43 +7,71 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
-class Utilisateur
+class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le nom ne peut pas être vide.")]
+    #[Assert\Regex(
+        pattern: "/^[a-zA-Z]+$/",
+        message: "Le nom ne doit contenir que des lettres."
+    )]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le prénom ne peut pas être vide.")]
+    #[Assert\Regex(
+        pattern: "/^[a-zA-Z\s]+$/",
+        message: "Le prénom ne doit contenir que des lettres et des espaces."
+    )]
     private ?string $prenom = null;
 
+    
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "L'email ne peut pas être vide.")]
+    #[Assert\Email(message: "L'email '{{ value }}' n'est pas valide.")]
     private ?string $email = null;
-
+    
     #[ORM\Column(length: 255)]
-    private ?string $mdp = null;
-
+    #[Assert\NotBlank(message: "Le mot de passe ne peut pas être vide.")]
+    #[Assert\Regex(
+        pattern: "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\d\s]).+$/",
+        message: "Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial."
+    )]
+    private ?string $password = null;
+    
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "L'adresse ne peut pas être vide.")]
     private ?string $adresse = null;
-
+    
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le numéro de téléphone ne peut pas être vide.")]
+    #[Assert\Length(min: 8, max: 8, exactMessage: "Le numéro de téléphone doit comporter exactement {{ limit }} caractères.")]
     private ?string $telephone = null;
-
+    
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateInscription = null;
-
+    
     #[ORM\Column(length: 255)]
     private ?string $image = null;
-
+    
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le rôle ne peut pas être vide.")]
     private ?string $role = null;
+
+   
+    
+    #[ORM\Column(length: 255)]
+    private ?string $Sexe = null;
 
     /**
      * @var Collection<int, Formation>
@@ -75,6 +103,8 @@ class Utilisateur
     #[ORM\ManyToMany(targetEntity: Partenariat::class, inversedBy: 'utilisateurs')]
     private Collection $partenariats;
 
+    
+
     public function __construct()
     {
         $this->formation = new ArrayCollection();
@@ -82,6 +112,7 @@ class Utilisateur
         $this->evennement = new ArrayCollection();
         $this->produit = new ArrayCollection();
         $this->partenariats = new ArrayCollection();
+        $this->dateInscription = new \DateTime();
     }
 
     public function getId(): ?int
@@ -125,17 +156,18 @@ class Utilisateur
         return $this;
     }
 
-    public function getMdp(): ?string
+    public function getPassword(): ?string
     {
-        return $this->mdp;
+        return $this->password;
     }
 
-    public function setMdp(string $mdp): static
+    public function setPassword(string $password): static
     {
-        $this->mdp = $mdp;
-
+        $this->password = $password;
         return $this;
     }
+
+   
 
     public function getAdresse(): ?string
     {
@@ -166,10 +198,9 @@ class Utilisateur
         return $this->dateInscription;
     }
 
-    public function setDateInscription(\DateTimeInterface $dateInscription): static
+    public function setDateInscription(?\DateTime $date = null): self
     {
-        $this->dateInscription = $dateInscription;
-
+        $this->dateInscription = $date ?? new \DateTime();
         return $this;
     }
 
@@ -185,17 +216,35 @@ class Utilisateur
         return $this;
     }
 
-    public function getRole(): string 
+    public function getRoles(): array
+    {
+        return [$this->role];
+    }
+    public function getRole(): string
     {
         return $this->role;
     }
 
-    public function setRole(string $role): static 
+    public function setRole(?string $role): self
     {
+        $validRoles = ['ROLE_VISITEUR', 'ROLE_ADMIN', 'ROLE_CLIENT', 'ROLE_ARTISAN'];
+
+        if ($role === null || !in_array($role, $validRoles)) {
+            $role = 'ROLE_VISITEUR';
+        }
+
         $this->role = $role;
         return $this;
     }
+    public function getUserIdentifier(): string
+{
+    return $this->email; //login
+}
 
+    public function eraseCredentials(): void
+    {
+
+    }
     /**
      * @return Collection<int, Formation>
      */
@@ -318,6 +367,18 @@ class Utilisateur
     public function removePartenariat(Partenariat $partenariat): static
     {
         $this->partenariats->removeElement($partenariat);
+
+        return $this;
+    }
+
+    public function getSexe(): ?string
+    {
+        return $this->Sexe;
+    }
+
+    public function setSexe(string $Sexe): static
+    {
+        $this->Sexe = $Sexe;
 
         return $this;
     }
