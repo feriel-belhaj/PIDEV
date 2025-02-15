@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
 class Produit
@@ -28,7 +29,7 @@ class Produit
     #[ORM\Column]
     private ?int $quantitestock = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
 
     #[ORM\Column(length: 255)]
@@ -37,9 +38,6 @@ class Produit
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $datecreation = null;
 
-    /**
-     * @var Collection<int, Utilisateur>
-     */
     #[ORM\ManyToMany(targetEntity: Utilisateur::class, mappedBy: 'produit')]
     private Collection $produits;
 
@@ -61,7 +59,6 @@ class Produit
     public function setNom(string $nom): static
     {
         $this->nom = $nom;
-
         return $this;
     }
 
@@ -73,7 +70,6 @@ class Produit
     public function setDescription(string $description): static
     {
         $this->description = $description;
-
         return $this;
     }
 
@@ -85,7 +81,6 @@ class Produit
     public function setPrix(float $prix): static
     {
         $this->prix = $prix;
-
         return $this;
     }
 
@@ -97,7 +92,6 @@ class Produit
     public function setQuantitestock(int $quantitestock): static
     {
         $this->quantitestock = $quantitestock;
-
         return $this;
     }
 
@@ -109,7 +103,6 @@ class Produit
     public function setImage(string $image): static
     {
         $this->image = $image;
-
         return $this;
     }
 
@@ -121,7 +114,6 @@ class Produit
     public function setCategorie(string $categorie): static
     {
         $this->categorie = $categorie;
-
         return $this;
     }
 
@@ -133,13 +125,9 @@ class Produit
     public function setDatecreation(\DateTimeInterface $datecreation): static
     {
         $this->datecreation = $datecreation;
-
         return $this;
     }
 
-    /**
-     * @return Collection<int, Utilisateur>
-     */
     public function getProduits(): Collection
     {
         return $this->produits;
@@ -151,7 +139,6 @@ class Produit
             $this->produits->add($produit);
             $produit->addProduit($this);
         }
-
         return $this;
     }
 
@@ -160,7 +147,19 @@ class Produit
         if ($this->produits->removeElement($produit)) {
             $produit->removeProduit($this);
         }
-
         return $this;
+    }
+
+    public static function getUniqueCategories(array $produits): array
+    {
+        $categories = array_map(fn($produit) => $produit->getCategorie(), $produits);
+        return array_values(array_unique($categories));
+    }
+
+    public static function getUniqueCategoriesObject(array $produits): array
+    {
+        $categories = array_map(fn($produit) => $produit->getCategorie(), $produits);
+        $uniqueCategories = array_unique($categories);
+        return array_map(fn($category) => ['key' => $category, 'value' => $category], array_values($uniqueCategories));
     }
 }

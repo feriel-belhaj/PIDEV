@@ -17,6 +17,9 @@ class Certificat
     #[ORM\Column(length: 255)]
     private ?string $nom = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $prenom = null;
+
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $dateobt = null;
 
@@ -28,7 +31,16 @@ class Certificat
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?formation $formation = null;
+    private ?Formation $formation = null;
+
+    public function __construct()
+    {
+        $this->dateobt = new \DateTime();
+        $this->nom = '';
+        $this->prenom = '';
+        $this->niveau = '';
+        $this->nomorganisme = '';
+    }
 
     public function getId(): ?int
     {
@@ -40,10 +52,20 @@ class Certificat
         return $this->nom;
     }
 
-    public function setNom(string $nom): static
+    public function setNom(?string $nom): static
     {
         $this->nom = $nom;
+        return $this;
+    }
 
+    public function getPrenom(): ?string
+    {
+        return $this->prenom;
+    }
+
+    public function setPrenom(?string $prenom): static
+    {
+        $this->prenom = $prenom;
         return $this;
     }
 
@@ -64,10 +86,9 @@ class Certificat
         return $this->niveau;
     }
 
-    public function setNiveau(string $niveau): static
+    public function setNiveau(?string $niveau): static
     {
         $this->niveau = $niveau;
-
         return $this;
     }
 
@@ -76,10 +97,9 @@ class Certificat
         return $this->nomorganisme;
     }
 
-    public function setNomorganisme(string $nomorganisme): static
+    public function setNomorganisme(?string $nomorganisme): static
     {
         $this->nomorganisme = $nomorganisme;
-
         return $this;
     }
 

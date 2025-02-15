@@ -1,11 +1,23 @@
-{% extends 'base.html.twig' %}
+{% extends 'baseBack.html.twig' %}
 
-{% block title %}New Evenement{% endblock %}
+{% block title %}Nouveau Projet{% endblock %}
 
 {% block body %}
-    <h1>Create new Evenement</h1>
-
-    {{ include('evenement/_form.html.twig') }}
-
-    <a href="{{ path('app_evenement_index') }}">back to list</a>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="h3 mb-0">Créer un nouveau projet</h1>
+                </div>
+                <div class="card-body">
+                    {{ include('evenement/_form.html.twig') }}
+                </div>
+                <div class="card-footer">
+                    <a href="{{ path('app_evenement_index') }}" class="btn btn-secondary">Retour à la liste</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

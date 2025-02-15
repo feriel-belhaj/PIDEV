@@ -324,10 +324,17 @@
                 </li>
 
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{asset('ui-typography.html')}}">
-                        <i class="align-middle" data-feather="align-left"></i> <span class="align-middle">Typography</span>
-                    </a>
-                </li>
+    <a class="sidebar-link" href="{{ path('admin_produit_index') }}">
+        <i class="align-middle" data-feather="box"></i> <span class="align-middle">Produits</span>
+    </a>
+</li>
+
+                <li class="sidebar-item">
+    <a class="sidebar-link" href="{{ path('admin_commande_index') }}">
+        <i class="align-middle" data-feather="box"></i> <span class="align-middle">Commande</span>
+    </a>
+</li>
+
 
                 <li class="sidebar-item">
                     <a class="sidebar-link" href="{{asset('icons-feather.html')}}">

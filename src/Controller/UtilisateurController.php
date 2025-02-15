@@ -29,7 +29,8 @@ final class UtilisateurController extends AbstractController
         return $this->render('base.html.twig', [
             'user' => $user,  
         ]);
-    }
+    } 
+    
 
     #[Route('/new', name: 'app_utilisateur_new', methods: ['GET', 'POST'])]
     public function new(Request $request,EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher ): Response

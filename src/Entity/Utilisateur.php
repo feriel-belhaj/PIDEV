@@ -77,7 +77,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
      * @var Collection<int, Formation>
      */
     #[ORM\ManyToMany(targetEntity: Formation::class, inversedBy: 'utilisateurs')]
-    private Collection $formation;
+    private Collection $formations;
 
     /**
      * @var Collection<int, Creation>

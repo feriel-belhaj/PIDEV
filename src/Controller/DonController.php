@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Entity\Evenement;
 
 #[Route('/don')]
 final class DonController extends AbstractController
@@ -22,22 +23,32 @@ final class DonController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_don_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/new/{id}', name: 'app_don_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager, Evenement $evenement): Response
     {
         $don = new Don();
+        $don->setEvenement($evenement);
+        $don->setDonationdate(new \DateTimeImmutable());
+        
         $form = $this->createForm(DonType::class, $don);
+        
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($don);
+            
+            // Mettre à jour le montant collecté de l'événement
+            $evenement->setCollectedamount($evenement->getCollectedamount() + $don->getAmount());
+            
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_don_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'Merci pour votre don !');
+            return $this->redirectToRoute('app_evenement_index');
         }
 
         return $this->render('don/new.html.twig', [
             'don' => $don,
+            'evenement' => $evenement,
             'form' => $form,
         ]);
     }
