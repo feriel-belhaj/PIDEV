@@ -5,77 +5,81 @@ namespace App\Controller;
 use App\Entity\Creation;
 use App\Form\CreationType;
 use App\Repository\CreationRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;       
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/creation')]
-final class CreationController extends AbstractController
-{
-    #[Route(name: 'app_creation_index', methods: ['GET'])]
-    public function index(CreationRepository $creationRepository): Response
+
+final class CreationController extends AbstractController{
+    #[Route('/craetion', name: 'app_creation')]
+    public function index(): Response
     {
         return $this->render('creation/index.html.twig', [
-            'creations' => $creationRepository->findAll(),
+            'controller_name' => 'ServiceController',
         ]);
     }
 
-    #[Route('/new', name: 'app_creation_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/showcreation', name: 'showcreation')]
+    public function showservice (CreationRepository $serRep ): Response
     {
-        $creation = new Creation();
-        $form = $this->createForm(CreationType::class, $creation);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($creation);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_creation_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('creation/new.html.twig', [
-            'creation' => $creation,
-            'form' => $form,
-        ]);
-    }
-
-    #[Route('/{id}', name: 'app_creation_show', methods: ['GET'])]
-    public function show(Creation $creation): Response
-    {
+        $Blog = $serRep->findAll();
         return $this->render('creation/show.html.twig', [
-            'creation' => $creation,
+            'tabservice' => $Blog,
+        ]);
+    }  
+
+    #[Route('/addFormcreation', name: 'addFormcreation')]
+    public function addFromcraetion( ManagerRegistry $m, Request $req): Response
+    {
+        $em = $m->getManager(); 
+        $serv = new Creation();
+        $form = $this->createForm(CreationType::class, $serv);
+        $form->handleRequest($req);
+    
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($serv);
+            $em->flush();
+            return $this->redirectToRoute('showcreation'); 
+        }
+    
+        return $this->render('creation/addForm.html.twig', [
+            'form' => $form->createView(),
         ]);
     }
-
-    #[Route('/{id}/edit', name: 'app_creation_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Creation $creation, EntityManagerInterface $entityManager): Response
+    
+    #[Route('/updateFormservice/{id}', name: 'updateFormservice')]
+    public function updateFormBlog(ManagerRegistry $m, Request $req, $id, CreationRepository $BlogRep): Response
     {
-        $form = $this->createForm(CreationType::class, $creation);
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+        $em = $m->getManager(); 
+        $Blog = $BlogRep->find($id);
+        $form=$this->createForm(CreationType::class, $Blog);
+        $form->handleRequest($req);
+        
+        if ($form->isSubmitted() && $form->isValid()){
+            $em->persist($Blog);
+            $em->flush();
+            return $this->redirectToRoute('showcreation'); 
 
-            return $this->redirectToRoute('app_creation_index', [], Response::HTTP_SEE_OTHER);
         }
-
-        return $this->render('creation/edit.html.twig', [
-            'creation' => $creation,
+        return $this->render('creation/modForm.html.twig', [
             'form' => $form,
         ]);
     }
-
-    #[Route('/{id}', name: 'app_creation_delete', methods: ['POST'])]
-    public function delete(Request $request, Creation $creation, EntityManagerInterface $entityManager): Response
+    #[Route('/deletcreation/{id}', name: 'deletecreation')]
+    public function deleteFormBlog( $id,ManagerRegistry $m, CreationRepository $BlogRep): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$creation->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($creation);
-            $entityManager->flush();
-        }
+        $em = $m->getManager();
+    
+        $Blog = $BlogRep->find($id);
+      
+        $em->remove($Blog);
+        $em->flush();
+        return $this->redirectToRoute('showcreation'); // redige vers la liste des auteurs aprés l'ajout  
 
-        return $this->redirectToRoute('app_creation_index', [], Response::HTTP_SEE_OTHER);
     }
+
+
 }

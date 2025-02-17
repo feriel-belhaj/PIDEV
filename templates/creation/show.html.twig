@@ -1,50 +1,61 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Creation{% endblock %}
+{% block title %}Créations{% endblock %}
 
 {% block body %}
-    <h1>Creation</h1>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Liste des Créations</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ creation.id }}</td>
-            </tr>
-            <tr>
-                <th>Titre</th>
-                <td>{{ creation.titre }}</td>
-            </tr>
-            <tr>
-                <th>Decription</th>
-                <td>{{ creation.decription }}</td>
-            </tr>
-            <tr>
-                <th>Image</th>
-                <td>{{ creation.image }}</td>
-            </tr>
-            <tr>
-                <th>Categorie</th>
-                <td>{{ creation.categorie }}</td>
-            </tr>
-            <tr>
-                <th>DatePublic</th>
-                <td>{{ creation.datePublic ? creation.datePublic|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Statut</th>
-                <td>{{ creation.statut }}</td>
-            </tr>
-            <tr>
-                <th>NbLike</th>
-                <td>{{ creation.nbLike }}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_creation_index') }}">back to list</a>
-
-    <a href="{{ path('app_creation_edit', {'id': creation.id}) }}">edit</a>
-
-    {{ include('creation/_delete_form.html.twig') }}
+        <table class="table table-striped table-bordered table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Titre</th>
+                    <th>Description</th>
+                    <th>Image</th>
+                    <th>Catégorie</th>
+                    <th>Date de Publication</th>
+                    <th>Statut</th>
+                    <th>Likes</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in tabservice %}
+                    <tr>
+                        <td>{{ a.id }}</td>
+                        <td>{{ a.titre }}</td>
+                        <td>{{ a.getDecription() }}</td>
+                        <td>
+                            {% if a.image %}
+                                <img src="{{ asset('uploads/' ~ a.image) }}" alt="Image" class="img-thumbnail" style="width: 100px; height: auto;">
+                            {% else %}
+                                <span class="text-muted">Aucune image</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ a.categorie }}</td>
+                        <td>{{ a.getDatePublic()|date('d/m/Y H:i') }}</td>
+                        <td>
+                            {% if a.statut == 'active' %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="fw-bold text-primary">{{ a.getNbLike() }}</span>
+                        </td>
+                        <td>
+                            <a href="{{ path('updateFormservice', { id: a.id }) }}" class="btn btn-sm btn-primary">Modifier</a>
+                           <a href="{{ path('deletecreation', { id: a.id }) }}" class="btn btn-sm btn-primary">supprimer</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted">Aucune création disponible</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

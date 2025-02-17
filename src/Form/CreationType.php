@@ -6,6 +6,7 @@ use App\Entity\Creation;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 class CreationType extends AbstractType
 {
@@ -21,6 +22,11 @@ class CreationType extends AbstractType
             ])
             ->add('statut')
             ->add('nbLike')
+
+            ->add('save', SubmitType::class, [
+                'label' => 'Enregistrer',
+                'attr' => ['class' => 'btn btn-success'] // Bootstrap styling
+            ]);
         ;
     }
 

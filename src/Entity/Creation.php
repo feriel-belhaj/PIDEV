@@ -43,8 +43,7 @@ class Creation
     #[ORM\OneToMany(targetEntity: Commentaire::class, mappedBy: 'creation')]
     private Collection $commentaires;
 
-    #[ORM\ManyToOne(inversedBy: 'creation')]
-    private ?Utilisateur $utilisateur = null;
+   
 
     public function __construct()
     {
@@ -170,15 +169,5 @@ class Creation
         return $this;
     }
 
-    public function getUtilisateur(): ?Utilisateur
-    {
-        return $this->utilisateur;
-    }
-
-    public function setUtilisateur(?Utilisateur $utilisateur): static
-    {
-        $this->utilisateur = $utilisateur;
-
-        return $this;
-    }
+    
 }
