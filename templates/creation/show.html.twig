@@ -17,9 +17,15 @@
                 <div class="row">
                     <div class="col-md-4">
                         {% if creation.image %}
-                            <img src="{{ asset('uploads/' ~ creation.image) }}" alt="Image" class="img-fluid rounded">
+                            <img src="{{ asset('uploads/images/' ~ creation.image) }}" 
+                                 alt="{{ creation.titre }}" 
+                                 class="img-fluid rounded"
+                                 style="max-width: 100%; height: auto; object-fit: contain;">
                         {% else %}
-                            <div class="text-center text-muted">Aucune image</div>
+                            <div class="text-center text-muted p-4 border rounded">
+                                <i class="fas fa-image fa-3x mb-2"></i>
+                                <p class="mb-0">Aucune image</p>
+                            </div>
                         {% endif %}
                     </div>
                     <div class="col-md-8">
