@@ -7,8 +7,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CreationRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Creation
 {
     #[ORM\Id]
@@ -17,37 +19,62 @@ class Creation
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
+    #[Assert\NotBlank(message: "Le titre ne peut pas être vide")]
+    #[Assert\Length(
+        min: 2,
+        max: 100,
+        minMessage: "Le titre doit contenir au moins {{ limit }} caractères",
+        maxMessage: "Le titre ne peut pas dépasser {{ limit }} caractères"
+    )]
     private ?string $titre = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $decription = null;
+    #[Assert\NotBlank(message: "La description ne peut pas être vide")]
+    #[Assert\Length(
+        min: 10,
+        max: 255,
+        minMessage: "La description doit contenir au moins {{ limit }} caractères",
+        maxMessage: "La description ne peut pas dépasser {{ limit }} caractères"
+    )]
+    private ?string $description = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
 
     #[ORM\Column(length: 100)]
+    #[Assert\NotBlank(message: "La catégorie est requise")]
     private ?string $categorie = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $datePublic = null;
 
     #[ORM\Column(length: 100)]
-    private ?string $statut = null;
+    #[Assert\Choice(choices: ["actif", "inactif", "en_attente"], message: "Statut invalide")]
+    private ?string $statut = "actif";
 
     #[ORM\Column]
-    private ?int $nbLike = null;
+    private ?int $nbLike = 0;
 
-    /**
-     * @var Collection<int, Commentaire>
-     */
-    #[ORM\OneToMany(targetEntity: Commentaire::class, mappedBy: 'creation')]
+    #[ORM\OneToMany(targetEntity: Commentaire::class, mappedBy: 'creation', cascade: ['persist', 'remove'])]
     private Collection $commentaires;
 
-   
+    private $imageFile;
 
     public function __construct()
     {
         $this->commentaires = new ArrayCollection();
+        $this->datePublic = new \DateTime();
+        $this->nbLike = 0;
+        $this->statut = 'actif';
+    }
+
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function setUpdatedAtValue(): void
+    {
+        if ($this->datePublic === null) {
+            $this->datePublic = new \DateTime();
+        }
     }
 
     public function getId(): ?int
@@ -63,19 +90,17 @@ class Creation
     public function setTitre(string $titre): static
     {
         $this->titre = $titre;
-
         return $this;
     }
 
-    public function getDecription(): ?string
+    public function getDescription(): ?string
     {
-        return $this->decription;
+        return $this->description;
     }
 
-    public function setDecription(string $decription): static
+    public function setDescription(string $description): static
     {
-        $this->decription = $decription;
-
+        $this->description = $description;
         return $this;
     }
 
@@ -84,10 +109,23 @@ class Creation
         return $this->image;
     }
 
-    public function setImage(string $image): static
+    public function setImage(?string $image): static
     {
         $this->image = $image;
+        return $this;
+    }
 
+    public function getImageFile()
+    {
+        return $this->imageFile;
+    }
+
+    public function setImageFile($imageFile): static
+    {
+        $this->imageFile = $imageFile;
+        if ($imageFile) {
+            $this->datePublic = new \DateTime();
+        }
         return $this;
     }
 
@@ -99,7 +137,6 @@ class Creation
     public function setCategorie(string $categorie): static
     {
         $this->categorie = $categorie;
-
         return $this;
     }
 
@@ -111,7 +148,6 @@ class Creation
     public function setDatePublic(\DateTimeInterface $datePublic): static
     {
         $this->datePublic = $datePublic;
-
         return $this;
     }
 
@@ -123,7 +159,6 @@ class Creation
     public function setStatut(string $statut): static
     {
         $this->statut = $statut;
-
         return $this;
     }
 
@@ -135,13 +170,9 @@ class Creation
     public function setNbLike(int $nbLike): static
     {
         $this->nbLike = $nbLike;
-
         return $this;
     }
 
-    /**
-     * @return Collection<int, Commentaire>
-     */
     public function getCommentaires(): Collection
     {
         return $this->commentaires;
@@ -153,21 +184,16 @@ class Creation
             $this->commentaires->add($commentaire);
             $commentaire->setCreation($this);
         }
-
         return $this;
     }
 
     public function removeCommentaire(Commentaire $commentaire): static
     {
         if ($this->commentaires->removeElement($commentaire)) {
-            // set the owning side to null (unless already changed)
             if ($commentaire->getCreation() === $this) {
                 $commentaire->setCreation(null);
             }
         }
-
         return $this;
     }
-
-    
 }

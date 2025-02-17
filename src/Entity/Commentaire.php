@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CommentaireRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Commentaire
 {
     #[ORM\Id]
@@ -21,9 +22,10 @@ class Commentaire
     private ?\DateTimeInterface $dateComment = null;
 
     #[ORM\Column(length: 100)]
-    private ?string $etat = null;
+    private ?string $etat = 'actif';
 
-    #[ORM\ManyToOne(inversedBy: 'commentaires')]
+    #[ORM\ManyToOne(targetEntity: Creation::class, inversedBy: 'commentaires')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Creation $creation = null;
 
     public function getId(): ?int
@@ -36,10 +38,9 @@ class Commentaire
         return $this->contenu;
     }
 
-    public function setContenu(string $contenu): static
+    public function setContenu(?string $contenu): self
     {
         $this->contenu = $contenu;
-
         return $this;
     }
 
@@ -48,10 +49,9 @@ class Commentaire
         return $this->dateComment;
     }
 
-    public function setDateComment(\DateTimeInterface $dateComment): static
+    public function setDateComment(?\DateTimeInterface $dateComment): self
     {
         $this->dateComment = $dateComment;
-
         return $this;
     }
 
@@ -60,10 +60,9 @@ class Commentaire
         return $this->etat;
     }
 
-    public function setEtat(string $etat): static
+    public function setEtat(?string $etat): self
     {
         $this->etat = $etat;
-
         return $this;
     }
 
@@ -72,10 +71,20 @@ class Commentaire
         return $this->creation;
     }
 
-    public function setCreation(?Creation $creation): static
+    public function setCreation(?Creation $creation): self
     {
         $this->creation = $creation;
-
         return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function prePersist(): void
+    {
+        if ($this->dateComment === null) {
+            $this->dateComment = new \DateTime();
+        }
+        if ($this->etat === null) {
+            $this->etat = 'actif';
+        }
     }
 }

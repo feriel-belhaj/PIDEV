@@ -1,48 +1,43 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Commentaire {% endblock %}
+{% block title %}Liste des Commentaires{% endblock %}
 
 {% block body %}
     <div class="container mt-4">
-        <h1 class="text-center mb-4">Liste des commentaire </h1>
+        <h1>Liste des Commentaires</h1>
 
-        <table class="table table-striped table-bordered table-hover">
-            <thead class="table-dark">
+        <a href="{{ path('commentaire_new') }}" class="btn btn-primary mb-3">Ajouter un commentaire</a>
+
+        <table class="table">
+            <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>contenu/th>
+                    <th>Contenu</th>
                     <th>Date</th>
-                    <th>etat</th>
-                    <th>Creation</th>
-                        <th>modifier </th>
-                    <th>supprimer </th>
-                    
-                   
+                    <th>État</th>
+                    <th>Création</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for a in tabservice %}
-                    <tr>
-                        <td>{{ a.id }}</td>
-                        <td>{{ a.contenu }}</td>
-                       
-                        
-                        <td>{{ a.getDateComment()|date('d/m/Y H:i') }}</td>
-                        <td>{{ a.etat }}</td>
-                            <td>{{ a.getCreation().id }}</td>
-                       
-                          <td>
-                           <a href="{{ path('updateFormcmn', { id: a.id }) }}" class="btn btn-sm btn-primary">Modifier</a>
-                         
-                          </td> 
-                          <td> 
-                          <a href="{{ path('deleteFormBlog', { id: a.id }) }}" class="btn btn-sm btn-primary">supprimer</a>     </td> 
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="9" class="text-center text-muted">Aucune création disponible</td>
-                    </tr>
-                {% endfor %}
+            {% for commentaire in tabservice %}
+                <tr>
+                    <td>{{ commentaire.contenu }}</td>
+                    <td>{{ commentaire.dateComment|date('Y-m-d H:i:s') }}</td>
+                    <td>{{ commentaire.etat }}</td>
+                    <td>{{ commentaire.creation ? commentaire.creation.titre : '' }}</td>
+                    <td>
+                        <a href="{{ path('commentaire_edit', {'id': commentaire.id}) }}" class="btn btn-sm btn-primary">Modifier</a>
+                        <form method="post" action="{{ path('commentaire_delete', {'id': commentaire.id}) }}" style="display: inline">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ commentaire.id) }}">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" class="text-center">Aucun commentaire trouvé</td>
+                </tr>
+            {% endfor %}
             </tbody>
         </table>
     </div>

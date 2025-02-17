@@ -9,79 +9,82 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
-use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Routing\Annotation\Route;
 
-
-
-final class CommentaireController extends AbstractController
+#[Route('/commentaire')]
+class CommentaireController extends AbstractController
 {
-    #[Route(name: 'app_commentaire_index', methods: ['GET'])]
-    public function index(CommentaireRepository $commentaireRepository): Response
+    private $entityManager;
+    private $commentaireRepository;
+
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        CommentaireRepository $commentaireRepository
+    ) {
+        $this->entityManager = $entityManager;
+        $this->commentaireRepository = $commentaireRepository;
+    }
+
+    #[Route('/', name: 'commentaire_list')]
+    public function index(): Response
     {
-        return $this->render('commentaire/index.html.twig', [
-            'commentaires' => $commentaireRepository->findAll(),
+        return $this->render('commentaire/show.html.twig', [
+            'tabservice' => $this->commentaireRepository->findAll(),
         ]);
     }
 
-    #[Route('/showcmnt', name: 'showcmnt')]
-    public function showcmnt (CommentaireRepository $serRep ): Response
+    #[Route('/new', name: 'commentaire_new')]
+    public function new(Request $request): Response
     {
-        $Blog = $serRep->findAll();
-        return $this->render('commentaire/show.html.twig', [
-            'tabservice' => $Blog,
-        ]);
-    }  
+        $commentaire = new Commentaire();
+        $form = $this->createForm(CommentaireType::class, $commentaire);
+        $form->handleRequest($request);
 
-    #[Route('/addFromcmnt', name: 'addFromcmnt')]
-    public function addFromcmnt( ManagerRegistry $m, Request $req): Response
-    {
-        $em = $m->getManager(); 
-        $serv = new Commentaire();
-        $form = $this->createForm(CommentaireType::class, $serv);
-        $form->handleRequest($req);
-    
         if ($form->isSubmitted() && $form->isValid()) {
-            $em->persist($serv);
-            $em->flush();
-            return $this->redirectToRoute('showcmnt'); 
+            $this->entityManager->persist($commentaire);
+            $this->entityManager->flush();
+            return $this->redirectToRoute('commentaire_list');
         }
-    
+
         return $this->render('commentaire/addForm.html.twig', [
             'form' => $form->createView(),
         ]);
     }
 
-    #[Route('/updateFormcmnt/{id}', name: 'updateFormcmn')]
-    public function updateFormcmnt(ManagerRegistry $m, Request $req, $id, CommentaireRepository $BlogRep): Response
+    #[Route('/{id}/edit', name: 'commentaire_edit')]
+    public function edit(Request $request, int $id): Response
     {
-
-        $em = $m->getManager(); 
-        $Blog = $BlogRep->find($id);
-        $form=$this->createForm(CommentaireType::class, $Blog);
-        $form->handleRequest($req);
+        $commentaire = $this->commentaireRepository->find($id);
         
-        if ($form->isSubmitted() && $form->isValid()){
-            $em->persist($Blog);
-            $em->flush();
-            return $this->redirectToRoute('showcmnt'); 
-
+        if (!$commentaire) {
+            throw $this->createNotFoundException('Commentaire non trouvé');
         }
+
+        $form = $this->createForm(CommentaireType::class, $commentaire);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->entityManager->flush();
+            return $this->redirectToRoute('commentaire_list');
+        }
+
         return $this->render('commentaire/modForm.html.twig', [
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
-    #[Route('/deleteFormBlog/{id}', name: 'deleteFormBlog')]
-    public function deleteFormBlog( $id,ManagerRegistry $m, CommentaireRepository $BlogRep): Response
+    #[Route('/{id}/delete', name: 'commentaire_delete', methods: ['POST'])]
+    public function delete(int $id): Response
     {
-        $em = $m->getManager();
-    
-        $Blog = $BlogRep->find($id);
-      
-        $em->remove($Blog);
-        $em->flush();
-        return $this->redirectToRoute('showcmnt'); // redige vers la liste des auteurs aprés l'ajout  
+        $commentaire = $this->commentaireRepository->find($id);
+        
+        if (!$commentaire) {
+            throw $this->createNotFoundException('Commentaire non trouvé');
+        }
 
+        $this->entityManager->remove($commentaire);
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('commentaire_list');
     }
 }
