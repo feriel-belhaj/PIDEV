@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle Création{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Ajouter une Nouvelle Création</h1>
+
+        <div class="card shadow-lg p-4">
+            {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+
+            <div class="mb-3">
+                {{ form_label(form.titre, 'Titre', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.titre, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.titre) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.decription, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.decription, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.decription) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.image, 'Image', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.image, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.image) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.categorie, 'Catégorie', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.categorie, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.categorie) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.datePublic, 'Date de Publication', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.datePublic, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.datePublic) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.statut, 'Statut', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.statut, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.statut) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.nbLike, 'Nombre de Likes', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.nbLike, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.nbLike) }}
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a href="{{ path('showcreation') }}" class="btn btn-secondary">Annuler</a>
+                <button type="submit" class="btn btn-success">Enregistrer</button>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

@@ -1,4 +1,31 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+    
+    <div class="mb-3">
+        {{ form_label(form.contenu, 'Contenu', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.contenu, {'attr': {'class': 'form-control', 'rows': 4}}) }}
+        {{ form_errors(form.contenu) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.etat, 'État', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.etat, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.etat) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.creation, 'Création', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.creation, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.creation) }}
+    </div>
+
+    <div class="d-grid gap-2">
+        <button type="submit" class="btn btn-primary">
+            {{ button_label|default('Enregistrer') }}
+        </button>
+    </div>
 {{ form_end(form) }}
