@@ -1,0 +1,304 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Certificat{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Great+Vibes&family=Playfair+Display:wght@700&family=Pinyon+Script&display=swap');
+
+        @page {
+            size: landscape;
+        }
+
+        .certificate-container {
+            width: 900px;
+            height: 600px;
+            margin: 30px auto;
+            padding: 25px 35px;
+            background: #fff;
+            border: 15px solid #D4A762;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+            background-image: 
+                radial-gradient(circle at 10px 10px, #D4A762 1px, transparent 1px),
+                radial-gradient(circle at 10px 10px, #D4A762 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .certificate {
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            position: relative;
+            padding: 15px 25px;
+            border: 2px solid #D4A762;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .certificate::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border: 1px solid #D4A762;
+            z-index: -1;
+        }
+
+        .header {
+            margin-bottom: 10px;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #D4A762, transparent);
+        }
+
+        .title {
+            font-size: 32px;
+            color: #D4A762;
+            font-family: 'Cormorant Garamond', serif;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: #666;
+            margin-bottom: 10px;
+            font-family: 'Great Vibes', cursive;
+        }
+
+        .content {
+            font-size: 16px;
+            line-height: 1.3;
+            margin: 10px 0;
+            padding: 0 15px;
+            text-align: center;
+            font-family: 'Cormorant Garamond', serif;
+            color: #333;
+        }
+
+        .content br {
+            margin-bottom: 3px;
+            display: block;
+            content: "";
+        }
+
+        .content strong {
+            font-size: 18px;
+            color: #000;
+        }
+
+        .recipient {
+            font-size: 32px;
+            color: #333;
+            margin: 5px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            padding: 10px 0;
+        }
+
+        .recipient .nom {
+            font-family: 'Playfair Display', serif;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 700;
+            color: #2c3e50;
+            display: block;
+            font-size: 34px;
+        }
+
+        .recipient .prenom {
+            font-family: 'Pinyon Script', cursive;
+            font-size: 38px;
+            color: #D4A762;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .details {
+            margin: 10px 0;
+            font-size: 14px;
+            font-family: 'Cormorant Garamond', serif;
+            color: #666;
+        }
+
+        .signature-section {
+            margin-top: 10px;
+            padding-top: 5px;
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+        }
+
+        .signature-box {
+            margin: 0 10px;
+        }
+
+        .signature-line {
+            width: 120px;
+            margin: 5px auto;
+        }
+
+        .certificate-footer {
+            margin-top: 10px;
+            font-size: 12px;
+            line-height: 1.2;
+            text-align: center;
+            font-family: 'Cormorant Garamond', serif;
+            position: relative;
+            padding-top: 10px;
+        }
+
+        .seal {
+            width: 90px;
+            height: 90px;
+            bottom: 15px;
+            right: 25px;
+            position: absolute;
+            background: #D4A762;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            transform: rotate(-15deg);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border: 3px solid white;
+            font-family: 'Cormorant Garamond', serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background-image: radial-gradient(circle at center, #D4A762, darken(#D4A762, 10%));
+        }
+
+        .seal::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border: 1px solid #D4A762;
+            border-radius: 50%;
+        }
+
+        .decorative-corner {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23D4A762"><path d="M12 2L2 12h10V2z"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        .corner-tl { top: 10px; left: 10px; }
+        .corner-tr { top: 10px; right: 10px; }
+        .corner-bl { bottom: 10px; left: 10px; }
+        .corner-br { bottom: 10px; right: 10px; }
+
+        @media print {
+            @page {
+                size: landscape;
+            }
+            
+            .certificate-container {
+                width: 100%;
+                height: 100vh;
+                border: none;
+                box-shadow: none;
+                margin: 0;
+                padding: 15px;
+            }
+
+            .certificate {
+                padding: 15px;
+            }
+
+            .btn-secondary, .btn-primary {
+                display: none;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="certificate-container">
+        <div class="decorative-corner corner-tl"></div>
+        <div class="decorative-corner corner-tr"></div>
+        <div class="decorative-corner corner-bl"></div>
+        <div class="decorative-corner corner-br"></div>
+        
+        <div class="certificate">
+            <div class="header">
+                <h1 class="title">Certificat de Formation</h1>
+                <div class="subtitle">Ce certificat est décerné à</div>
+            </div>
+
+            <div class="recipient">
+                <span class="nom">{{ certificat.nom }}</span>
+                <span class="prenom">{{ certificat.prenom }}</span>
+            </div>
+
+            <div class="content">
+                pour avoir suivi avec succès la formation<br>
+                <strong>"{{ certificat.formation.titre }}"</strong><br>
+                de niveau <strong>{{ certificat.niveau }}</strong><br>
+                dispensée par <strong>{{ certificat.nomorganisme }}</strong>
+            </div>
+
+            <div class="details">
+                Délivré le {{ certificat.dateobt|date('d/m/Y') }}
+            </div>
+
+            <div class="signature-section">
+                <div class="signature-box">
+                    <div class="signature-line"></div>
+                    <div>Directeur de formation</div>
+                </div>
+                <div class="signature-box">
+                    <div class="signature-line"></div>
+                    <div>Responsable pédagogique</div>
+                </div>
+            </div>
+
+            <div class="seal">
+                <div>
+                    CERTIFIÉ<br>
+                    ArtiZina<br>
+                    {{ certificat.dateobt|date('Y') }}
+                </div>
+            </div>
+
+            <div class="certificate-footer">
+                Ce certificat est délivré par ArtiZina - Centre de Formation Professionnelle<br>
+                Numéro d'enregistrement: #{{ certificat.id|format('%04d') }}
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{{ path('app_certificat_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        <button onclick="window.print()" class="btn btn-primary">Imprimer le certificat</button>
+    </div>
+{% endblock %}

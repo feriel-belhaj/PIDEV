@@ -1,0 +1,25 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Modifier le Certificat{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Modifier le Certificat</h1>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Détails du certificat</h5>
+                <p><strong>Nom:</strong> {{ certificat.nom }}</p>
+                <p><strong>Prénom:</strong> {{ certificat.prenom }}</p>
+                <p><strong>Formation:</strong> {{ certificat.formation.titre }}</p>
+                <p><strong>Date d'obtention:</strong> {{ certificat.dateobt|date('d/m/Y') }}</p>
+            </div>
+        </div>
+
+        {{ include('certificat/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+
+        <div class="mt-3">
+            <a href="{{ path('app_certificat_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        </div>
+    </div>
+{% endblock %}

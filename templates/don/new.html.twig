@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Faire un don{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="h3 mb-0">Faire un don pour "{{ evenement.titre }}"</h1>
+                </div>
+                <div class="card-body">
+                    {{ include('don/_form.html.twig') }}
+                </div>
+                <div class="card-footer">
+                    <a href="{{ path('app_evenement_show', {'id': evenement.id}) }}" class="btn btn-link">Retour au projet</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

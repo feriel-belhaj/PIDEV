@@ -1,0 +1,108 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mettre à jour une Candidature{% endblock %}
+
+{% block body %}
+<div class="container mt-5 text-center">
+    <div class="p-5 bg-light rounded contact-form position-relative">
+        
+        <!-- Croix pour annuler -->
+        <a href="{{ path('app_candidature_index') }}" class="position-absolute top-0 end-0 m-3 text-danger" style="font-size: 24px; text-decoration: none;">&times;</a>
+        
+        <h3 class="display-5 mb-0">Mise à Jour de la Candidature</h3>
+
+        {{ form_start(form, {'attr': {'id': 'candidatureForm', 'enctype': 'multipart/form-data'}}) }}
+
+        <div class="mb-3 text-start">
+            {{ form_label(form.typeCollab,"Type De Collaboration") }}
+            {{ form_widget(form.typeCollab, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light ' ~ (form.typeCollab.vars.errors|length > 0 ? 'is-invalid' : '')}}) }}
+            <div class="invalid-feedback">{{ form_errors(form.typeCollab) }}</div>
+        </div>
+
+        <div class="mb-3 text-start">
+            {{ form_label(form.motivation) }}
+            {{ form_widget(form.motivation, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light ' ~ (form.motivation.vars.errors|length > 0 ? 'is-invalid' : '')}}) }}
+            <div class="invalid-feedback">{{ form_errors(form.motivation) }}</div>
+        </div>
+
+        <div class="mb-3 text-start">
+            {{ form_label(form.datePostulation) }}
+            {{ form_widget(form.datePostulation, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'readonly': 'readonly'}}) }}
+        </div>
+
+    
+
+
+    <!-- Champ pour le CV -->
+<div class="mb-3 text-start">
+    {{ form_label(form.cv, "Mettre Votre CV") }}
+    {{ form_widget(form.cv, {
+        'attr': {
+            'class': 'w-100 form-control p-3 mb-4 border-primary bg-light ' ~ (form.cv.vars.errors|length > 0 ? 'is-invalid' : '')
+        }
+    }) }}
+    <div class="invalid-feedback">
+        {{ form_errors(form.cv) }}
+    </div>
+    {% if candidature.cv %}
+        <div class="mt-3">
+            <a href="{{ asset('uploads/candidatures/' ~ candidature.cv) }}" target="_blank" class="btn btn-outline-primary">
+                Voir le CV actuel
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+           
+          
+            
+        
+        <!-- Champ pour le Portfolio -->
+<div class="mb-3 text-start">
+    {{ form_label(form.portfolio) }}
+    {{ form_widget(form.portfolio, {
+        'attr': {
+            'class': 'w-100 form-control p-3 mb-4 border-primary bg-light ' ~ (form.portfolio.vars.errors|length > 0 ? 'is-invalid' : '')
+        }
+    }) }}
+    <div class="invalid-feedback">
+        {{ form_errors(form.portfolio) }}
+    </div>
+    {% if candidature.portfolio %}
+        <div class="mt-3">
+            <a href="{{ asset('uploads/candidatures/' ~ candidature.portfolio) }}" target="_blank" class="btn btn-outline-primary">
+                Voir le Portfolio actuel
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+        <div class="d-flex justify-content-center mt-3">
+            <button type="submit" class="btn btn-primary border-0 rounded-pill py-3 px-5 me-3">Mettre à jour</button>
+        </div>
+
+        {{ form_end(form) }}
+      
+    </div>
+</div>
+
+<style>
+    .text-start label {
+        font-weight: bold;
+    }
+
+    .is-invalid {
+        border-color: red !important;
+    }
+
+    .invalid-feedback {
+        color: red;
+        font-size: 0.9em;
+    }
+
+    .mt-3 {
+        margin-top: 1rem;
+    }
+</style>
+
+{% endblock %} 

@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter un Produit{% endblock %}
+
+{% block body %}
+<div class="container mt-5 text-center">
+    <div class="p-5 bg-light rounded contact-form position-relative">
+        <!-- Croix pour annuler -->
+        <a href="{{ path('app_produit_index') }}" class="position-absolute top-0 end-0 m-3 text-danger" style="font-size: 24px; text-decoration: none;">&times;</a>
+        
+        <h3 class="display-5 mb-0">Ajouter un Produit</h3>
+
+        {{ form_start(form, {'attr': {'id': 'produitForm', 'enctype': 'multipart/form-data'}}) }}
+
+        <div class="mb-3 text-start">
+            {{ form_label(form.nom) }}
+            {{ form_widget(form.nom, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Nom du Produit'}}) }}
+        </div>
+
+        <div class="mb-3 text-start">
+            {{ form_label(form.description) }}
+            {{ form_widget(form.description, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Description du Produit'}}) }}
+        </div>
+
+        <div class="mb-3 text-start">
+            {{ form_label(form.prix) }}
+            {{ form_widget(form.prix, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Prix du Produit'}}) }}
+        </div>
+
+        <div class="mb-3 text-start">
+            {{ form_label(form.quantitestock) }}
+            {{ form_widget(form.quantitestock, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Quantité en Stock'}}) }}
+        </div>
+
+        <div class="mb-3 text-start">
+            {{ form_label(form.image) }}
+            {{ form_widget(form.image, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light'}}) }}
+        </div>
+
+        <div class="mb-3 text-start">
+            {{ form_label(form.categorie) }}
+            {{ form_widget(form.categorie, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light'}}) }}
+        </div>
+
+        <div class="mb-3 text-start">
+            {{ form_label(form.datecreation) }}
+            {{ form_widget(form.datecreation, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light'}}) }}
+        </div>
+
+        <button type="submit" class="btn btn-primary border-0 rounded-pill py-3 px-5 me-3 animated bounceInLeft" style="font-family: 'Open Sans', sans-serif;">
+            Ajouter
+        </button>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+
+<style>
+    /* Alignement du texte à gauche */
+    .text-start label {
+        font-weight: bold;
+    }
+</style>
+
+{% endblock %}

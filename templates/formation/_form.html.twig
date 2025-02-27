@@ -1,0 +1,317 @@
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .form-label {
+        color: #000;
+        font-weight: bold;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-error {
+        color: #dc3545;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+        font-style: italic;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+
+    .form-control.is-invalid, .form-select.is-invalid {
+        border-color: #dc3545;
+        background-image: none;
+    }
+
+    .btn-submit {
+        background-color: #dc3545;
+        border: none;
+        padding: 0.75rem 2rem;
+        color: white;
+        border-radius: 5px;
+        font-weight: bold;
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        background-color: #c82333;
+        transform: translateY(-2px);
+    }
+
+    .form-group {
+        margin-top: 2rem;
+        text-align: center;
+    }
+
+    .table td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .form-control, .form-select, .btn-submit {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .is-valid {
+        border-color: #198754 !important;
+        background-color: #f8fff9 !important;
+    }
+    
+    .is-invalid {
+        border-color: #dc3545 !important;
+        background-color: #fff8f8 !important;
+    }
+
+    .form-error {
+        color: #dc3545;
+        font-size: 0.875em;
+        margin-top: 0.25rem;
+    }
+</style>
+
+{{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'form-container', 'enctype': 'multipart/form-data'}}) }}
+<table class="table">
+    <tr>
+        <td>{{ form_label(form.titre, "Titre", {'label_attr': {'class': 'form-label'}}) }}</td>
+        <td>{{ form_widget(form.titre, {
+            'attr': {
+                'class': 'form-control' ~ (form_errors(form.titre) ? ' is-invalid' : ''),
+                'placeholder': 'Entrez le titre'
+            }
+        }) }}</td>
+        <td><div class="form-error">{{ form_errors(form.titre) }}</div></td>
+    </tr>
+    <tr>
+        <td>{{ form_label(form.description, "Description", {'label_attr': {'class': 'form-label'}}) }}</td>
+        <td>{{ form_widget(form.description, {
+            'attr': {
+                'class': 'form-control' ~ (form_errors(form.description) ? ' is-invalid' : ''),
+                'rows': 5,
+                'placeholder': 'Entrez la description'
+            }
+        }) }}</td>
+        <td><div class="form-error">{{ form_errors(form.description) }}</div></td>
+    </tr>
+    <tr>
+        <td>{{ form_label(form.datedeb, "Date de début", {'label_attr': {'class': 'form-label'}}) }}</td>
+        <td>{{ form_widget(form.datedeb, {
+            'attr': {
+                'class': 'form-control' ~ (form_errors(form.datedeb) ? ' is-invalid' : ''),
+                'placeholder': 'Entrez la date de début'
+            }
+        }) }}</td>
+        <td><div class="form-error">{{ form_errors(form.datedeb) }}</div></td>
+    </tr>
+    <tr>
+        <td>{{ form_label(form.datefin, "Date de fin", {'label_attr': {'class': 'form-label'}}) }}</td>
+        <td>{{ form_widget(form.datefin, {
+            'attr': {
+                'class': 'form-control' ~ (form_errors(form.datefin) ? ' is-invalid' : ''),
+                'placeholder': 'Entrez la date de fin'
+            }
+        }) }}</td>
+        <td><div class="form-error">{{ form_errors(form.datefin) }}</div></td>
+    </tr>
+    <tr>
+        <td>{{ form_label(form.niveau, "Niveau", {'label_attr': {'class': 'form-label'}}) }}</td>
+        <td>
+            {{ form_widget(form.niveau, {
+                'attr': {
+                    'class': 'form-select' ~ (form_errors(form.niveau) ? ' is-invalid' : ''),
+                    'placeholder': 'Sélectionnez le niveau'
+                }
+            }) }}
+        </td>
+        <td><div class="form-error">{{ form_errors(form.niveau) }}</div></td>
+    </tr>
+    <tr>
+        <td>{{ form_label(form.prix, "Prix", {'label_attr': {'class': 'form-label'}}) }}</td>
+        <td>{{ form_widget(form.prix, {
+            'attr': {
+                'class': 'form-control' ~ (form_errors(form.prix) ? ' is-invalid' : ''),
+                'placeholder': 'Entrez le prix'
+            }
+        }) }}</td>
+        <td><div class="form-error">{{ form_errors(form.prix) }}</div></td>
+    </tr>
+    <tr>
+        <td>{{ form_label(form.emplacement, "Emplacement", {'label_attr': {'class': 'form-label'}}) }}</td>
+        <td>{{ form_widget(form.emplacement, {
+            'attr': {
+                'class': 'form-control' ~ (form_errors(form.emplacement) ? ' is-invalid' : ''),
+                'placeholder': 'Entrez l\'emplacement'
+            }
+        }) }}</td>
+        <td><div class="form-error">{{ form_errors(form.emplacement) }}</div></td>
+    </tr>
+    <tr>
+        <td>{{ form_label(form.nbplace, "Nombre de places", {'label_attr': {'class': 'form-label'}}) }}</td>
+        <td>{{ form_widget(form.nbplace, {
+            'attr': {
+                'class': 'form-control' ~ (form_errors(form.nbplace) ? ' is-invalid' : ''),
+                'placeholder': 'Entrez le nombre de places'
+            }
+        }) }}</td>
+        <td><div class="form-error">{{ form_errors(form.nbplace) }}</div></td>
+    </tr>
+    <tr>
+        <td>{{ form_label(form.nbparticipant, "Nombre de participants", {'label_attr': {'class': 'form-label'}}) }}</td>
+        <td>{{ form_widget(form.nbparticipant, {
+            'attr': {
+                'class': 'form-control' ~ (form_errors(form.nbparticipant) ? ' is-invalid' : ''),
+                'placeholder': 'Entrez le nombre de participants'
+            }
+        }) }}</td>
+        <td><div class="form-error">{{ form_errors(form.nbparticipant) }}</div></td>
+    </tr>
+    <tr>
+        <td>{{ form_label(form.organisateur, "Organisateur", {'label_attr': {'class': 'form-label'}}) }}</td>
+        <td>{{ form_widget(form.organisateur, {
+            'attr': {
+                'class': 'form-control' ~ (form_errors(form.organisateur) ? ' is-invalid' : ''),
+                'placeholder': 'Entrez le nom de l\'organisateur'
+            }
+        }) }}</td>
+        <td><div class="form-error">{{ form_errors(form.organisateur) }}</div></td>
+    </tr>
+    <tr>
+        <td>{{ form_label(form.duree, "Durée", {'label_attr': {'class': 'form-label'}}) }}</td>
+        <td>{{ form_widget(form.duree, {
+            'attr': {
+                'class': 'form-control' ~ (form_errors(form.duree) ? ' is-invalid' : ''),
+                'placeholder': 'Entrez la durée'
+            }
+        }) }}</td>
+        <td><div class="form-error">{{ form_errors(form.duree) }}</div></td>
+    </tr>
+    <tr>
+        <td>{{ form_label(form.image, "Image", {'label_attr': {'class': 'form-label'}}) }}</td>
+        <td>
+            <div class="d-flex gap-2 align-items-start">
+                {{ form_widget(form.image, {
+                    'attr': {
+                        'class': 'form-control' ~ (form_errors(form.image) ? ' is-invalid' : ''),
+                        'accept': 'image/*',
+                        'required': false
+                    }
+                }) }}
+                <button type="button" class="btn btn-primary" id="generateImageBtn">
+                    Générer
+                </button>
+            </div>
+            <div id="generatedImagePreview" class="mt-2" style="display: none;">
+                <img src="" alt="Image générée" style="max-width: 200px;" id="previewImage">
+            </div>
+            <small class="text-muted">Formats acceptés : JPG, PNG, GIF</small>
+            <div class="form-error">
+                {{ form_errors(form.image) }}
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td>{{ form_label(form.model3dFile) }}</td>
+        <td>{{ form_widget(form.model3dFile) }}</td>
+        <td>{{ form_errors(form.model3dFile) }}</td>
+    </tr>
+</table>
+
+<div class="form-group">
+    {{ form_widget(form.save, {
+        'label': 'Enregistrer',
+        'attr': {
+            'class': 'btn-submit'
+        }
+    }) }}
+</div>
+
+{{ form_end(form) }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const generateBtn = document.getElementById('generateImageBtn');
+    const descriptionField = document.querySelector('#formation_description');
+    const imagePreview = document.getElementById('generatedImagePreview');
+    const previewImage = document.getElementById('previewImage');
+
+    generateBtn.addEventListener('click', async function() {
+        const description = descriptionField.value;
+        if (!description) {
+            alert('Veuillez d\'abord remplir la description de la formation.');
+            return;
+        }
+
+        generateBtn.disabled = true;
+        generateBtn.textContent = 'Génération en cours...';
+
+        try {
+            const response = await fetch('/generate-image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ description: description })
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            // Afficher l'aperçu de l'image
+            previewImage.src = data.imageUrl;
+            imagePreview.style.display = 'block';
+
+            // Créer un fichier à partir de l'URL de l'image
+            const imageResponse = await fetch(data.imageUrl);
+            const blob = await imageResponse.blob();
+            const file = new File([blob], 'generated-image.png', { type: 'image/png' });
+
+            // Créer un nouveau FileList contenant notre fichier
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+
+            // Mettre à jour le champ de fichier
+            document.querySelector('#formation_image').files = dataTransfer.files;
+
+        } catch (error) {
+            alert('Erreur lors de la génération de l\'image : ' + error.message);
+        } finally {
+            generateBtn.disabled = false;
+            generateBtn.textContent = 'Générer';
+        }
+    });
+});
+</script>
+
+
+

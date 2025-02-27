@@ -1,0 +1,13 @@
+knp_paginator:
+    page_range: 3                      # pour avoir 3 pages visibles comme dans votre capture
+    default_options:
+        page_name: page                # nom du paramètre de page
+        sort_field_name: sort          # nom du paramètre de tri
+        sort_direction_name: direction # nom du paramètre de direction
+        distinct: true                 # garantir des résultats distincts
+        filter_field_name: filterField # nom du paramètre de filtre
+        filter_value_name: filterValue # nom du paramètre de valeur du filtre
+    template:
+        pagination: 'pagination/sliding.html.twig'     # template de pagination
+        sortable: '@KnpPaginator/Pagination/sortable_link.html.twig'     # template pour les liens triables
+        filtration: '@KnpPaginator/Pagination/filtration.html.twig'  # template pour la filtration 

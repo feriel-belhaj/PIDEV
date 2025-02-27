@@ -1,0 +1,476 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Liste des Formations{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <!-- Ajout d'Animate.css pour les animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js"/>
+    
+    <!-- Style personnalisé pour les tableaux et boutons -->
+    <style>
+        .table th, .table td {
+            vertical-align: middle;
+        }
+        .table thead {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .badge {
+            padding: 0.5em 1em;
+            font-size: 0.875em;
+            border-radius: 0.25rem;
+        }
+        .bg-success { background-color: #28a745 !important; color: white; }
+        .bg-warning { background-color: #ffc107 !important; color: black; }
+        .bg-danger { background-color: #dc3545 !important; color: white; }
+        
+        .btn-group .btn {
+            margin: 0 2px;
+        }
+        
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0,0,0,.05);
+        }
+        
+        .card-header {
+            background-color: #f8f9fc;
+            border-bottom: 1px solid #e3e6f0;
+        }
+
+        /* Styles pour le formulaire de recherche et les filtres */
+        .search-bar {
+            margin-bottom: 20px;
+        }
+        .filter-group {
+            margin-bottom: 20px;
+        }
+
+        /* Styles pour le graphique */
+        .statistic-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            margin-top: 20px; /* Ajout d'un espace au-dessus du graphique */
+            height: 400px; /* Hauteur fixe pour le conteneur */
+        }
+        
+        #statisticChart, #levelChart {
+            max-width: 100%;
+            height: 300px !important; /* Hauteur fixe pour le canvas */
+        }
+
+        .loading-indicator {
+            position: absolute;
+            right: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ffc107;
+            display: none;
+        }
+        
+        .search-bar {
+            position: relative;
+        }
+        
+        #searchInput:focus {
+            box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+            border-color: #ffc107;
+        }
+
+        .dropdown {
+            margin-right: 5px;
+        }
+        
+        .dropdown-item {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .dropdown-item.active {
+            background-color: #e9ecef;
+            color: #000;
+        }
+        
+        .dropdown-item i {
+            width: 20px;
+            color: #6c757d;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="search-bar">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="searchInput" placeholder="Rechercher une formation..." autocomplete="off">
+                    <div class="dropdown">
+                        <button class="btn btn-light dropdown-toggle" type="button" id="sortButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-sort me-1"></i> Trier par
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item sort-option" href="#" data-sort="desc">
+                                    <i class="fas fa-sort-amount-down me-2"></i>Plus récentes d'abord
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item sort-option" href="#" data-sort="asc">
+                                    <i class="fas fa-sort-amount-up me-2"></i>Plus anciennes d'abord
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-primary" type="button" id="searchButton">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <form method="GET" action="{{ path('app_formation_index1') }}">
+                    <select name="niveau" class="form-select" onchange="this.form.submit()">
+                        <option value="">Tous les niveaux</option>
+                        <option value="Débutant" {% if app.request.get('niveau') == 'Débutant' %}selected{% endif %}>Débutant</option>
+                        <option value="Intermédiaire" {% if app.request.get('niveau') == 'Intermédiaire' %}selected{% endif %}>Intermédiaire</option>
+                        <option value="Avancé" {% if app.request.get('niveau') == 'Avancé' %}selected{% endif %}>Avancé</option>
+                    </select>
+                </form>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Liste des Formations</h6>
+                    <a href="{{ path('app_formation_new') }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Ajouter une formation
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Titre</th>
+                                    <th>Date début</th>
+                                    <th>Date fin</th>
+                                    <th>Niveau</th>
+                                    <th>Prix</th>
+                                    <th>Places</th>
+                                    <th>Participants</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for formation in formations %}
+                                    <tr>
+                                        <td>{{ formation.id }}</td>
+                                        <td>{{ formation.titre }}</td>
+                                        <td>{{ formation.datedeb ? formation.datedeb|date('d/m/Y') : '' }}</td>
+                                        <td>{{ formation.datefin ? formation.datefin|date('d/m/Y') : '' }}</td>
+                                        <td>
+                                            {% if formation.niveau == 'debutant' %}
+                                                <span class="badge bg-success">Débutant</span>
+                                            {% elseif formation.niveau == 'intermediaire' %}
+                                                <span class="badge bg-warning">Intermédiaire</span>
+                                            {% elseif formation.niveau == 'avance' %}
+                                                <span class="badge bg-danger">Avancé</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ formation.prix }} DT</td>
+                                        <td>{{ formation.nbplace }}</td>
+                                        <td>{{ formation.nbparticipant }}</td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ path('app_formation_show', {'id': formation.id}) }}" class="btn btn-info btn-sm" title="Voir">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{{ path('app_formation_edit', {'id': formation.id}) }}" class="btn btn-warning btn-sm" title="Modifier">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <form method="post" action="{{ path('app_formation_delete', {'id': formation.id}) }}" style="display: inline-block" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette formation ?');">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ formation.id) }}">
+                                                    <button class="btn btn-danger btn-sm" title="Supprimer">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="9" class="text-center">Aucune formation trouvée</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section pour tous les graphiques statistiques -->
+    <div class="row">
+        <!-- Graphique des réservations -->
+        <div class="col-md-4">
+            <div class="statistic-card">
+                <h6 class="m-0 font-weight-bold text-primary">Statistiques des Réservations</h6>
+                <canvas id="statisticChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Graphique des formations -->
+        <div class="col-md-4">
+            <div class="statistic-card">
+                <h6 class="m-0 font-weight-bold text-primary">Statistiques des Formations</h6>
+                <canvas id="formationChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Graphique par niveau -->
+        <div class="col-md-4">
+            <div class="statistic-card">
+                <h6 class="m-0 font-weight-bold text-primary">Statistiques par Niveau</h6>
+                <canvas id="levelChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const sortOptions = document.querySelectorAll('.sort-option');
+            const tableBody = document.querySelector('table tbody');
+            let searchTimeout;
+            let currentSort = 'desc';
+
+            // Créer l'indicateur de chargement
+            const loadingIndicator = document.createElement('div');
+            loadingIndicator.className = 'loading-indicator';
+            loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            document.querySelector('.search-bar').appendChild(loadingIndicator);
+
+            function updateTable(data) {
+                tableBody.innerHTML = '';
+                if (data.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="9" class="text-center">Aucune formation trouvée</td>
+                        </tr>`;
+                    return;
+                }
+
+                data.forEach(formation => {
+                    const row = document.createElement('tr');
+                    let niveauBadge = '';
+                    
+                    switch(formation.niveau) {
+                        case 'debutant':
+                            niveauBadge = '<span class="badge bg-success">Débutant</span>';
+                            break;
+                        case 'intermediaire':
+                            niveauBadge = '<span class="badge bg-warning">Intermédiaire</span>';
+                            break;
+                        case 'avance':
+                            niveauBadge = '<span class="badge bg-danger">Avancé</span>';
+                            break;
+                    }
+
+                    row.innerHTML = `
+                        <td>${formation.id}</td>
+                        <td>${formation.titre}</td>
+                        <td>${formation.datedeb}</td>
+                        <td>${formation.datefin}</td>
+                        <td>${niveauBadge}</td>
+                        <td>${formation.prix} DT</td>
+                        <td>${formation.nbplace}</td>
+                        <td>${formation.nbparticipant}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="/formation/${formation.id}" class="btn btn-info btn-sm" title="Voir">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="/formation/${formation.id}/edit" class="btn btn-warning btn-sm" title="Modifier">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form method="post" action="/formation/${formation.id}" style="display: inline-block" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette formation ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete') }}">
+                                    <button class="btn btn-danger btn-sm" title="Supprimer">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>`;
+                    tableBody.appendChild(row);
+                });
+            }
+
+            // Mettre à jour l'apparence du tri actif
+            function updateSortAppearance() {
+                sortOptions.forEach(option => {
+                    if (option.dataset.sort === currentSort) {
+                        option.classList.add('active');
+                    } else {
+                        option.classList.remove('active');
+                    }
+                });
+            }
+
+            // Initialiser l'apparence
+            updateSortAppearance();
+
+            // Gestionnaire d'événements pour les options de tri
+            sortOptions.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentSort = this.dataset.sort;
+                    updateSortAppearance();
+                    searchFormations();
+                });
+            });
+
+            function searchFormations() {
+                const searchTerm = searchInput.value;
+                loadingIndicator.style.display = 'block';
+
+                fetch(`/formation/formations/search?search=${searchTerm}&sort=${currentSort}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        updateTable(data);
+                        loadingIndicator.style.display = 'none';
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        loadingIndicator.style.display = 'none';
+                    });
+            }
+
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(searchFormations, 300);
+            });
+
+            // Graphique pour les réservations
+            const ctx1 = document.getElementById('statisticChart');
+            new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Réservations'],
+                    datasets: [{
+                        data: [{{ totalReservees }}],
+                        backgroundColor: ['#1cc88a'],
+                        borderColor: ['#1cc88a'],
+                        borderWidth: 1,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Total des Réservations',
+                            font: {
+                                size: 16
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Graphique pour les formations
+            const ctx2 = document.getElementById('formationChart');
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Total Formations', 'Formations Réservées'],
+                    datasets: [{
+                        data: [{{ totalFormations }}, {{ totalReservees }}],
+                        backgroundColor: [
+                            '#4e73df', // Bleu
+                            '#e74a3b'  // Rouge
+                        ],
+                        borderColor: [
+                            '#4e73df',
+                            '#e74a3b'
+                        ],
+                        borderWidth: 1,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Répartition des Formations',
+                            font: {
+                                size: 16
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Graphique pour les niveaux
+            const ctx3 = document.getElementById('levelChart');
+            new Chart(ctx3, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Débutant', 'Intermédiaire', 'Avancé'],
+                    datasets: [{
+                        data: [{{ totalDebutant }}, {{ totalIntermediaire }}, {{ totalAvance }}],
+                        backgroundColor: [
+                            '#4e73df', // Bleu
+                            '#1cc88a', // Vert
+                            '#e74a3b'  // Rouge
+                        ],
+                        borderColor: [
+                            '#4e73df',
+                            '#1cc88a',
+                            '#e74a3b'
+                        ],
+                        borderWidth: 1,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Répartition des Formations par Niveau',
+                            font: {
+                                size: 16
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

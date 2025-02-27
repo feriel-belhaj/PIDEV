@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mettre à jour un Partenariat{% endblock %}
+
+{% block body %}
+<div class="container mt-5 text-center">
+    <div class="p-5 bg-light rounded contact-form position-relative">
+        
+        <!-- Croix pour annuler -->
+        <a href="{{ path('app_partenariat_index') }}" class="position-absolute top-0 end-0 m-3 text-danger" style="font-size: 24px; text-decoration: none;">&times;</a>
+        
+        <h3 class="display-5 mb-0">Mise à Jour du Partenariat</h3>
+
+        {{ form_start(form, {'attr': {'id': 'partenariatForm', 'enctype': 'multipart/form-data'}}) }}
+
+        <div class="mb-3 text-start">
+            {{ form_label(form.nom) }}
+            {{ form_widget(form.nom, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Nom du Partenariat'}}) }}
+            {% if form.nom.vars.errors|length > 0 %}
+                <div class="text-danger">{{ form_errors(form.nom) }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3 text-start">
+            {{ form_label(form.type) }}
+            {{ form_widget(form.type, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Type de Partenariat'}}) }}
+            {% if form.type.vars.errors|length > 0 %}
+                <div class="text-danger">{{ form_errors(form.type) }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3 text-start">
+            {{ form_label(form.description) }}
+            {{ form_widget(form.description, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Description du Partenariat'}}) }}
+            {% if form.description.vars.errors|length > 0 %}
+                <div class="text-danger">{{ form_errors(form.description) }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3 text-start">
+            {{ form_label(form.dateDebut) }}
+            {{ form_widget(form.dateDebut, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light'}}) }}
+            {% if form.dateDebut.vars.errors|length > 0 %}
+                <div class="text-danger">{{ form_errors(form.dateDebut) }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3 text-start">
+            {{ form_label(form.dateFin) }}
+            {{ form_widget(form.dateFin, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light'}}) }}
+            {% if form.dateFin.vars.errors|length > 0 %}
+                <div class="text-danger">{{ form_errors(form.dateFin) }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3 text-start">
+            {{ form_label(form.statut) }}
+            {{ form_widget(form.statut, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light'}}) }}
+            {% if form.statut.vars.errors|length > 0 %}
+                <div class="text-danger">{{ form_errors(form.statut) }}</div>
+            {% endif %}
+        </div>
+
+        <div class="mb-3 text-start">
+            {{ form_label(form.image) }}
+            {{ form_widget(form.image, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light'}}) }}
+            {% if form.image.vars.errors|length > 0 %}
+                <div class="text-danger">{{ form_errors(form.image) }}</div>
+            {% endif %}
+
+            {% if partenariat.image %}
+                <div class="mt-2">
+                    <img src="{{ asset('uploads/partenariats/' ~ partenariat.image) }}" alt="Image actuelle" class="img-fluid rounded" style="max-width: 200px;">
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="d-flex justify-content-center mt-3">
+            <button type="submit" class="btn btn-primary border-0 rounded-pill py-3 px-5 me-3">Mettre à jour</button>
+        </div>
+
+        {{ form_end(form) }}
+
+    </div>
+</div>
+
+<style>
+    .text-start label {
+        font-weight: bold;
+    }
+</style>
+
+{% endblock %}

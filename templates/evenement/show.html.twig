@@ -1,0 +1,135 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ evenement.titre }}{% endblock %}
+
+{% block body %}
+<!-- Project Header -->
+<div class="container-fluid bg-light py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Project Image -->
+            <div class="col-md-8">
+                {% if evenement.imageurl %}
+                    <img src="{{ asset('uploads/images/' ~ evenement.imageurl) }}" class="img-fluid rounded shadow" alt="{{ evenement.titre }}">
+                {% else %}
+                    <img src="{{ asset('img/event-default.jpg') }}" class="img-fluid rounded shadow" alt="{{ evenement.titre }}">
+                {% endif %}
+            </div>
+            
+            <!-- Project Info -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h1 class="h2 mb-4">{{ evenement.titre }}</h1>
+                        
+                        <!-- Progress Section -->
+                        <div class="progress mb-3" style="height: 8px;">
+                            {% set progress = (evenement.collectedamount / evenement.goalamount * 100)|round %}
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ progress }}%"></div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h2 class="h1 mb-0">{{ evenement.collectedamount|number_format(0, ',', ' ') }} €</h2>
+                            <p class="text-muted">collectés sur {{ evenement.goalamount|number_format(0, ',', ' ') }} €</p>
+                            
+                            <div class="d-flex justify-content-between mb-3">
+                                <div>
+                                    <h4 class="mb-0">{{ progress }}%</h4>
+                                    <small class="text-muted">financé</small>
+                                </div>
+                                <div>
+                                    {% set daysLeft = date(evenement.enddate).diff(date()).days %}
+                                    <h4 class="mb-0">{{ daysLeft }}</h4>
+                                    <small class="text-muted">jours restants</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Donation Button -->
+                        <div class="d-grid gap-2 mb-4">
+                            <a href="{{ path('app_don_new', {'id': evenement.id}) }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-heart me-2"></i>Faire un don
+                            </a>
+                        </div>
+                        
+                        <!-- Creator Info -->
+                        <div class="d-flex align-items-center mb-4">
+                            <img src="{{ asset('img/user-placeholder.jpg') }}" class="rounded-circle me-3" width="50" height="50" alt="Creator">
+                            <div>
+                                <h5 class="mb-0">{{ evenement.createur ?? 'Anonymous' }}</h5>
+                                <p class="text-muted mb-0">{{ evenement.localisation }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Project Details -->
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Description -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h3 class="mb-4">À propos du projet</h3>
+                    <div class="project-description">
+                        {{ evenement.description|nl2br }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Timeline -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h3 class="mb-4">Calendrier</h3>
+                    <div class="d-flex justify-content-between mb-3">
+                        <div>
+                            <h5>Début du projet</h5>
+                            <p class="text-muted">{{ evenement.startdate|date('d/m/Y') }}</p>
+                        </div>
+                        <div class="text-end">
+                            <h5>Fin de la campagne</h5>
+                            <p class="text-muted">{{ evenement.enddate|date('d/m/Y') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <!-- Project Stats -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="mb-3">Statistiques du projet</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-calendar-alt me-2 text-primary"></i>
+                            Créé le {{ evenement.createdat|date('d/m/Y') }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-map-marker-alt me-2 text-primary"></i>
+                            {{ evenement.localisation }}
+                        </li>
+                        <li>
+                            <i class="fas fa-tag me-2 text-primary"></i>
+                            Status: {{ evenement.status }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS -->
+<style>
+.project-description {
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Panier{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="mb-4 text-center">Détails de votre réservation</h1>
+        
+        <!-- Détails de la formation -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">{{ formation.titre }}</h5>
+                <p class="card-text">{{ formation.description }}</p>
+                <p><strong>Organisateur:</strong> {{ formation.organisateur }}</p>
+                <p><strong>Prix:</strong> {{ formation.prix }} D</p>
+                <p><strong>Durée:</strong> {{ formation.duree }} jours</p>
+                <p><strong>Emplacement:</strong> {{ formation.emplacement }}</p>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <form action="{{ path('app_stripe_checkout', {'id': formation.id}) }}" method="POST">
+                <button type="submit" class="btn btn-primary btn-lg">Procéder au paiement</button>
+            </form>
+            <a href="{{ path('app_formation_index') }}" class="btn btn-secondary btn-lg mt-2">Retour à la liste des formations</a>
+        </div>
+    </div>
+{% endblock %}
