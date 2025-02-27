@@ -4,7 +4,8 @@
 
 {% block stylesheets %}
 		<link rel="stylesheet" href="{{ asset('css/SignUpForm.css') }}">
-        {% endblock %}
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}
 {% block body %}
     <h1>ArtiZina — Rejoignez notre équipe d'artistes !</h1>
 
@@ -18,9 +19,7 @@
 			{{ form_start(form ,{'attr' : {'novalidate' : 'novalidate', 'id' :"register-form"}})}}
 			<h1>Créer un compte</h1>
 			<div class="social-container">
-				<a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
 				<a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
-				<a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
 			</div>
 			<span>Saisissez vos informations </span>
 			
@@ -56,9 +55,14 @@
 			{{ form_widget(form.role, {'attr': {'placeholder': 'Role'}, 'label': false}) }}
 			{{ form_errors(form.role) }}
 
-			{{ form_widget(form.imageFile, {'label': false}) }}
-			{{ form_errors(form.imageFile) }}
-
+			<div class="image-file-container">
+				<div class="image-tooltip-container">
+					<i class="fas fa-info-circle tooltip-ball"></i> <!-- Icône informative -->
+					<div class="tooltip-message">Veuillez choisir une image dont le visage apparait clairement pour une connexion ultérieure avec la reconnaissance faciale</div>
+				</div>
+				{{ form_widget(form.imageFile, {'label': false}) }}
+				{{ form_errors(form.imageFile) }}	
+			</div>
 
 			<button type="submit" id="register-button">S'inscrire</button>
 		{{ form_end(form) }}

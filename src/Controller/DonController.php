@@ -10,6 +10,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+<<<<<<< Updated upstream
+=======
+use App\Entity\Evenement;
+use App\Entity\Utilisateur;
+use Symfony\Bundle\SecurityBundle\Security;
+>>>>>>> Stashed changes
 
 #[Route('/don')]
 final class DonController extends AbstractController
@@ -22,14 +28,25 @@ final class DonController extends AbstractController
         ]);
     }
 
+<<<<<<< Updated upstream
     #[Route('/new', name: 'app_don_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
+=======
+    #[Route('/new/{id}', name: 'app_don_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, Security $security, EntityManagerInterface $entityManager, Evenement $evenement): Response
+>>>>>>> Stashed changes
     {
         $don = new Don();
         $form = $this->createForm(DonType::class, $don);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $utilisateur = $security->getUser();
+            if ( $utilisateur instanceof Utilisateur) {
+                $don->setCreateur($utilisateur);
+                
+            }
             $entityManager->persist($don);
             $entityManager->flush();
 

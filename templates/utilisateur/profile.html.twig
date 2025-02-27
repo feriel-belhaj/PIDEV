@@ -1,0 +1,197 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Espace Personnel{% endblock %}
+{% block javascripts %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
+{% block body %}
+
+    <div class="container-fluid menu bg-light py-6 my-6">
+        <div class="container">
+            <div class="text-center wow bounceInUp" data-wow-delay="0.1s">
+                <small class="d-inline-block fw-bold text-dark text-uppercase bg-light border border-primary rounded-pill px-4 py-1 mb-3">Espace Personnel</small>
+                <h1 class="display-5 mb-5">Bienvenue, {{ utilisateur.prenom }} !</h1>
+            </div>
+
+            <div class="tab-class text-center">
+                <!-- Onglets de navigation -->
+                <ul class="nav nav-pills d-inline-flex justify-content-center mb-5 wow bounceInUp" data-wow-delay="0.1s">
+                    {% set categories = ['Mes Commandes', 'Mes Événements', 'Mes Partenariats', 'Mes Produits', 'Mes Candidatures', 'Mes Dons', 'Mes Formations'] %}
+                    
+                    {% for categorie in categories %}
+                        <li class="nav-item p-2">
+                            <a class="d-flex py-2 mx-2 border border-primary bg-white rounded-pill {% if loop.index == 1 %} active {% endif %}" 
+                               data-bs-toggle="pill" href="#{{ categorie|replace({' ': ''}) }}">
+                                <span class="text-dark" style="width: 150px;">{{ categorie }}</span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <!-- Contenu des sections -->
+                <div class="tab-content">
+                    
+                    <!-- Commandes -->
+                    <div id="MesCommandes" class="tab-pane fade show p-0 active">
+                        <div class="row g-4">
+                            {% for commande in commandes %}
+                                <div class="col-lg-6 wow bounceInUp" data-wow-delay="0.1s">
+                                    <div class="menu-item d-flex align-items-center">
+                                        <div class="w-100 d-flex flex-column text-start ps-4">
+                                            <h4>Commande #{{ commande.id }}</h4>
+                                            <p>Passée le {{ commande.datecmd|date('d/m/Y') }}</p>
+                                            <p>Montant : <strong>{{ commande.prix }} dt</strong></p>
+                                            <p>Statut : <strong>{{ commande.statut }} </strong></p>
+                                            <a href="{{ path('app_commande_show', {'id': commande.id}) }}" class="btn btn-primary">Voir détails</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <p>Aucune commande trouvée.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Événements -->
+                    <div id="MesÉvénements" class="tab-pane fade p-0">
+                        <div class="row g-4">
+                            {% for evenement in evennements %}
+                                <div class="col-lg-6 wow bounceInUp">
+                                    <div class="menu-item d-flex align-items-center">
+                                        <div class="w-100 d-flex flex-column text-start ps-4">
+                                            <div class="d-flex align-items-center">
+                                                <img src="{{ asset('uploads/images/' ~ evenement.imageurl) }}" class="rounded-circle me-2" width="60" height="60">
+                                                <h4>{{ evenement.titre }}</h4>
+                                            </div>
+
+                                            <br>
+                                            <p>Objectif :<strong> {{ evenement.goalamount }}</strong></p>
+                                            <p>Collecté : {{ evenement.collectedamount }}</p>
+                                            <p>Description : {{ evenement.description }}</p>
+                                            <p>Commence le : {{ evenement.startdate|date('d/m/Y') }}</p>
+                                            <p>Se termine le : {{ evenement.enddate|date('d/m/Y') }}</p>
+                                            <p>Lieu : {{ evenement.localisation }}</p>
+                                            <p>Statut : {{ evenement.status }}</p>
+                                            <p>Organisé le: {{ evenement.createdat|date('d/m/Y') }}</p>
+                                            <a href="" class="btn btn-primary">Voir détails</a>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <p>Aucun événement créé.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Partenariats -->
+                    <div id="MesPartenariats" class="tab-pane fade p-0">
+                        <div class="row g-4">
+                            {% for partenariat in partenariats %}
+                                <div class="col-lg-6 wow bounceInUp">
+                                    <div class="menu-item d-flex align-items-center">
+                                        <div class="w-100 d-flex flex-column text-start ps-4">
+                                            <h4>{{ partenariat.nom }}</h4>
+                                            <p>Type : {{ partenariat.type }}</p>
+                                            <a href="" class="btn btn-primary">Voir détails</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <p>Aucun partenariat enregistré.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Produits -->
+                    <div id="MesProduits" class="tab-pane fade p-0">
+                        <div class="row g-4">
+                            {% for produit in produits %}
+                                <div class="col-lg-6 wow bounceInUp">
+                                    <div class="menu-item d-flex align-items-center">
+                                        <img src="{{ asset('uploads/' ~ produit.image) }}" alt="{{ produit.nom }}" class="img-fluid rounded-circle" style="width: 100px; height: 100px;">
+                                        <div class="w-100 d-flex flex-column text-start ps-4">
+                                            <h4>{{ produit.nom }}</h4>
+                                            <p>Prix : {{ produit.prix }} dt</p>
+                                            <p>{{ produit.description }}</p>
+                                            <a href="" class="btn btn-primary">Voir détails</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <p>Aucun produit ajouté.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Candidatures -->
+                    <div id="MesCandidatures" class="tab-pane fade p-0">
+                        <div class="row g-4">
+                            {% for candidature in candidatures %}
+                                <div class="col-lg-6 wow bounceInUp">
+                                    <div class="menu-item d-flex align-items-center">
+                                        <div class="w-100 d-flex flex-column text-start ps-4">
+                                            <h4>Poste : {{ candidature.typeCollab }}</h4>
+                                            <p>Date de soumission : {{ candidature.datePostulation|date('d/m/Y') }}</p>
+                                            <a href="" class="btn btn-primary">Voir détails</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <p>Aucune candidature soumise.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Dons -->
+                    <div id="MesDons" class="tab-pane fade p-0">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="text-end">Total des dons : {{ dons|reduce((carry, don) => carry + don.amount, 0) }} dt</h4>
+                    </div>
+                        <div class="row g-4">
+                            {% for don in dons %}
+                                <div class="col-lg-6 wow bounceInUp">
+                                    <div class="menu-item d-flex align-items-center">
+                                        <div class="w-100 d-flex flex-column text-start ps-4">
+                                            <h4>Montant : {{ don.amount }} dt</h4>
+                                            <p>Date : {{ don.donationdate|date('d/m/Y') }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <p>Aucun don effectué.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Formations -->
+                    <div id="MesFormations" class="tab-pane fade p-0">
+                        <div class="row g-4">
+                            {% for formation in formation %}
+                                <div class="col-lg-6 wow bounceInUp">
+                                    <div class="menu-item d-flex align-items-center">
+                                        <div class="w-100 d-flex flex-column text-start ps-4">
+                                            <h4>{{ formation.titre }}</h4>
+                                            <p>Durée : {{ formation.duree }} mois</p>
+                                            <a href="" class="btn btn-primary">Imprimer certificat</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <p>Aucune formation suivie.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Profil End -->
+
+    
+{% endblock %}
+
+
+
+

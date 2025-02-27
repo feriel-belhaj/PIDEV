@@ -14,6 +14,7 @@ class CandidatureType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+<<<<<<< Updated upstream
             ->add('datePostulation', null, [
                 'widget' => 'single_text',
             ])
@@ -21,6 +22,24 @@ class CandidatureType extends AbstractType
             ->add('partenariat', EntityType::class, [
                 'class' => Partenariat::class,
                 'choice_label' => 'id',
+=======
+        ->add('datePostulation', DateType::class, [
+            'widget' => 'single_text',
+            'attr' => ['readonly' => true], 
+        ])
+            ->add('typeCollab', ChoiceType::class, [
+                'choices' => [
+                    'Stage' => 'Stage',
+                    'Sponsoring' => 'Sponsoring',
+                    'Atelier collaboratif' => 'Atelier collaboratif',
+                ],
+                'placeholder' => 'Choisir le Type de Collaboration',
+                'attr' => ['class' => 'form-select border-primary p-2'],
+                'required' => !$isEdit,
+                'constraints' => !$isEdit ? [
+                    new Assert\NotBlank(['message' => 'remplir champs']),
+                ] : [],
+>>>>>>> Stashed changes
             ])
         ;
     }

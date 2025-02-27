@@ -58,9 +58,44 @@ class Formation
     #[ORM\ManyToMany(targetEntity: Utilisateur::class, mappedBy: 'formation')]
     private Collection $utilisateurs;
 
+<<<<<<< Updated upstream
     public function __construct()
     {
         $this->utilisateurs = new ArrayCollection();
+=======
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Utilisateur $createur = null;
+
+   
+    public function getCreateur(): ?Utilisateur
+    {
+        return $this->createur;
+    }
+
+    public function setCreateur(?Utilisateur $createur): self
+    {
+        $this->createur = $createur;
+        return $this;
+    }
+
+     /**
+     * @var Collection<int, Certificat>
+     */
+    #[ORM\OneToMany(targetEntity: Certificat::class, mappedBy: 'formation', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $certificats;
+
+    #[ORM\OneToMany(mappedBy: 'formation', targetEntity: FormationReservee::class, cascade: ['remove'])]
+    private Collection $formationsReservees;
+
+    public function __construct()
+    {
+        $this->utilisateurs = new ArrayCollection();
+        $this->certificats = new ArrayCollection();
+        $this->formationsReservees = new ArrayCollection();
+        $this->datedeb = new \DateTime();
+        $this->datefin = new \DateTime();
+>>>>>>> Stashed changes
     }
 
     public function getId(): ?int
@@ -238,4 +273,43 @@ class Formation
 
         return $this;
     }
+<<<<<<< Updated upstream
 }
+=======
+
+    public function __toString(): string
+    {
+        return $this->titre ?? '';
+    }
+
+    /**
+     * @return Collection<int, FormationReservee>
+     */
+    public function getFormationsReservees(): Collection
+    {
+        return $this->formationsReservees;
+    }
+
+    public function addFormationReservee(FormationReservee $formationReservee): self
+    {
+        if (!$this->formationsReservees->contains($formationReservee)) {
+            $this->formationsReservees->add($formationReservee);
+            $formationReservee->setFormation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFormationReservee(FormationReservee $formationReservee): self
+    {
+        if ($this->formationsReservees->removeElement($formationReservee)) {
+            // set the owning side to null (unless already changed)
+            if ($formationReservee->getFormation() === $this) {
+                $formationReservee->setFormation(null);
+            }
+        }
+
+        return $this;
+    }
+}
+>>>>>>> Stashed changes

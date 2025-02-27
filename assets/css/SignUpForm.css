@@ -328,5 +328,45 @@ ul.form-error li {
 .sexe-options input[type="radio"]:checked + label:active {
     transform: scale(0.98);
 }
+.image-file-container {
+    display: flex;
+    align-items: center; /* Pour aligner l'image et l'icône verticalement au centre */
+    flex-direction: column; /* Empile les éléments verticalement */
+    position: relative;
+}
 
+.image-tooltip-container {
+    position: relative;
+    display: inline-block;
+    margin-top: 10px; /* Espacement entre l'image et l'icône */
+}
+
+.tooltip-ball {
+    font-size: 24px; /* Taille de l'icône */
+    color: #646464; /* Couleur de l'icône */
+    cursor: pointer;
+    margin-top: 10px; /* Espacement au-dessus de l'icône */
+}
+
+.tooltip-message {
+    visibility: hidden;
+    width: 300px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px;
+    position: absolute;
+    top: -40px; /* Positionner le message au-dessus de l'icône */
+    left: 50%;
+    transform: translateX(-50%); /* Centrer horizontalement */
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 9;
+}
+
+.image-tooltip-container:hover .tooltip-message {
+    visibility: visible;
+    opacity: 1;
+}
 

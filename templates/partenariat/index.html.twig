@@ -5,6 +5,7 @@
 {% block body %}
     <h1>Partenariat index</h1>
 
+<<<<<<< Updated upstream
     <table class="table">
         <thead>
             <tr>
@@ -39,3 +40,130 @@
 
     <a href="{{ path('app_partenariat_new') }}">Create new</a>
 {% endblock %}
+=======
+             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+             {% if app.user %}
+            <a href="{{ path('app_partenariat_new') }}" class="btn btn-custom-maj border-0 rounded-pill py-2 px-3 mb-3 wow bounceInUp" data-wow-delay="0.2s">
+             <i class="fas fa-edit fa-1.5x"></i>
+                </a>
+            {% else %}
+                <a href="{{ path('app_login') }}" class="btn btn-custom-maj border-0 rounded-pill py-2 px-3 mb-3 wow bounceInUp" data-wow-delay="0.2s"><i class="fas fa-edit fa-1.5x"></i></a>
+            {% endif %}
+
+   
+
+        <div class="row">
+
+
+            
+            
+            {% for partenariat in partenariats %}
+                <div class="col-md-4">
+                    <div class="card service-item shadow-lg rounded-lg mb-4 position-relative wow bounceInUp" 
+                            data-wow-delay="0.{{ loop.index }}s"
+                            onclick="window.location.href='{{ path('app_partenariat_show', {'id': partenariat.id}) }}';"
+                            style="cursor: pointer;">                     
+                               <!-- Statut en haut à droite -->
+                            <span class="badge position-absolute top-0 end-0 m-2 px-3 py-2 text-white 
+                        {% if partenariat.statut|trim|lower == 'actif' %} bg-success
+                        {% elseif partenariat.statut|trim|lower == 'en cours' %} bg-warning
+                        {% elseif partenariat.statut|trim|lower == 'expiré' %} bg-danger
+                        {% else %} bg-secondary {% endif %}">
+                        {{ partenariat.statut }}
+                    </span>
+
+>
+
+                        <!-- Image du partenariat -->
+                        {% if partenariat.image %}
+                            <img src="{{ asset('uploads/partenariats/' ~ partenariat.image) }}" class="card-img-top" alt="{{ partenariat.nom }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                            <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 200px;">
+                                <p class="text-muted">Aucune image</p>
+                            </div>
+                        {% endif %}
+
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-dark">{{ partenariat.nom }}</h5>
+                            <p class="card-text text-muted"><strong>Type:</strong> {{ partenariat.type }}</p>
+                            <p class="card-text">{{ partenariat.description }}</p>
+                            <p class="text-secondary"><strong>Début:</strong> {{ partenariat.dateDebut ? partenariat.dateDebut|date('Y-m-d') : 'Non défini' }}</p>
+                            <p class="text-secondary"><strong>Fin:</strong> {{ partenariat.dateFin ? partenariat.dateFin|date('Y-m-d') : 'Non défini' }}</p>
+                            <div class="d-flex align-items-center">
+                                <img src="{{ asset('uploads/' ~ partenariat.createur.image) }}" class="rounded-circle me-2" width="40" height="40" alt="Creator">
+                                <p class="text-secondary mb-0"> {{ partenariat.createur ? partenariat.createur.prenom : 'Non défini' }}</p>
+                            </div>
+                            {% if app.user == partenariat.createur %}
+                            <!-- Boutons d'actions -->
+                            <a href="{{ path('app_partenariat_edit', {'id': partenariat.id}) }}" class="btn btn-primary border-0 rounded-pill py-2 px-5 me-5 animated bounceInLeft" style="font-family: 'Open Sans', sans-serif;"> Modifier</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-center">Aucune partenariat trouvé.</p>
+          
+           
+{% endfor %}
+
+
+
+<style>
+    
+    /* Animation au survol */
+    .service-item {
+        background-color: ##FFFCF8; /* Couleur de fond par défaut */
+        border: none;
+        transition: all 0.3s ease-in-out;
+    }
+.service-item:hover .btn-primary {
+    background-color: white; /* Bouton devient blanc */
+    color: #D4A762; /* Texte du bouton devient doré */
+    border: 1px solid #D4A762;
+}
+
+    .service-item:hover {
+        background-color: #D4A762; /* Jaune doré comme dans l'exemple */
+        color: white;
+        transform: scale(1.05);
+    }
+
+    .service-item:hover .card-title {
+        color: white;
+    }
+
+    .service-item:hover .card-text {
+        color: #333;
+    }
+
+    .service-item:hover .action-btn {
+        background-color: white;
+        color: #D4A762;
+        border: 1px solid #D4A762;
+    }
+
+    .service-item:hover .action-btn:hover {
+        background-color: #D4A762; /* Jaune plus foncé au survol */
+        color: white;
+    }
+
+    .badge {
+        font-size: 0.8rem;
+        border-radius: 50px;
+    }
+    .btn-custom-maj {
+    background-color: #D4A762; /* Même couleur que Mettre à jour */
+    color: white;
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-custom-maj:hover {
+    background-color: beige;
+    color: #D4A762;
+    border: 1px solid #D4A762;
+}
+
+</style>
+
+{% endblock %}
+>>>>>>> Stashed changes

@@ -3,10 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Partenariat;
+use App\Entity\Utilisateur;
 use App\Form\PartenariatType;
 use App\Repository\PartenariatRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -23,14 +26,35 @@ final class PartenariatController extends AbstractController
     }
 
     #[Route('/new', name: 'app_partenariat_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, Security $security): Response
     {
         $partenariat = new Partenariat();
         $form = $this->createForm(PartenariatType::class, $partenariat);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+<<<<<<< Updated upstream
+=======
+            /** @var UploadedFile $imageFile */
+            $imageFile = $form->get('image')->getData();
+
+            if ($imageFile) {
+                $newFilename = uniqid().'.'.$imageFile->guessExtension();
+                $imageFile->move($this->getParameter('partenariat_images_directory'), $newFilename);
+                $partenariat->setImage($newFilename);
+            }
+
+            
+            $utilisateur = $security->getUser(); // Récupérer l'utilisateur connecté
+
+            if ( $utilisateur instanceof Utilisateur) {
+                $partenariat->setCreateur($utilisateur);
+                $partenariat->addUtilisateur($utilisateur);
+            }
+
+>>>>>>> Stashed changes
             $entityManager->persist($partenariat);
+            $entityManager->persist($utilisateur);
             $entityManager->flush();
 
             return $this->redirectToRoute('app_partenariat_index', [], Response::HTTP_SEE_OTHER);

@@ -31,8 +31,29 @@ class Commande
     /**
      * @var Collection<int, Produit>
      */
+<<<<<<< Updated upstream
     #[ORM\ManyToMany(targetEntity: Produit::class)]
+=======
+    #[ORM\ManyToMany(targetEntity: Produit::class, inversedBy: 'commandes')]
+    #[ORM\JoinTable(name: "commandeProduits")]
+    #[ORM\JoinColumn(name: "commande_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    #[ORM\InverseJoinColumn(name: "produit_id", referencedColumnName: "id", onDelete: "CASCADE")]
+>>>>>>> Stashed changes
     private Collection $produit;
+
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Utilisateur $createur = null;
+    public function getCreateur(): ?Utilisateur
+    {
+        return $this->createur;
+    }
+
+    public function setCreateur(?Utilisateur $createur): self
+    {
+        $this->createur = $createur;
+        return $this;
+    }
 
     public function __construct()
     {
@@ -104,6 +125,7 @@ class Commande
     {
         if (!$this->produit->contains($produit)) {
             $this->produit->add($produit);
+            
         }
 
         return $this;
@@ -115,4 +137,83 @@ class Commande
 
         return $this;
     }
+<<<<<<< Updated upstream
+=======
+
+    public function setProduit(?Produit $produit): self
+    {
+        $this->produit = $produit;
+        return $this;
+    }
+    ///
+    private ?EntityManagerInterface $entityManager = null;
+
+public function setEntityManager(EntityManagerInterface $entityManager): void
+{
+    $this->entityManager = $entityManager;
+}
+
+public function setQuantiteProduit(Produit $produit, int $quantite, EntityManagerInterface $entityManager): void
+{
+    $conn = $entityManager->getConnection();
+    
+    
+    $sqlCheck = "SELECT COUNT(*) FROM commande_produit WHERE commande_id = :commande_id AND produit_id = :produit_id";
+    $stmtCheck = $conn->prepare($sqlCheck);
+    $count = $stmtCheck->executeQuery([
+        'commande_id' => $this->getId(),
+        'produit_id' => $produit->getId(),
+    ])->fetchOne();
+
+    if ($count > 0) {
+        
+        $sql = "UPDATE commande_produit SET quantite = :quantite WHERE commande_id = :commande_id AND produit_id = :produit_id";
+    } else {
+      
+        $sql = "INSERT INTO commande_produit (commande_id, produit_id, quantite) VALUES (:commande_id, :produit_id, :quantite)";
+    }
+
+    $stmt = $conn->prepare($sql);
+    $stmt->executeQuery([
+        'commande_id' => $this->getId(),
+        'produit_id' => $produit->getId(),
+        'quantite' => $quantite,
+    ]);
+
+    $entityManager->flush(); 
+}
+public function getQuantiteProduit(Produit $produit): ?int
+{
+    if (!$this->entityManager) {
+        throw new \LogicException('EntityManager must be set before calling getQuantiteProduit.');
+    }
+
+    $conn = $this->entityManager->getConnection();
+    $sql = "SELECT quantite FROM commande_produit WHERE commande_id = :commande_id AND produit_id = :produit_id";
+    $stmt = $conn->prepare($sql);
+    $result = $stmt->executeQuery([
+        'commande_id' => $this->getId(),
+        'produit_id' => $produit->getId(),
+    ]);
+
+    return $result->fetchOne() ?: null;
+}
+public function recalculerPrixTotal(): void
+{
+    if (!$this->entityManager) {
+        throw new \LogicException('EntityManager must be set before calling recalculerPrixTotal.');
+    }
+
+    $totalPrix = 0;
+    foreach ($this->produit as $produit) {
+        $quantite = $this->getQuantiteProduit($produit);
+        $totalPrix += $produit->getPrix() * $quantite;
+    }
+
+    $this->setPrix($totalPrix);
+
+    
+    $this->entityManager->flush();
+}
+>>>>>>> Stashed changes
 }

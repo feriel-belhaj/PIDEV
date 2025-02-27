@@ -3,6 +3,7 @@
 {% block title %}Formation index{% endblock %}
 
 {% block body %}
+<<<<<<< Updated upstream
     <h1>Formation index</h1>
 
     <table class="table">
@@ -54,4 +55,65 @@
     </table>
 
     <a href="{{ path('app_formation_new') }}">Create new</a>
+=======
+    {# Affichage des messages flash #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="container mt-5">
+    {% if app.user %}
+        <div class="text-right mb-4 animate__animated animate__fadeInUp">
+            <a href="{{ path('app_formation_new') }}" class="btn btn-primary btn-lg">Créer une nouvelle formation</a>
+        </div>
+        {% else %}
+        <div class="text-right mb-4 animate__animated animate__fadeInUp">
+            <a href="{{ path('app_login') }}"  class="btn btn-primary btn-lg">Créer une nouvelle formation</a>
+        </div>
+        {% endif %}
+
+        <div class="row">
+            {% for formation in formations %}
+                <div class="col-md-4 mb-4 animate__animated animate__fadeInUp">
+                    <div class="card h-100">
+                        {% if formation.image %}
+                            <img src="{{ asset('uploads/formation_images/' ~ formation.image) }}" class="card-img-top" alt="{{ formation.titre }}">
+                        {% else %}
+                            <img src="{{ asset('images/default-formation.jpg') }}" class="card-img-top" alt="Default Image">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ formation.titre }}</h5>
+                            <p class="card-text">{{ formation.description|slice(0, 100) }}...</p>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>Date de début:</strong> {{ formation.datedeb ? formation.datedeb|date('Y-m-d') : 'N/A' }}</li>
+                                <li class="list-group-item"><strong>Date de fin:</strong> {{ formation.datefin ? formation.datefin|date('Y-m-d') : 'N/A' }}</li>
+                                <li class="list-group-item"><strong>Niveau:</strong> {{ formation.niveau }}</li>
+                                <li class="list-group-item"><strong>Prix:</strong> {{ formation.prix }} D</li>
+                                <li class="list-group-item"><strong>Emplacement:</strong> {{ formation.emplacement }}</li>
+                                <li class="list-group-item"><strong>Places disponibles:</strong> {{ formation.nbplace - formation.nbparticipant }}</li>
+                                <li class="list-group-item"><strong>Durée:</strong> {{ formation.duree }} heures</li>
+                                <li class="list-group-item"><strong>Organisateur:</strong> {{ formation.createur.prenom }} {{ formation.createur.nom }} </li>
+                            </ul>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <a href="{{ path('app_formation_show', {'id': formation.id}) }}" class="btn btn-primary py-2 px-4 d-none d-xl-inline-block rounded-pill">Voir plus</a>
+                           <!-- <a href="{{ path('app_formation_edit', {'id': formation.id}) }}" class="btn btn-primary py-2 px-4 d-none d-xl-inline-block rounded-pill">Modifier</a>-->
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12 animate__animated animate__fadeIn">
+                    <div class="alert alert-warning text-center" role="alert">
+                        Aucune formation trouvée.
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+>>>>>>> Stashed changes
 {% endblock %}

@@ -10,15 +10,26 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Entity\FormationReservee;
 
 #[Route('/certificat')]
 final class CertificatController extends AbstractController
 {
-    #[Route(name: 'app_certificat_index', methods: ['GET'])]
-    public function index(CertificatRepository $certificatRepository): Response
+    #[Route('/', name: 'app_certificat_index', methods: ['GET'])]
+    public function index(EntityManagerInterface $entityManager): Response
     {
+        $certificats = $entityManager
+            ->getRepository(Certificat::class)
+            ->findAll();
+
+        // Récupérer les formations réservées
+        $formationsReservees = $entityManager
+            ->getRepository(FormationReservee::class)
+            ->findAll();
+
         return $this->render('certificat/index.html.twig', [
-            'certificats' => $certificatRepository->findAll(),
+            'certificats' => $certificats,
+            'formationsReservees' => $formationsReservees,
         ]);
     }
 

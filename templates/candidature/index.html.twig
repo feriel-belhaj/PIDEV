@@ -3,7 +3,35 @@
 {% block title %}Candidature index{% endblock %}
 
 {% block body %}
+<<<<<<< Updated upstream
     <h1>Candidature index</h1>
+=======
+    <div class="container py-5">
+        <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+            <h1 class="display-5 mb-4">Listes des Candidatures</h1>
+        </div>
+        
+        <div class="row g-4">
+            {% for candidature in candidatures %}
+                <div class="col-lg-4 col-md-6 fadeInUp" style="animation: fadeInUp 0.6s ease-out {{ loop.index * 0.2 }}s forwards;">
+                    <div class="team-item rounded overflow-hidden position-relative shadow-lg card-effect">
+                        <div class="team-img position-relative">
+                            {% if candidature.partenariat.image %}
+                                <img src="{{ asset('uploads/partenariats/' ~ candidature.partenariat.image) }}" 
+                                     class="img-fluid w-100" 
+                                     alt="Logo du partenariat">
+                            {% endif %}
+                            <div class="team-social d-flex flex-column position-absolute top-0 end-0 m-3">
+                                {% if candidature.cv %}
+                                        <div class="mt-4 text-center">
+                                            <a class="btn icon-bg btn-sm rounded-circle mb-2" href="{{ asset('uploads/' ~ candidature.cv) }}" target="_blank" data-bs-toggle="tooltip" title="Voir CV">
+                                                <i class="fas fa-file-alt"></i>
+                                            </a>
+                                        </div>
+                                    {% else %}
+                                        <p class="text-muted text-center mt-4">Pas de CV fourni</p>
+                                    {% endif %}
+>>>>>>> Stashed changes
 
     <table class="table">
         <thead>

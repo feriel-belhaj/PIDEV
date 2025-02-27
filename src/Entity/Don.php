@@ -28,9 +28,29 @@ class Don
     #[ORM\Column(type: Types::TEXT)]
     private ?string $message = null;
 
+<<<<<<< Updated upstream
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?evenement $evenement = null;
+=======
+    #[ORM\ManyToOne(inversedBy: 'dons')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Evenement $evenement = null;
+    
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Utilisateur $createur = null;
+    public function getCreateur(): ?Utilisateur
+    {
+        return $this->createur;
+    }
+
+    public function setCreateur(?Utilisateur $createur): self
+    {
+        $this->createur = $createur;
+        return $this;
+    }
+>>>>>>> Stashed changes
 
     public function getId(): ?int
     {

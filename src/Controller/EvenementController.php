@@ -3,10 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Evenement;
+use App\Entity\Utilisateur;
 use App\Form\EvenementType;
 use App\Repository\EvenementRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -23,13 +25,35 @@ final class EvenementController extends AbstractController
     }
 
     #[Route('/new', name: 'app_evenement_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, Security $security, EntityManagerInterface $entityManager): Response
     {
         $evenement = new Evenement();
         $form = $this->createForm(EvenementType::class, $evenement);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+<<<<<<< Updated upstream
+=======
+            $imageFile = $form->get('imageFile')->getData();
+            if ($imageFile) {
+                $newFilename = uniqid().'.'.$imageFile->guessExtension();
+                try {
+                    $imageFile->move(
+                        $this->getParameter('images_directory'),
+                        $newFilename
+                    );
+                    $evenement->setImageurl($newFilename);
+                } catch (FileException $e) {
+                    // Gérer l'erreur si nécessaire
+                }
+            }
+            $user = $security->getUser();
+
+            if ($user instanceof Utilisateur) {             
+                
+                $evenement->setCreateur($user);
+            }
+>>>>>>> Stashed changes
             $entityManager->persist($evenement);
             $entityManager->flush();
 
@@ -76,6 +100,6 @@ final class EvenementController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_evenement_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_evenement_admin', [], Response::HTTP_SEE_OTHER);
     }
 }

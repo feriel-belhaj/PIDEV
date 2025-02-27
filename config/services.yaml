@@ -5,6 +5,13 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     uploads_directory: '%kernel.project_dir%/public/uploads'
+<<<<<<< Updated upstream
+=======
+    partenariat_images_directory: '%kernel.project_dir%/public/uploads/partenariats'
+    formation_images_directory: '%kernel.project_dir%/public/uploads/formation_images'
+    face_api_key: '%env(FACE_API_KEY)%'
+    face_api_secret: '%env(FACE_API_SECRET)%'
+>>>>>>> Stashed changes
 
 services:
     Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator: '@security.authenticator.form_login.main'

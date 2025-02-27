@@ -3,10 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Produit;
+use App\Entity\Utilisateur;
 use App\Form\ProduitType;
 use App\Repository\ProduitRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -23,18 +26,25 @@ final class ProduitController extends AbstractController
     }
 
     #[Route('/new', name: 'app_produit_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager,Security $security): Response
     {
+        
         $produit = new Produit();
         $form = $this->createForm(ProduitType::class, $produit);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $user = $security->getUser();
+    
+            if ($user instanceof Utilisateur) {
+                
+                $produit->setCreateur($user);
+            }
             $entityManager->persist($produit);
             $entityManager->flush();
 
             return $this->redirectToRoute('app_produit_index', [], Response::HTTP_SEE_OTHER);
-        }
+            }
 
         return $this->render('produit/new.html.twig', [
             'produit' => $produit,
@@ -78,4 +88,69 @@ final class ProduitController extends AbstractController
 
         return $this->redirectToRoute('app_produit_index', [], Response::HTTP_SEE_OTHER);
     }
+<<<<<<< Updated upstream
+=======
+   
+
+    //////backend
+    #[Route('/admin/produits', name: 'admin_produit_index')]
+public function adminIndex(EntityManagerInterface $entityManager): Response
+{
+    $produits = $entityManager->getRepository(Produit::class)->findAll();
+
+    return $this->render('produit/admin_produit_index.html.twig', [
+        'produits' => $produits,
+    ]);
+    
+}
+#[Route('/admin/produit', name: 'admin_produit_index')]
+public function index2(Request $request,Security $security, EntityManagerInterface $entityManager): Response
+{
+    
+    $produits = $entityManager->getRepository(Produit::class)->findAll();
+
+    
+    $produit = new Produit();
+    $form = $this->createForm(ProduitType::class, $produit);
+
+    
+    $form->handleRequest($request);
+    if ($form->isSubmitted() && $form->isValid()) {
+        
+        $imageFile = $form->get('image')->getData();
+        if ($imageFile) {
+            $newFilename = uniqid().'.'.$imageFile->guessExtension(); 
+            try {
+                $imageFile->move(
+                    $this->getParameter('uploads_directory'), 
+                    $newFilename
+                );
+                $produit->setImage($newFilename);
+            } catch (\Exception $e) {
+                $this->addFlash('danger', 'Erreur lors de l\'upload de l\'image.');
+                return $this->redirectToRoute('admin_produit_index');
+            }
+        }
+        $user = $security->getUser();
+    
+            if ($user instanceof Utilisateur) {
+                
+                $produit->setCreateur($user);
+            }
+
+        $entityManager->persist($produit);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Produit ajouté avec succès !');
+
+        return $this->redirectToRoute('admin_produit_index');
+    }
+
+    return $this->render('produit/admin_produit_index.html.twig', [
+        'produits' => $produits,
+        'form' => $form->createView(), 
+    ]);
+
+}
+>>>>>>> Stashed changes
 }

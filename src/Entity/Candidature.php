@@ -16,6 +16,29 @@ class Candidature
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $datePostulation = null;
+<<<<<<< Updated upstream
+=======
+
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Utilisateur $createur = null;
+    public function getCreateur(): ?Utilisateur
+    {
+        return $this->createur;
+    }
+
+    public function setCreateur(?Utilisateur $createur): self
+    {
+        $this->createur = $createur;
+        return $this;
+    }
+        
+
+    #[ORM\ManyToOne(targetEntity: Partenariat::class, inversedBy: 'candidatures')]
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
+    private ?Partenariat $partenariat = null;
+
+>>>>>>> Stashed changes
 
     #[ORM\Column(length: 255)]
     private ?string $status = null;
@@ -63,4 +86,64 @@ class Candidature
 
         return $this;
     }
+<<<<<<< Updated upstream
 }
+=======
+
+    public function getCv(): ?string
+    {
+        return $this->cv;
+    }
+
+    public function setCv(string $cv): static
+    {
+        $this->cv = $cv;
+
+        return $this;
+    }
+
+    public function getPortfolio(): ?string
+    {
+        return $this->portfolio;
+    }
+
+    public function setPortfolio(string $portfolio): static
+    {
+        $this->portfolio = $portfolio;
+
+        return $this;
+    }
+
+    public function getMotivation(): ?string
+    {
+        return $this->motivation;
+    }
+
+    public function setMotivation(string $motivation): static
+    {
+        $this->motivation = $motivation;
+
+        return $this;
+    }
+
+    
+
+    public function getTypeCollab(): ?string
+    {
+        return $this->typeCollab;
+    }
+
+    public function setTypeCollab(string $typeCollab): static
+    {
+        $this->typeCollab = $typeCollab;
+
+        return $this;
+    }
+    public function __construct()
+    {
+        $this->datePostulation = new \DateTime(); // Date système par défaut
+    }
+
+
+} 
+>>>>>>> Stashed changes

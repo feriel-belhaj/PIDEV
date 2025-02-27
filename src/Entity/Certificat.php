@@ -28,7 +28,22 @@ class Certificat
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+<<<<<<< Updated upstream
     private ?formation $formation = null;
+=======
+    private ?Formation $formation = null;
+
+    
+
+    public function __construct()
+    {
+        $this->dateobt = new \DateTime();
+        $this->nom = '';
+        $this->prenom = '';
+        $this->niveau = '';
+        $this->nomorganisme = '';
+    }
+>>>>>>> Stashed changes
 
     public function getId(): ?int
     {

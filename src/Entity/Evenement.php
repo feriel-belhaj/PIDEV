@@ -54,9 +54,38 @@ class Evenement
     #[ORM\ManyToMany(targetEntity: Utilisateur::class, mappedBy: 'evennement')]
     private Collection $utilisateurs;
 
+<<<<<<< Updated upstream
     public function __construct()
     {
         $this->utilisateurs = new ArrayCollection();
+=======
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Utilisateur $createur = null;
+
+   
+    public function getCreateur(): ?Utilisateur
+    {
+        return $this->createur;
+    }
+
+    public function setCreateur(?Utilisateur $createur): self
+    {
+        $this->createur = $createur;
+        return $this;
+    }
+
+    #[ORM\OneToMany(mappedBy: 'evenement', targetEntity: Don::class, cascade: ['remove'])]
+    private Collection $dons;
+
+    public function __construct()
+    {
+        $this->utilisateurs = new ArrayCollection();
+        $this->dons = new ArrayCollection();
+        $this->startdate = new \DateTime();
+        $this->enddate = (new \DateTime())->modify('+1 day');
+        $this->createdat = new \DateTimeImmutable();
+>>>>>>> Stashed changes
     }
 
     public function getId(): ?int

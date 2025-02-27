@@ -37,15 +37,41 @@ class Produit
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $datecreation = null;
 
+<<<<<<< Updated upstream
     /**
      * @var Collection<int, Utilisateur>
      */
     #[ORM\ManyToMany(targetEntity: Utilisateur::class, mappedBy: 'produit')]
     private Collection $produits;
+=======
+    
+    /**
+     * @var Collection<int, Utilisateur>
+     */
+    #[ORM\ManyToMany(targetEntity: Utilisateur::class, mappedBy: 'produits')]
+    private Collection $utilisateurs;
+    
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Utilisateur $createur = null;
+
+   
+    public function getCreateur(): ?Utilisateur
+    {
+        return $this->createur;
+    }
+
+    public function setCreateur(?Utilisateur $createur): self
+    {
+        $this->createur = $createur;
+        return $this;
+    }
+>>>>>>> Stashed changes
 
     public function __construct()
     {
-        $this->produits = new ArrayCollection();
+        $this->utilisateurs = new ArrayCollection();
+       
     }
 
     public function getId(): ?int
@@ -136,31 +162,57 @@ class Produit
 
         return $this;
     }
+<<<<<<< Updated upstream
 
     /**
      * @return Collection<int, Utilisateur>
      */
     public function getProduits(): Collection
+=======
+    /**
+     * @return Collection<int, Utilisateur>
+     */
+    public function getUtilisateurs(): Collection
+>>>>>>> Stashed changes
     {
-        return $this->produits;
+        return $this->utilisateurs;
     }
 
-    public function addProduit(Utilisateur $produit): static
+    public function addUtilisateur(Utilisateur $utilisateur): static
     {
-        if (!$this->produits->contains($produit)) {
-            $this->produits->add($produit);
-            $produit->addProduit($this);
+        if (!$this->utilisateurs->contains($utilisateur)) {
+            $this->utilisateurs->add($utilisateur);
+            $utilisateur->addProduit($this);
         }
 
         return $this;
     }
 
-    public function removeProduit(Utilisateur $produit): static
+    public function removeUtilisateur(Utilisateur $utilisateur): static
     {
-        if ($this->produits->removeElement($produit)) {
-            $produit->removeProduit($this);
+        if ($this->utilisateurs->removeElement($utilisateur)) {
+            $utilisateur->removeProduit($this);
         }
 
         return $this;
     }
+<<<<<<< Updated upstream
+=======
+
+    public static function getUniqueCategories(array $produits): array
+    {
+        $categories = array_map(fn($produit) => $produit->getCategorie(), $produits);
+        return array_values(array_unique($categories));
+    }
+
+    public static function getUniqueCategoriesObject(array $produits): array
+    {
+        $categories = array_map(fn($produit) => $produit->getCategorie(), $produits);
+        $uniqueCategories = array_unique($categories);
+        return array_map(fn($category) => ['key' => $category, 'value' => $category], array_values($uniqueCategories));
+    }
+
+   
+
+>>>>>>> Stashed changes
 }
