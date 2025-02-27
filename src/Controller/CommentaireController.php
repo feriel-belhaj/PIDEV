@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Commentaire;
 use App\Form\CommentaireType;
 use App\Repository\CommentaireRepository;
+use App\Service\ProfanityFilterService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,13 +17,16 @@ class CommentaireController extends AbstractController
 {
     private $entityManager;
     private $commentaireRepository;
+    private $profanityFilter;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        CommentaireRepository $commentaireRepository
+        CommentaireRepository $commentaireRepository,
+        ProfanityFilterService $profanityFilter
     ) {
         $this->entityManager = $entityManager;
         $this->commentaireRepository = $commentaireRepository;
+        $this->profanityFilter = $profanityFilter;
     }
 
     #[Route('/', name: 'commentaire_list')]
@@ -41,6 +45,10 @@ class CommentaireController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Filter profanity from comment content
+            $filteredContent = $this->profanityFilter->filterText($commentaire->getContenu());
+            $commentaire->setContenu($filteredContent);
+            
             $this->entityManager->persist($commentaire);
             $this->entityManager->flush();
             return $this->redirectToRoute('commentaire_list');
@@ -64,6 +72,10 @@ class CommentaireController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Filter profanity from comment content during edit
+            $filteredContent = $this->profanityFilter->filterText($commentaire->getContenu());
+            $commentaire->setContenu($filteredContent);
+            
             $this->entityManager->flush();
             return $this->redirectToRoute('commentaire_list');
         }

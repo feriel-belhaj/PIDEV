@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Creation;
 use App\Form\CreationType;
 use App\Repository\CreationRepository;
+use App\Service\ProfanityFilterService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;       
 use Symfony\Component\HttpFoundation\Request;
@@ -18,10 +19,12 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class CreationController extends AbstractController
 {
     private $uploadDir;
+    private $profanityFilter;
 
-    public function __construct(string $uploadDir = 'uploads/images')
+    public function __construct(string $uploadDir = 'uploads/images', ProfanityFilterService $profanityFilter = null)
     {
         $this->uploadDir = $uploadDir;
+        $this->profanityFilter = $profanityFilter;
     }
 
     #[Route('/', name: 'index', methods: ['GET'])]
@@ -33,13 +36,18 @@ class CreationController extends AbstractController
     }
 
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request, ManagerRegistry $doctrine): Response
+    public function new(Request $request, ManagerRegistry $doctrine, ProfanityFilterService $profanityFilter): Response
     {
         $creation = new Creation();
         $form = $this->createForm(CreationType::class, $creation);
         $form->handleRequest($request);
     
         if ($form->isSubmitted() && $form->isValid()) {
+            // Filter profanity from title and description
+            $filteredTitle = $profanityFilter->filterText($creation->getTitre());
+            $filteredDescription = $profanityFilter->filterText($creation->getDescription());
+            $creation->setTitre($filteredTitle);
+            $creation->setDescription($filteredDescription);
             /** @var UploadedFile $imageFile */
             $imageFile = $form->get('image')->getData();
 
@@ -104,12 +112,17 @@ class CreationController extends AbstractController
     }
     
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Creation $creation, ManagerRegistry $doctrine): Response
+    public function edit(Request $request, Creation $creation, ManagerRegistry $doctrine, ProfanityFilterService $profanityFilter): Response
     {
         $form = $this->createForm(CreationType::class, $creation);
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
+            // Filter profanity from title and description during edit
+            $filteredTitle = $profanityFilter->filterText($creation->getTitre());
+            $filteredDescription = $profanityFilter->filterText($creation->getDescription());
+            $creation->setTitre($filteredTitle);
+            $creation->setDescription($filteredDescription);
             /** @var UploadedFile $imageFile */
             $imageFile = $form->get('image')->getData();
 

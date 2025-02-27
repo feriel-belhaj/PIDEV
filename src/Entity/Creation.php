@@ -19,7 +19,7 @@ class Creation
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    #[Assert\NotBlank(message: "Le titre ne peut pas être vide")]
+    #[Atsser\NotBlank(message: "Le titre ne peut pas être vide")]
     #[Assert\Length(
         min: 2,
         max: 100,
