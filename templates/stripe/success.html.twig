@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paiement réussi{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {% if payment_data is defined and payment_data is not null %}
+            <div class="alert alert-success">
+                <h2>Paiement réussi !</h2>
+                <p>Votre don de {{ payment_data.amount }} € a bien été enregistré.</p>
+                {% if payment_data.email_sent %}
+                    <p>Un email de confirmation vous a été envoyé.</p>
+                {% else %}
+                    <p class="text-warning">Note: L'email de confirmation n'a pas pu être envoyé.</p>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="alert alert-warning">
+                <h2>État du paiement inconnu</h2>
+                <p>Nous n'avons pas pu récupérer les informations de votre paiement.</p>
+            </div>
+        {% endif %}
+
+        <a href="{{ path('app_evenement_index') }}" class="btn btn-primary">Retour aux événements</a>
+    </div>
+{% endblock %} 

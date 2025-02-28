@@ -1,0 +1,126 @@
+
+
+{% block title %}{% endblock %}
+
+{% block stylesheets %}
+		<link rel="stylesheet" href="{{ asset('css/SignUpForm.css') }}">
+        {% endblock %}
+{% block body %}
+    <h1>ArtiZina — Rejoignez notre équipe d'artistes !</h1>
+
+    {#{{ include('utilisateur/_form.html.twig') }}#}
+
+    {#<a href="{{ path('app_utilisateur_index') }}">back to list</a>#}
+	<br>
+    <div class="container" id="container">
+
+		<div class="form-container sign-up-container">
+			{{ form_start(form ,{'attr' : {'novalidate' : 'novalidate', 'id' :"register-form"}})}}
+			<h1>Créer un compte</h1>
+			<div class="social-container">
+				<a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+				<a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+				<a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+			</div>
+			<span>Saisissez vos informations </span>
+			
+			{{ form_widget(form.nom, {'attr': {'placeholder': 'Nom'}, 'label': false}) }}
+			{{ form_errors(form.nom) }}
+
+			{{ form_widget(form.prenom, {'attr': {'placeholder': 'Prénom'}, 'label': false}) }}
+			{{ form_errors(form.prenom) }}
+
+			{{ form_widget(form.email, {'attr': {'placeholder': 'Email' ,'id' :"register-email"}, 'label': false}) }}
+			{{ form_errors(form.email) }}
+
+			
+			{{ form_widget(form.password.first, {'attr': {'placeholder': 'Mot de passe', 'id' :"register-password", 'autocomplete': 'new-password'}, 'label': false}) }}
+			{{ form_errors(form.password.first) }}
+
+			{{ form_widget(form.password.second, {'attr': {'placeholder': 'Confirmer le mot de passe', 'autocomplete': 'new-password'}, 'label': false}) }}
+			{{ form_errors(form.password.second) }}
+
+			<div id="password-match"></div>
+
+			{{ form_widget(form.adresse, {'attr': {'placeholder': 'Adresse'}, 'label': false}) }}
+			{{ form_errors(form.adresse) }}
+
+			{{ form_widget(form.telephone, {'attr': {'placeholder': 'Téléphone'}, 'label': false}) }}
+			{{ form_errors(form.telephone) }}
+
+			<br>
+			{{ form_widget(form.sexe, {'attr': {'class': 'sexe-options'}}) }}
+			{{ form_errors(form.sexe) }}
+			<br>
+
+			{{ form_widget(form.role, {'attr': {'placeholder': 'Role'}, 'label': false}) }}
+			{{ form_errors(form.role) }}
+
+			{{ form_widget(form.imageFile, {'label': false}) }}
+			{{ form_errors(form.imageFile) }}
+
+
+			<button type="submit" id="register-button">S'inscrire</button>
+		{{ form_end(form) }}
+
+	</div>
+<div>
+    <img src="{{ asset('img/logo.png') }}"  width="400" height="auto">
+    <br>
+
+</div>
+	
+	<div class="overlay-container">
+		<div class="overlay">
+			<div class="overlay-panel overlay-left">
+				<h1>Bienvenue de nouveau !</h1>
+				<p>Pour rester connecté avec nous, veuillez vous connecter avec vos informations personnelles</p>
+				<h5> Vous avez déja un compte ?</h5>
+				<button class="ghost" onclick="window.location.href='{{ path('app_login') }}'">Se connecter</button>
+			</div>
+			<div class="overlay-panel overlay-right">
+				<h1>Bonjour, Artiste !</h1>
+				<p>Entrez vos informations personnelles et commencez votre aventure avec nous</p>
+				
+				<button class="ghost" id="signUp">S'inscrire</button>
+			</div>
+		</div>
+		</div>
+	</div>
+{% endblock %}
+
+ {% block javascripts %}
+            <script src="{{ asset('js/signUp.js') }}"></script>
+			<script>
+				document.addEventListener("DOMContentLoaded", function () {
+					let form = document.querySelector("form");
+					form.addEventListener("submit", function () {
+					setTimeout(() => {
+						form.reset(); 
+					}, 500);
+				});
+
+				});
+			</script>
+
+			<script>
+			document.addEventListener("DOMContentLoaded", function () {
+				const passwordField = document.getElementById('utilisateur_password_first');
+				const confirmPasswordField = document.getElementById('utilisateur_password_second');
+				const passwordMatchMessage = document.getElementById('password-match');
+				
+					confirmPasswordField.addEventListener('input', function () {
+						if (confirmPasswordField.value === passwordField.value) {
+							passwordMatchMessage.textContent = 'Les mots de passe correspondent';
+							passwordMatchMessage.style.color = 'green';
+						} else {
+							passwordMatchMessage.textContent = 'Les mots de passe ne correspondent pas';
+							passwordMatchMessage.style.color = 'red';
+						}
+					});
+			});
+			</script>
+
+			
+
+{% endblock %}

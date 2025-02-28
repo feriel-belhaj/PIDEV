@@ -1,0 +1,4 @@
+<form method="post">
+    {{ form_widget(form) }}
+    <button type="submit" class="{{ button_class|default('btn btn-success') }}">{{ button_label|default('Enregistrer') }}</button>
+</form>

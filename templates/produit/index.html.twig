@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Produit index{% endblock %}
+
+{% block body %}
+
+    
+
+    <!-- Menu Start -->
+    <div class="container-fluid menu bg-light py-6 my-6">
+        <div class="container">
+            <div class="text-center wow bounceInUp" data-wow-delay="0.1s">
+                <small class="d-inline-block fw-bold text-dark text-uppercase bg-light border border-primary rounded-pill px-4 py-1 mb-3">notre catalogue</small>
+                <h1 class="display-5 mb-5">Most Popular  artistic products</h1>
+            </div>
+
+            <div class="tab-class text-center">
+                <!-- Formulaire unique pour commander plusieurs produits -->
+                <form action="{{ path('app_commande_new') }}" method="post">
+                    
+                    <!-- Navigation par catégories -->
+                    <ul class="nav nav-pills d-inline-flex justify-content-center mb-5 wow bounceInUp" data-wow-delay="0.1s">
+                        {% for categorie in categories %}
+                            <li class="nav-item p-2">
+                                <a class="d-flex py-2 mx-2 border border-primary bg-white rounded-pill {% if loop.index == 1 %} active {% endif %}" 
+                                   data-bs-toggle="pill" href="#{{ categorie }}">
+                                    <span class="text-dark" style="width: 150px;">{{ categorie }}</span>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                    <!-- Contenu des catégories -->
+                    <div class="tab-content">
+                        {% for categorie in categories %}
+                            <div id="{{ categorie }}" class="tab-pane fade show p-0 {% if loop.index == 1 %} active {% endif %}">
+                                <div class="row g-4">
+                                    {% for produit in produits %}
+                                        {% if produit.categorie == categorie %}
+                                            <div class="col-lg-6 wow bounceInUp" data-wow-delay="0.1s">
+                                                <div class="menu-item d-flex align-items-center">
+                                                    <img class="flex-shrink-0 img-fluid rounded-circle" 
+                                                         src="{{ asset('uploads/' ~ produit.image) }}" 
+                                                         alt="{{ produit.nom }}" 
+                                                         style="width: 100px; height: 100px; object-fit: cover;">
+                                                    <div class="w-100 d-flex flex-column text-start ps-4">
+                                                        <div class="d-flex justify-content-between border-bottom border-primary pb-2 mb-2">
+                                                            <h4>{{ produit.nom }}</h4>
+                                                            <h4 class="text-primary">{{ produit.prix }}dt</h4>
+                                                        </div>
+                                                        <p class="mb-0">{{ produit.description }}</p>
+
+                                                        <!-- Champ pour sélectionner la quantité -->
+                                                        <div class="input-group mt-2">
+                                                            <input type="hidden" name="produits[{{ produit.id }}][id]" value="{{ produit.id }}">
+                                                            <input type="number" name="produits[{{ produit.id }}][quantite]" class="form-control" placeholder="Quantité" min="0">
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Bouton global pour commander tous les produits sélectionnés -->
+                    {% if app.user %}
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary py-2 px-4 d-none d-xl-inline-block rounded-pill">Commander</button>
+                    </div>
+
+                    <!-- Nouveau bouton pour rediriger vers la liste des commandes juste en dessous du bouton "Commander" -->
+                    <div class="text-center mt-2">
+                        <a href="{{ path('app_commande_index') }}" class="btn btn-secondary py-2 px-4 d-none d-xl-inline-block rounded-pill">Voir mes commandes</a>
+                    </div>
+                    {% else %}
+                        <div class="text-center mt-4">
+                        <a  href="{{ path('app_login') }}" class="btn btn-primary py-2 px-4 d-none d-xl-inline-block rounded-pill">Commander</a>
+                    </div>
+                    {% endif %}
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Menu End -->
+
+{% endblock %}

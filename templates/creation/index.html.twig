@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Creation index{% endblock %}
+
+{% block body %}
+    <h1>Creation index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Titre</th>
+                <th>Decription</th>
+                <th>Image</th>
+                <th>Categorie</th>
+                <th>DatePublic</th>
+                <th>Statut</th>
+                <th>NbLike</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for creation in creations %}
+            <tr>
+                <td>{{ creation.id }}</td>
+                <td>{{ creation.titre }}</td>
+                <td>{{ creation.decription }}</td>
+                <td>{{ creation.image }}</td>
+                <td>{{ creation.categorie }}</td>
+                <td>{{ creation.datePublic ? creation.datePublic|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ creation.statut }}</td>
+                <td>{{ creation.nbLike }}</td>
+                <td>
+                    <a href="{{ path('app_creation_show', {'id': creation.id}) }}">show</a>
+                    <a href="{{ path('app_creation_edit', {'id': creation.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_creation_new') }}">Create new</a>
+{% endblock %}

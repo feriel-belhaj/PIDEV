@@ -1,0 +1,365 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Dashboard des Événements{% endblock %}
+
+{% block body %}
+<div class="container-fluid p-0">
+    <h1 class="h3 mb-3"><strong>Analytics</strong> Dashboard</h1>
+
+    <div class="row">
+        <div class="col-xl-6 col-xxl-5 d-flex">
+            <div class="w-100">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col mt-0">
+                                        <h5 class="card-title">Événements</h5>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="stat text-primary">
+                                            <i class="align-middle" data-feather="calendar"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h1 class="mt-1 mb-3">{{ totalEvenements }}</h1>
+                                <div class="mb-0">
+                                    <span class="text-danger"><i class="mdi mdi-arrow-bottom-right"></i> -3.65%</span>
+                                    <span class="text-muted">Depuis la semaine dernière</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col mt-0">
+                                        <h5 class="card-title">Donateurs</h5>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="stat text-primary">
+                                            <i class="align-middle" data-feather="users"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h1 class="mt-1 mb-3">{{ totalDonateurs }}</h1>
+                                <div class="mb-0">
+                                    <span class="text-success"><i class="mdi mdi-arrow-bottom-right"></i> +5.25%</span>
+                                    <span class="text-muted">Depuis la semaine dernière</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col mt-0">
+                                        <h5 class="card-title">Montant total des dons</h5>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="stat text-primary">
+                                            <i class="align-middle" data-feather="dollar-sign"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h1 class="mt-1 mb-3">{{ totalDons|number_format(0, ',', ' ') }}€</h1>
+                                <div class="mb-0">
+                                    <span class="text-success"><i class="mdi mdi-arrow-bottom-right"></i> +6.65%</span>
+                                    <span class="text-muted">Depuis la semaine dernière</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col mt-0">
+                                        <h5 class="card-title">Nombre de dons</h5>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="stat text-primary">
+                                            <i class="align-middle" data-feather="shopping-cart"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h1 class="mt-1 mb-3">{{ nombreDons }}</h1>
+                                <div class="mb-0">
+                                    <span class="text-danger"><i class="mdi mdi-arrow-bottom-right"></i> -2.25%</span>
+                                    <span class="text-muted">Depuis la semaine dernière</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-8 d-flex">
+            <div class="card flex-fill w-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Évolution des dons</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart">
+                        <canvas id="donations-evolution-chart" style="height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-12 col-lg-4 d-flex">
+            <div class="card flex-fill">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Distribution par catégorie</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart">
+                        <canvas id="categories-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-lg-8 col-xxl-9 d-flex">
+            <div class="card flex-fill">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Derniers Événements</h5>
+                        <a href="{{ path('app_evenement_admin') }}" class="btn btn-primary btn-sm">
+                            <i class="align-middle" data-feather="list"></i> Liste des événements
+                        </a>
+                    </div>
+                </div>
+                <table class="table table-hover my-0">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th class="d-none d-xl-table-cell">Date de création</th>
+                            <th class="d-none d-xl-table-cell">Date de début</th>
+                            <th>Status</th>
+                            <th class="d-none d-md-table-cell">Progression</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in derniersEvenements %}
+                        <tr>
+                            <td>{{ event.titre }}</td>
+                            <td class="d-none d-xl-table-cell">{{ event.createdat|date('d/m/Y') }}</td>
+                            <td class="d-none d-xl-table-cell">{{ event.startdate|date('d/m/Y') }}</td>
+                            <td>
+                                {% set now = "now"|date('Y-m-d') %}
+                                {% if event.startdate|date('Y-m-d') <= now %}
+                                    <span class="badge bg-secondary">Terminé</span>
+                                    <small class="d-block text-muted">(Dons fermés)</small>
+                                {% else %}
+                                    <span class="badge bg-success">Actif</span>
+                                    <small class="d-block text-success">(Dons ouverts)</small>
+                                {% endif %}
+                            </td>
+                            <td class="d-none d-md-table-cell text-center">
+                                {% set progress = (event.collectedamount / event.goalamount * 100)|round %}
+                                {{ progress }}%
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="col-12 col-lg-4 col-xxl-3 d-flex">
+            <div class="card flex-fill">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Calendrier</h5>
+                </div>
+                <div class="card-body d-flex">
+                    <div class="align-self-center w-100">
+                        <div class="chart">
+                            <div id="datetimepicker-dashboard"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var ctx = document.getElementById("donations-evolution-chart").getContext("2d");
+            var donsMensuels = {{ donsMensuels|json_encode|raw }};
+            var mois = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+            
+            new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"],
+                    datasets: [{
+                        label: "Montant des dons",
+                        data: donsMensuels.map(d => d.total),
+                        fill: true,
+                        backgroundColor: "rgba(54, 162, 235, 0.1)",
+                        borderColor: "rgba(54, 162, 235, 1)",
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: "rgba(54, 162, 235, 1)",
+                        pointBorderColor: "#fff",
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: "#fff",
+                        pointHoverBorderColor: "rgba(54, 162, 235, 1)",
+                        pointHoverBorderWidth: 2
+                    }, {
+                        label: "Nombre de dons",
+                        data: donsMensuels.map(d => d.nombre),
+                        fill: false,
+                        borderColor: "rgba(255, 99, 132, 1)",
+                        borderDash: [5, 5],
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: "rgba(255, 99, 132, 1)",
+                        pointBorderColor: "#fff",
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: "#fff",
+                        pointHoverBorderColor: "rgba(255, 99, 132, 1)",
+                        pointHoverBorderWidth: 2
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index',
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: {
+                                    size: 12,
+                                    family: "'Nunito', sans-serif"
+                                }
+                            }
+                        },
+                        tooltip: {
+                            enabled: true,
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#6e707e',
+                            titleFont: {
+                                size: 13,
+                                weight: 'bold',
+                                family: "'Nunito', sans-serif"
+                            },
+                            bodyColor: '#858796',
+                            bodyFont: {
+                                size: 12,
+                                family: "'Nunito', sans-serif"
+                            },
+                            borderColor: '#dddfeb',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: true,
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    return mois[tooltipItems[0].dataIndex];
+                                },
+                                label: function(context) {
+                                    if (context.dataset.label === "Montant des dons") {
+                                        return `Montant total : ${context.parsed.y.toLocaleString()} €`;
+                                    } else {
+                                        return `Nombre de dons : ${context.parsed.y}`;
+                                    }
+                                },
+                                labelTextColor: function(context) {
+                                    return '#6e707e';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12,
+                                    family: "'Nunito', sans-serif"
+                                }
+                            }
+                        },
+                        y: {
+                            position: 'left',
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString() + ' €';
+                                },
+                                font: {
+                                    size: 12,
+                                    family: "'Nunito', sans-serif"
+                                }
+                            },
+                            grid: {
+                                borderDash: [2],
+                                color: "rgba(234, 236, 244, 0.5)"
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Graphique des catégories
+            var statsParCategorie = {{ statsParCategorie|json_encode|raw }};
+            new Chart(document.getElementById("categories-chart"), {
+                type: 'doughnut',
+                data: {
+                    labels: statsParCategorie.map(s => s.categorie),
+                    datasets: [{
+                        data: statsParCategorie.map(s => s.nombre),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.8)',
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(153, 102, 255, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%'
+                }
+            });
+
+            // Configuration du calendrier
+            var date = new Date();
+            var defaultDate = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+            
+            document.getElementById("datetimepicker-dashboard").flatpickr({
+                inline: true,
+                prevArrow: "<span class=\"fas fa-chevron-left\" title=\"Previous month\"></span>",
+                nextArrow: "<span class=\"fas fa-chevron-right\" title=\"Next month\"></span>",
+                defaultDate: defaultDate,
+                locale: {
+                    firstDayOfWeek: 1,
+                    weekdays: {
+                        shorthand: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
+                        longhand: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']
+                    },
+                    months: {
+                        shorthand: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'],
+                        longhand: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

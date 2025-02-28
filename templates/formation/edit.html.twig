@@ -1,0 +1,20 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Edit Formation{% endblock %}
+
+{% block body %}
+    <h1>Edit Formation</h1>
+
+    {% if formation.image %}
+        <div class="mb-3">
+            <img src="{{ asset('uploads/' ~ formation.image) }}" alt="Current image" style="max-width: 200px">
+        </div>
+    {% endif %}
+
+    {{ include('formation/_form.html.twig', {
+        'button_label': 'Update',
+        'formation': formation
+    }) }}
+
+    <a href="{{ path('app_formation_index1') }}">Retour a la liste</a>
+{% endblock %}

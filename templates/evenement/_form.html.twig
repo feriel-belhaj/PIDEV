@@ -1,0 +1,95 @@
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+    <div class="mb-3">
+        {{ form_label(form.titre, 'Titre du projet', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.titre, {
+            'attr': {
+                'class': 'form-control' ~ (form.titre.vars.valid ? '' : ' is-invalid'),
+                'placeholder': 'Donnez un titre accrocheur à votre projet'
+            }
+        }) }}
+        {{ form_errors(form.titre, {'attr': {'class': 'invalid-feedback'}}) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.description, {
+            'attr': {
+                'class': 'form-control' ~ (form.description.vars.valid ? '' : ' is-invalid'),
+                'rows': '5',
+                'placeholder': 'Décrivez votre projet en détail...'
+            }
+        }) }}
+        {{ form_errors(form.description, {'attr': {'class': 'invalid-feedback'}}) }}
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            {{ form_label(form.startdate, 'Date de début', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.startdate, {
+                'attr': {
+                    'class': 'form-control' ~ (form.startdate.vars.valid ? '' : ' is-invalid')
+                }
+            }) }}
+            {{ form_errors(form.startdate, {'attr': {'class': 'invalid-feedback'}}) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_label(form.enddate, 'Date de fin', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.enddate, {
+                'attr': {
+                    'class': 'form-control' ~ (form.enddate.vars.valid ? '' : ' is-invalid')
+                }
+            }) }}
+            {{ form_errors(form.enddate, {'attr': {'class': 'invalid-feedback'}}) }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.localisation, 'Localisation', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.localisation, {
+            'attr': {
+                'class': 'form-control' ~ (form.localisation.vars.valid ? '' : ' is-invalid'),
+                'placeholder': 'Où se déroulera votre projet ?'
+            }
+        }) }}
+        {{ form_errors(form.localisation, {'attr': {'class': 'invalid-feedback'}}) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.goalamount, 'Objectif de financement', {'label_attr': {'class': 'form-label'}}) }}
+        <div class="input-group has-validation">
+            {{ form_widget(form.goalamount, {
+                'attr': {
+                    'class': 'form-control' ~ (form.goalamount.vars.valid ? '' : ' is-invalid'),
+                    'placeholder': 'Montant souhaité'
+                }
+            }) }}
+            <span class="input-group-text">€</span>
+            {{ form_errors(form.goalamount, {'attr': {'class': 'invalid-feedback'}}) }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.imageFile, 'Image du projet', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.imageFile, {
+            'attr': {
+                'class': 'form-control' ~ (form.imageFile.vars.valid ? '' : ' is-invalid')
+            }
+        }) }}
+        {{ form_errors(form.imageFile, {'attr': {'class': 'invalid-feedback'}}) }}
+        <div class="form-text">Format accepté : JPEG, PNG, GIF (max 1Mo)</div>
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.categorie, 'Catégorie', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.categorie, {
+            'attr': {
+                'class': 'form-control' ~ (form.categorie.vars.valid ? '' : ' is-invalid')
+            }
+        }) }}
+        {{ form_errors(form.categorie, {'attr': {'class': 'invalid-feedback'}}) }}
+    </div>
+
+    <div class="d-grid gap-2">
+        <button type="submit" class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+    </div>
+{{ form_end(form) }}

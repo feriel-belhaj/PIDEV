@@ -1,0 +1,304 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Nouveau Projet{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .ai-button {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        #aiError {
+            word-break: break-word;
+        }
+        #apiTestResult {
+            margin-top: 15px;
+            display: none;
+        }
+        .api-test-details {
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .endpoint-result {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        .endpoint-result.success {
+            background-color: rgba(25, 135, 84, 0.1);
+            border-left: 4px solid #198754;
+        }
+        .endpoint-result.error {
+            background-color: rgba(220, 53, 69, 0.1);
+            border-left: 4px solid #dc3545;
+        }
+        .endpoint-url {
+            font-weight: bold;
+            word-break: break-all;
+        }
+        .troubleshooting-tips {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 4px;
+        }
+        .api-key-help {
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        .api-success-note {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: rgba(25, 135, 84, 0.1);
+            border-left: 4px solid #198754;
+            border-radius: 4px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="h3 mb-0">Créer un nouveau projet</h1>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success mb-3">
+                        <i class="fas fa-check-circle me-2"></i> L'API Gemini est configurée et prête à être utilisée avec le modèle <strong>gemini-1.5-pro</strong>.
+                    </div>
+                    <div class="ai-button">
+                        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#aiModal">
+                            <i class="fas fa-robot me-2"></i>Générer avec IA
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" id="testApiBtn">
+                            <i class="fas fa-plug me-2"></i>Tester l'API
+                        </button>
+                    </div>
+                    <div id="apiTestResult" class="alert">
+                        <h5 class="alert-heading">Résultat du test API</h5>
+                        <div id="apiTestContent"></div>
+                        <div id="apiTestEndpoints"></div>
+                        <div id="troubleshootingTips" class="troubleshooting-tips" style="display: none;">
+                            <h6>Conseils de dépannage:</h6>
+                            <ul>
+                                <li>Vérifiez que votre clé API est correcte et active</li>
+                                <li>Assurez-vous que vous avez activé l'API Gemini dans votre projet Google</li>
+                                <li>Vérifiez que votre clé API a les autorisations nécessaires</li>
+                                <li>Essayez de générer une nouvelle clé API dans Google AI Studio</li>
+                            </ul>
+                            <div class="api-key-help">
+                                <a href="https://aistudio.google.com/app/apikey" target="_blank" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-key me-1"></i> Obtenir une nouvelle clé API
+                                </a>
+                                <p class="mt-2 small">
+                                    1. Connectez-vous à <a href="https://aistudio.google.com/" target="_blank">Google AI Studio</a><br>
+                                    2. Allez dans "Get API key" ou "Obtenir une clé API"<br>
+                                    3. Créez une nouvelle clé API et copiez-la<br>
+                                    4. Mettez à jour la clé dans le fichier .env de votre application
+                                </p>
+                            </div>
+                        </div>
+                        <div class="api-success-note" id="apiSuccessNote" style="display: none;">
+                            <h6><i class="fas fa-info-circle me-1"></i> Information:</h6>
+                            <p>Le modèle <strong>gemini-1.5-pro</strong> est disponible et fonctionne correctement avec votre clé API. Ce modèle sera utilisé pour générer le contenu de vos projets.</p>
+                        </div>
+                        <div class="api-test-details">
+                            <pre id="apiTestDetails"></pre>
+                        </div>
+                    </div>
+                    {{ include('evenement/_form.html.twig') }}
+                </div>
+                <div class="card-footer">
+                    <a href="{{ path('app_evenement_index') }}" class="btn btn-secondary">Retour à la liste</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Modal -->
+<div class="modal fade" id="aiModal" tabindex="-1" aria-labelledby="aiModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="aiModalLabel">Générer un projet avec l'IA</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="aiPrompt" class="form-label">Décrivez votre projet</label>
+                    <textarea id="aiPrompt" class="form-control" rows="4" placeholder="Ex: Un projet de jardin communautaire à Tunis pour cultiver des légumes biologiques"></textarea>
+                </div>
+                <div class="loading-spinner" id="loadingSpinner">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <p class="mt-2">Génération en cours...</p>
+                </div>
+                <div id="aiError" class="alert alert-danger mt-3" style="display: none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="generateButton">Générer</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const generateButton = document.getElementById('generateButton');
+            const aiPrompt = document.getElementById('aiPrompt');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const aiError = document.getElementById('aiError');
+            const modal = new bootstrap.Modal(document.getElementById('aiModal'));
+            
+            // Test API functionality
+            const testApiBtn = document.getElementById('testApiBtn');
+            const apiTestResult = document.getElementById('apiTestResult');
+            const apiTestContent = document.getElementById('apiTestContent');
+            const apiTestEndpoints = document.getElementById('apiTestEndpoints');
+            const apiTestDetails = document.getElementById('apiTestDetails');
+            const troubleshootingTips = document.getElementById('troubleshootingTips');
+            const apiSuccessNote = document.getElementById('apiSuccessNote');
+            
+            testApiBtn.addEventListener('click', function() {
+                testApiBtn.disabled = true;
+                testApiBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Test en cours...';
+                apiTestResult.style.display = 'none';
+                
+                fetch('{{ path('app_test_gemini_api') }}')
+                    .then(response => response.json())
+                    .then(data => {
+                        testApiBtn.disabled = false;
+                        testApiBtn.innerHTML = '<i class="fas fa-plug me-2"></i>Tester l\'API';
+                        apiTestResult.style.display = 'block';
+                        
+                        const hasSuccess = Object.values(data.results).some(result => result.success);
+                        
+                        if (hasSuccess) {
+                            apiTestResult.className = 'alert alert-success';
+                            apiTestContent.innerHTML = '<p>✅ Connexion à l\'API Gemini réussie!</p>';
+                            troubleshootingTips.style.display = 'none';
+                            apiSuccessNote.style.display = 'block';
+                        } else {
+                            apiTestResult.className = 'alert alert-danger';
+                            apiTestContent.innerHTML = '<p>❌ Échec de la connexion à l\'API Gemini.</p>';
+                            troubleshootingTips.style.display = 'block';
+                            apiSuccessNote.style.display = 'none';
+                        }
+                        
+                        // Display detailed results for each endpoint
+                        apiTestEndpoints.innerHTML = '';
+                        Object.entries(data.results).forEach(([endpoint, result]) => {
+                            const resultClass = result.success ? 'success' : 'error';
+                            const statusText = result.success ? 'Succès' : (result.status === 'error' ? 'Erreur' : `Échec (${result.status})`);
+                            
+                            const endpointDiv = document.createElement('div');
+                            endpointDiv.className = `endpoint-result ${resultClass}`;
+                            endpointDiv.innerHTML = `
+                                <div class="endpoint-url">${endpoint}</div>
+                                <div><strong>Statut:</strong> ${statusText}</div>
+                                <div><strong>Réponse:</strong> ${result.message || result.response}</div>
+                            `;
+                            apiTestEndpoints.appendChild(endpointDiv);
+                        });
+                        
+                        apiTestDetails.textContent = JSON.stringify(data, null, 2);
+                    })
+                    .catch(error => {
+                        testApiBtn.disabled = false;
+                        testApiBtn.innerHTML = '<i class="fas fa-plug me-2"></i>Tester l\'API';
+                        apiTestResult.style.display = 'block';
+                        apiTestResult.className = 'alert alert-danger';
+                        apiTestContent.innerHTML = '<p>❌ Erreur lors du test de l\'API: ' + error.message + '</p>';
+                        troubleshootingTips.style.display = 'block';
+                        apiSuccessNote.style.display = 'none';
+                    });
+            });
+            
+            // Generate content functionality
+            generateButton.addEventListener('click', function() {
+                const prompt = aiPrompt.value.trim();
+                
+                if (!prompt) {
+                    aiError.textContent = 'Veuillez entrer une description pour votre projet.';
+                    aiError.style.display = 'block';
+                    return;
+                }
+                
+                aiError.style.display = 'none';
+                loadingSpinner.style.display = 'block';
+                generateButton.disabled = true;
+                
+                // Send request to the server
+                fetch('{{ path('app_evenement_generate_ai') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: new URLSearchParams({
+                        'prompt': prompt
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.error || `HTTP error! Status: ${response.status}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    loadingSpinner.style.display = 'none';
+                    generateButton.disabled = false;
+                    
+                    if (data.error) {
+                        aiError.textContent = data.error;
+                        aiError.style.display = 'block';
+                        return;
+                    }
+                    
+                    // Fill the form with the generated data
+                    document.querySelector('#evenement_titre').value = data.titre || '';
+                    document.querySelector('#evenement_description').value = data.description || '';
+                    document.querySelector('#evenement_localisation').value = data.localisation || '';
+                    document.querySelector('#evenement_goalamount').value = data.goalamount || '';
+                    
+                    // Close the modal
+                    modal.hide();
+                })
+                .catch(error => {
+                    loadingSpinner.style.display = 'none';
+                    generateButton.disabled = false;
+                    aiError.textContent = 'Erreur: ' + error.message;
+                    aiError.style.display = 'block';
+                    console.error('Error:', error);
+                });
+            });
+        });
+    </script>
+{% endblock %}

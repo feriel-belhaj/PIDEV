@@ -1,0 +1,286 @@
+{% extends 'base.html.twig' %}
+{% block title %}Evénements{% endblock %}
+{% block body %}
+
+<!-- Hero Section -->
+<div class="container-fluid bg-light py-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="display-4 mb-3">Découvrez des projets créatifs</h1>
+                <p class="lead text-muted">Explorez des événements innovants et soutenez des créateurs passionnés</p>
+            </div>
+            {% if app.user %}
+                <div class="col-md-4 text-end">
+                    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_ARTISAN') %}
+                        <a href="{{ path('app_evenement_new') }}" class="btn btn-primary py-2 px-4 d-none d-xl-inline-block rounded-pill">
+                            Ajouter un événement
+                        </a>
+                    {% else %}
+                        <a href="#" class="btn btn-secondary py-2 px-4 d-none d-xl-inline-block rounded-pill disabled"
+                        data-bs-toggle="tooltip" title="Seuls les administrateurs et artisans peuvent ajouter un événement">
+                            Ajouter un événement
+                        </a>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="col-md-4 text-end">
+                    <a href="{{ path('app_login') }}" class="btn btn-primary py-2 px-4 d-none d-xl-inline-block rounded-pill">Ajouter un événement</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Filters Section -->
+<div class="container-fluid border-bottom py-3">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9">
+                <div class="d-flex gap-3">
+                    <select class="form-select w-auto" id="categorieFilter">
+                        {% for categorie in categories %}
+                            <option value="{{ categorie }}" {% if categorie == selectedCategorie %}selected{% endif %}>
+                                {{ categorie }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <select class="form-select w-auto" id="triFilter">
+                        <option value="date_creation" {% if selectedTri == 'date_creation' %}selected{% endif %}>Trier par</option>
+                        <option value="popularite" {% if selectedTri == 'popularite' %}selected{% endif %}>Popularité</option>
+                        <option value="date_debut" {% if selectedTri == 'date_debut' %}selected{% endif %}>Date de début</option>
+                        <option value="montant" {% if selectedTri == 'montant' %}selected{% endif %}>Montant collecté</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <form class="input-group" method="GET" action="{{ path('app_evenement_index') }}" id="searchForm">
+                    {% if selectedCategorie != 'Toutes les catégories' %}
+                        <input type="hidden" name="categorie" value="{{ selectedCategorie }}">
+                    {% endif %}
+                    {% if selectedTri != 'date_creation' %}
+                        <input type="hidden" name="tri" value="{{ selectedTri }}">
+                    {% endif %}
+                    
+                    <input type="text" 
+                           class="form-control" 
+                           placeholder="Rechercher..." 
+                           name="recherche" 
+                           value="{{ recherche }}"
+                           id="searchInput">
+                    <button class="btn btn-outline-secondary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Projects Grid -->
+<div class="container py-5">
+    <div class="row g-4">
+        {% for evenement in evenements %}
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <a href="{{ path('app_evenement_show', {'id': evenement.id}) }}" class="text-decoration-none">
+                        {% if evenement.imageurl %}
+                            <img src="{{ asset('uploads/images/' ~ evenement.imageurl) }}" class="card-img-top" alt="{{ evenement.titre }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                            <img src="{{ asset('img/event-' ~ (loop.index % 8 + 1) ~ '.jpg') }}" class="card-img-top" alt="{{ evenement.titre }}" style="height: 200px; object-fit: cover;">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ evenement.titre }}</h5>
+                            <p class="card-text text-muted">{{ evenement.description|slice(0, 100) }}...</p>
+                            
+                            <!-- Progress Bar -->
+                            <div class="progress mb-3" style="height: 5px;">
+                                {% if evenement.collectedamount is defined and evenement.goalamount > 0 %}
+                                    {% set progress = (evenement.collectedamount / evenement.goalamount * 100)|round %}
+                                {% else %}
+                                    {% set progress = 0 %}
+                                {% endif %}
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ progress }}%"></div>
+                            </div>
+                            
+                            <!-- Ajout du bouton Donate plus visible -->
+                            <div class="text-center mb-4">
+                                <div class="card-footer bg-white border-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="badge {% if evenement.startdate|date('Y-m-d') <= "now"|date('Y-m-d') %}bg-secondary{% else %}bg-success{% endif %}">
+                                                {% if evenement.startdate|date('Y-m-d') <= "now"|date('Y-m-d') %}
+                                                    Terminé
+                                                {% else %}
+                                                    Actif
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        {% if evenement.startdate|date('Y-m-d') <= "now"|date('Y-m-d') %}
+                                            <button class="btn btn-secondary" disabled>
+                                                <i class="fas fa-heart-broken me-2"></i>Dons fermés
+                                            </button>
+                                        {% else %}
+                                            <a href="{{ path('app_don_new', {'id': evenement.id}) }}" class="btn btn-primary">
+                                                <i class="fas fa-heart me-2"></i>Faire un don
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between mb-3">
+                                <div>
+                                    <h6 class="mb-0">{{ evenement.collectedamount|default(0)|number_format(0, ',', ' ') }} €</h6>
+                                    <small class="text-muted">collectés sur {{ evenement.goalamount|number_format(0, ',', ' ') }} €</small>
+                                </div>
+                                <div class="text-end">
+                                    {% if evenement.enddate %}
+                                        {% set daysLeft = date(evenement.enddate).diff(date()).days %}
+                                        <h6 class="mb-0">{{ daysLeft }}</h6>
+                                        <small class="text-muted">jours restants</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                    {% if evenement.utilisateurs is not empty %}
+                                    {% for utilisateur in evenement.utilisateurs %}
+                                        <img src="{{ asset('uploads/' ~ utilisateur.image) }}" class="rounded-circle" width="40" height="40" alt="Creator">
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <p class="mb-0 small">Par <strong>
+                            
+                                                {{ utilisateur.prenom }}{% if not loop.last %}, {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            Anonymous
+                                        {% endif %}</strong></p>
+                                        <p class="mb-0 small text-muted">{{ evenement.localisation }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <h3 class="text-muted">Aucun projet trouvé</h3>
+                <p>Soyez le premier à créer un projet !</p>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if totalPages > 1 %}
+        <nav class="mt-5">
+            <ul class="pagination justify-content-center">
+                {# Bouton Précédent #}
+                <li class="page-item {{ currentPage == 1 ? 'disabled' : '' }}">
+                    <a class="page-link" href="{{ path('app_evenement_index', {
+                        'page': currentPage - 1,
+                        'categorie': selectedCategorie != 'Toutes les catégories' ? selectedCategorie : null,
+                        'tri': selectedTri != 'date_creation' ? selectedTri : null,
+                        'recherche': recherche
+                    }) }}" tabindex="-1">Précédent</a>
+                </li>
+
+                {# Numéros de page #}
+                {% for i in 1..totalPages %}
+                    {% if i == 1 or i == totalPages or i >= currentPage - 2 and i <= currentPage + 2 %}
+                        <li class="page-item {{ currentPage == i ? 'active' : '' }}">
+                            <a class="page-link" href="{{ path('app_evenement_index', {
+                                'page': i,
+                                'categorie': selectedCategorie != 'Toutes les catégories' ? selectedCategorie : null,
+                                'tri': selectedTri != 'date_creation' ? selectedTri : null,
+                                'recherche': recherche
+                            }) }}">{{ i }}</a>
+                        </li>
+                    {% elseif i == currentPage - 3 or i == currentPage + 3 %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+
+                {# Bouton Suivant #}
+                <li class="page-item {{ currentPage == totalPages ? 'disabled' : '' }}">
+                    <a class="page-link" href="{{ path('app_evenement_index', {
+                        'page': currentPage + 1,
+                        'categorie': selectedCategorie != 'Toutes les catégories' ? selectedCategorie : null,
+                        'tri': selectedTri != 'date_creation' ? selectedTri : null,
+                        'recherche': recherche
+                    }) }}">Suivant</a>
+                </li>
+            </ul>
+        </nav>
+    {% endif %}
+</div>
+
+<!-- Add custom CSS for better styling -->
+<style>
+.card {
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+.progress {
+    border-radius: 0;
+}
+.progress-bar {
+    transition: width 1.5s ease-in-out;
+}
+.form-select {
+    padding: 0.75rem;
+    border-radius: 25px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-size: 1rem;
+    background-color: white;
+}
+
+.form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+</style>
+
+<script>
+document.getElementById('categorieFilter').addEventListener('change', function() {
+    const selectedCategorie = this.value;
+    const url = new URL(window.location.href);
+    
+    if (selectedCategorie === 'Toutes les catégories') {
+        url.searchParams.delete('categorie');
+    } else {
+        url.searchParams.set('categorie', selectedCategorie);
+    }
+    
+    window.location.href = url.toString();
+});
+
+document.getElementById('triFilter').addEventListener('change', function() {
+    const selectedTri = this.value;
+    const url = new URL(window.location.href);
+    
+    if (selectedTri === 'date_creation') {
+        url.searchParams.delete('tri');
+    } else {
+        url.searchParams.set('tri', selectedTri);
+    }
+    
+    window.location.href = url.toString();
+});
+
+// Recherche sur appui de la touche Entrée
+document.getElementById('searchInput').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault(); // Empêche la double soumission
+        document.getElementById('searchForm').submit();
+    }
+});
+</script>
+
+{% endblock %}

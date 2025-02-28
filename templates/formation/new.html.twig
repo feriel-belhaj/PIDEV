@@ -1,0 +1,27 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Nouvelle Formation{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Créer une nouvelle Formation</h1>
+        {{ include('formation/_form.html.twig') }}
+        <a href="{{ path('app_formation_index1') }}" class="btn btn-secondary">Retour à la liste</a>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            // Validation du formulaire
+            $('form').on('submit', function(e) {
+                var imageInput = $('input[type="file"]');
+                if (imageInput.length && !imageInput.val()) {
+                    e.preventDefault();
+                    alert('Veuillez sélectionner une image');
+                }
+            });
+        });
+    </script>
+{% endblock %}

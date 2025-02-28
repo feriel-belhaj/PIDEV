@@ -1,0 +1,81 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Utilisateur{% endblock %}
+
+{% block body %}
+
+    <div class="d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+            {% if utilisateur.image %}
+                <img src="{{ asset('uploads/' ~ utilisateur.image) }}" alt="User Photo" class="img-fluid" style="max-width: 60px; height: auto; margin-right: 10px;">
+            {% else %}
+                <p>No photo available</p>
+            {% endif %}
+            <h1>{{ utilisateur.prenom }}</h1>
+            <h1 style="margin-left: 10px;">{{ utilisateur.nom }}</h1>
+        </div>
+
+        <div class="d-flex align-items-center">
+            <div class="action-line">
+                <a href="{{ path('app_utilisateur_editBack', {'id': utilisateur.id}) }}" class="action-btn">
+                    <img src="{{ asset('img/avatars/edit.png') }}" width="25px" height="25px" alt="Modifier">
+                </a>
+            </div>
+
+            <div class="action-line">
+                <form action="{{ path('app_utilisateur_delete', {'id': utilisateur.id}) }}" method="POST" style="display:inline;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ utilisateur.id) }}">
+                    <button type="submit">
+                        <img src="{{ asset('img/avatars/delete.png') }}" width="25px" height="25px" alt="Supprimer">
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ utilisateur.id }}</td>
+            </tr>
+            <tr>
+                <th>Nom</th>
+                <td>{{ utilisateur.nom }}</td>
+            </tr>
+            <tr>
+                <th>Prenom</th>
+                <td>{{ utilisateur.prenom }}</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>{{ utilisateur.email }}</td>
+            </tr>
+            <tr>
+                <th>Mot de passe</th>
+                <td>{{ utilisateur.password }}</td>
+            </tr>
+            <tr>
+                <th>Adresse</th>
+                <td>{{ utilisateur.adresse }}</td>
+            </tr>
+            <tr>
+                <th>Telephone</th>
+                <td>{{ utilisateur.telephone }}</td>
+            </tr>
+            <tr>
+                <th>DateInscription</th>
+                <td>{{ utilisateur.dateInscription ? utilisateur.dateInscription|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Role</th>
+                <td>{{ utilisateur.role }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_utilisateur_back') }}">back to list</a>
+
+
+{% endblock %}
