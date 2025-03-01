@@ -1,50 +1,81 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Creation{% endblock %}
+{% block title %}Détails de la Création{% endblock %}
 
 {% block body %}
-    <h1>Creation</h1>
+    <div class="container mt-4">
+        <h1 class="mb-4">Détails de la Création</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ creation.id }}</td>
-            </tr>
-            <tr>
-                <th>Titre</th>
-                <td>{{ creation.titre }}</td>
-            </tr>
-            <tr>
-                <th>Decription</th>
-                <td>{{ creation.decription }}</td>
-            </tr>
-            <tr>
-                <th>Image</th>
-                <td>{{ creation.image }}</td>
-            </tr>
-            <tr>
-                <th>Categorie</th>
-                <td>{{ creation.categorie }}</td>
-            </tr>
-            <tr>
-                <th>DatePublic</th>
-                <td>{{ creation.datePublic ? creation.datePublic|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Statut</th>
-                <td>{{ creation.statut }}</td>
-            </tr>
-            <tr>
-                <th>NbLike</th>
-                <td>{{ creation.nbLike }}</td>
-            </tr>
-        </tbody>
-    </table>
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
 
-    <a href="{{ path('app_creation_index') }}">back to list</a>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        {% if creation.image %}
+                            <img src="{{ asset('uploads/images/' ~ creation.image) }}" 
+                                 alt="{{ creation.titre }}" 
+                                 class="img-fluid rounded"
+                                 style="max-width: 100%; height: auto; object-fit: contain;">
+                        {% else %}
+                            <div class="text-center text-muted p-4 border rounded">
+                                <i class="fas fa-image fa-3x mb-2"></i>
+                                <p class="mb-0">Aucune image</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-8">
+                        <h2>{{ creation.titre }}</h2>
+                        <p class="text-muted">
+                            Publié le {{ creation.datePublic|date('d/m/Y à H:i') }}
+                        </p>
+                        <div class="mb-3">
+                            <h5>Description</h5>
+                            <p>{{ creation.description }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <h5>Catégorie</h5>
+                            <p>{{ creation.categorie }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <h5>Statut</h5>
+                            <span class="badge {% if creation.statut == 'actif' %}bg-success{% else %}bg-secondary{% endif %}">
+                                {{ creation.statut }}
+                            </span>
+                        </div>
+                        <div class="mb-3">
+                            <h5>Likes</h5>
+                            <p>{{ creation.nbLike }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{{ path('app_creation_edit', {'id': creation.id}) }}" class="btn btn-primary">Modifier</a>
+                <a href="{{ path('app_creation_index') }}" class="btn btn-secondary">Retour à la liste</a>
+                
+                {{ include('creation/_delete_form.html.twig') }}
+            </div>
+        </div>
 
-    <a href="{{ path('app_creation_edit', {'id': creation.id}) }}">edit</a>
-
-    {{ include('creation/_delete_form.html.twig') }}
+        {% if creation.commentaires|length > 0 %}
+            <div class="mt-4">
+                <h3>Commentaires ({{ creation.commentaires|length }})</h3>
+                {% for commentaire in creation.commentaires %}
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <p>{{ commentaire.contenu }}</p>
+                            <small class="text-muted">
+                                Posté le {{ commentaire.dateComment|date('d/m/Y à H:i') }}
+                            </small>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}

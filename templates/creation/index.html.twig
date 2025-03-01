@@ -1,47 +1,63 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Creation index{% endblock %}
+{% block title %}Liste des Créations{% endblock %}
 
 {% block body %}
-    <h1>Creation index</h1>
+    <div class="container mt-4">
+        <h1 class="mb-4">Liste des Créations</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Titre</th>
-                <th>Decription</th>
-                <th>Image</th>
-                <th>Categorie</th>
-                <th>DatePublic</th>
-                <th>Statut</th>
-                <th>NbLike</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for creation in creations %}
-            <tr>
-                <td>{{ creation.id }}</td>
-                <td>{{ creation.titre }}</td>
-                <td>{{ creation.decription }}</td>
-                <td>{{ creation.image }}</td>
-                <td>{{ creation.categorie }}</td>
-                <td>{{ creation.datePublic ? creation.datePublic|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ creation.statut }}</td>
-                <td>{{ creation.nbLike }}</td>
-                <td>
-                    <a href="{{ path('app_creation_show', {'id': creation.id}) }}">show</a>
-                    <a href="{{ path('app_creation_edit', {'id': creation.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="9">no records found</td>
-            </tr>
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
         {% endfor %}
-        </tbody>
-    </table>
 
-    <a href="{{ path('app_creation_new') }}">Create new</a>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Titre</th>
+                    <th>Description</th>
+                    <th>Image</th>
+                    <th>Catégorie</th>
+                    <th>Date de Publication</th>
+                    <th>Statut</th>
+                    <th>Likes</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for creation in creations %}
+                <tr>
+                    <td>{{ creation.id }}</td>
+                    <td>{{ creation.titre }}</td>
+                    <td>{{ creation.description }}</td>
+                    <td>
+                        {% if creation.image %}
+                            <img src="{{ asset('uploads/' ~ creation.image) }}" alt="Image" class="img-thumbnail" style="width: 50px">
+                        {% endif %}
+                    </td>
+                    <td>{{ creation.categorie }}</td>
+                    <td>{{ creation.datePublic ? creation.datePublic|date('d/m/Y H:i') : '' }}</td>
+                    <td>
+                        <span class="badge {% if creation.statut == 'actif' %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ creation.statut }}
+                        </span>
+                    </td>
+                    <td>{{ creation.nbLike }}</td>
+                    <td>
+                        <a href="{{ path('app_creation_show', {'id': creation.id}) }}" class="btn btn-sm btn-info">Voir</a>
+                        <a href="{{ path('app_creation_edit', {'id': creation.id}) }}" class="btn btn-sm btn-primary">Modifier</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="9" class="text-center">Aucune création trouvée</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{{ path('app_creation_new') }}" class="btn btn-success">Ajouter une création</a>
+    </div>
 {% endblock %}
