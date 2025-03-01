@@ -79,11 +79,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Formation::class, inversedBy: 'utilisateurs')]
     private Collection $formation;
 
-    /**
-     * @var Collection<int, Creation>
-     */
-    #[ORM\OneToMany(targetEntity: Creation::class, mappedBy: 'utilisateur')]
-    private Collection $creation;
+    // Relationship with Creation removed
 
     /**
      * @var Collection<int, Evenement>
@@ -103,15 +99,26 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Partenariat::class, inversedBy: 'utilisateurs')]
     private Collection $partenariats;
 
-    
+    /**
+     * @var Collection<int, Creation>
+     */
+    #[ORM\OneToMany(targetEntity: Creation::class, mappedBy: 'utilisateur', cascade: ['persist', 'remove'])]
+    private Collection $creations;
+
+    /**
+     * @var Collection<int, Commentaire>
+     */
+    #[ORM\OneToMany(targetEntity: Commentaire::class, mappedBy: 'utilisateur', cascade: ['persist', 'remove'])]
+    private Collection $commentaires;
 
     public function __construct()
     {
         $this->formation = new ArrayCollection();
-        $this->creation = new ArrayCollection();
         $this->evennement = new ArrayCollection();
         $this->produit = new ArrayCollection();
         $this->partenariats = new ArrayCollection();
+        $this->creations = new ArrayCollection();
+        $this->commentaires = new ArrayCollection();
         $this->dateInscription = new \DateTime();
     }
 
@@ -272,15 +279,15 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, Creation>
      */
-    public function getCreation(): Collection
+    public function getCreations(): Collection
     {
-        return $this->creation;
+        return $this->creations;
     }
 
     public function addCreation(Creation $creation): static
     {
-        if (!$this->creation->contains($creation)) {
-            $this->creation->add($creation);
+        if (!$this->creations->contains($creation)) {
+            $this->creations->add($creation);
             $creation->setUtilisateur($this);
         }
 
@@ -289,10 +296,40 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeCreation(Creation $creation): static
     {
-        if ($this->creation->removeElement($creation)) {
+        if ($this->creations->removeElement($creation)) {
             // set the owning side to null (unless already changed)
             if ($creation->getUtilisateur() === $this) {
                 $creation->setUtilisateur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Commentaire>
+     */
+    public function getCommentaires(): Collection
+    {
+        return $this->commentaires;
+    }
+
+    public function addCommentaire(Commentaire $commentaire): static
+    {
+        if (!$this->commentaires->contains($commentaire)) {
+            $this->commentaires->add($commentaire);
+            $commentaire->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommentaire(Commentaire $commentaire): static
+    {
+        if ($this->commentaires->removeElement($commentaire)) {
+            // set the owning side to null (unless already changed)
+            if ($commentaire->getUtilisateur() === $this) {
+                $commentaire->setUtilisateur(null);
             }
         }
 

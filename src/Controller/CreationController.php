@@ -14,17 +14,21 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/creation', name: 'app_creation_')]
 class CreationController extends AbstractController
 {
     private $uploadDir;
     private $profanityFilter;
+    private $security;
 
-    public function __construct(string $uploadDir = 'uploads/images', ProfanityFilterService $profanityFilter = null)
+    public function __construct(string $uploadDir = 'uploads/images', ProfanityFilterService $profanityFilter = null, Security $security = null)
     {
         $this->uploadDir = $uploadDir;
         $this->profanityFilter = $profanityFilter;
+        $this->security = $security;
     }
 
     #[Route('/', name: 'index', methods: ['GET'])]
@@ -36,9 +40,20 @@ class CreationController extends AbstractController
     }
 
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request, ManagerRegistry $doctrine, ProfanityFilterService $profanityFilter): Response
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function new(Request $request, ManagerRegistry $doctrine, ProfanityFilterService $profanityFilter, Security $security): Response
     {
         $creation = new Creation();
+        
+        // Set the current user as the creation author
+        $currentUser = $security->getUser();
+        if (!$currentUser) {
+            $this->addFlash('error', 'Vous devez être connecté pour créer du contenu.');
+            return $this->redirectToRoute('app_login');
+        }
+        
+        $creation->setUtilisateur($currentUser);
+        
         $form = $this->createForm(CreationType::class, $creation);
         $form->handleRequest($request);
     
@@ -112,8 +127,21 @@ class CreationController extends AbstractController
     }
     
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function edit(Request $request, Creation $creation, ManagerRegistry $doctrine, ProfanityFilterService $profanityFilter): Response
     {
+        // Check if the current user is the owner of the creation
+        $currentUser = $this->security->getUser();
+        if (!$currentUser) {
+            $this->addFlash('error', 'Vous devez être connecté pour modifier du contenu.');
+            return $this->redirectToRoute('app_login');
+        }
+        
+        if ($creation->getUtilisateur() !== $currentUser && !$this->isGranted('ROLE_ADMIN')) {
+            $this->addFlash('error', 'Vous n\'êtes pas autorisé à modifier cette création.');
+            return $this->redirectToRoute('app_creation_index');
+        }
+        
         $form = $this->createForm(CreationType::class, $creation);
         $form->handleRequest($request);
         
@@ -187,8 +215,21 @@ class CreationController extends AbstractController
     }
 
     #[Route('/{id}', name: 'delete', methods: ['POST'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function delete(Request $request, Creation $creation, ManagerRegistry $doctrine): Response
     {
+        // Check if the current user is the owner of the creation
+        $currentUser = $this->security->getUser();
+        if (!$currentUser) {
+            $this->addFlash('error', 'Vous devez être connecté pour supprimer du contenu.');
+            return $this->redirectToRoute('app_login');
+        }
+        
+        if ($creation->getUtilisateur() !== $currentUser && !$this->isGranted('ROLE_ADMIN')) {
+            $this->addFlash('error', 'Vous n\'êtes pas autorisé à supprimer cette création.');
+            return $this->redirectToRoute('app_creation_index');
+        }
+        
         if ($this->isCsrfTokenValid('delete'.$creation->getId(), $request->request->get('_token'))) {
             try {
                 if ($creation->getImage()) {

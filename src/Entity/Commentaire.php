@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\CommentaireRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommentaireRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -27,6 +28,10 @@ class Commentaire
     #[ORM\ManyToOne(targetEntity: Creation::class, inversedBy: 'commentaires')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Creation $creation = null;
+
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'commentaires')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Utilisateur $utilisateur = null;
 
     public function getId(): ?int
     {
@@ -74,6 +79,17 @@ class Commentaire
     public function setCreation(?Creation $creation): self
     {
         $this->creation = $creation;
+        return $this;
+    }
+
+    public function getUtilisateur(): ?Utilisateur
+    {
+        return $this->utilisateur;
+    }
+
+    public function setUtilisateur(?Utilisateur $utilisateur): self
+    {
+        $this->utilisateur = $utilisateur;
         return $this;
     }
 
