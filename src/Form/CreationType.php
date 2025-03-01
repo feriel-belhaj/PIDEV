@@ -3,6 +3,8 @@
 namespace App\Form;
 
 use App\Entity\Creation;
+use App\Entity\Utilisateur;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -14,9 +16,17 @@ use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Security\Core\Security;
 
 class CreationType extends AbstractType
 {
+    private $security;
+    
+    public function __construct(Security $security)
+    {
+        $this->security = $security;
+    }
+    
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -66,6 +76,15 @@ class CreationType extends AbstractType
                     'class' => 'form-control',
                     'accept' => 'image/png,image/jpeg,image/gif'
                 ]
+            ])
+            ->add('utilisateur', EntityType::class, [
+                'class' => Utilisateur::class,
+                'choice_label' => function(Utilisateur $utilisateur) {
+                    return $utilisateur->getNom() . ' ' . $utilisateur->getPrenom();
+                },
+                'required' => true,
+                'data' => $this->security->getUser(),
+                'disabled' => !$this->security->isGranted('ROLE_ADMIN')
             ])
             ->add('categorie', ChoiceType::class, [
                 'choices' => [

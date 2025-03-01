@@ -17,9 +17,13 @@ class Creation
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+    
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'creations')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Utilisateur $utilisateur = null;
 
     #[ORM\Column(length: 100)]
-    #[Atsser\NotBlank(message: "Le titre ne peut pas être vide")]
+    #[Assert\NotBlank(message: "Le titre ne peut pas être vide")]
     #[Assert\Length(
         min: 2,
         max: 100,
@@ -28,14 +32,7 @@ class Creation
     )]
     private ?string $titre = null;
 
-    #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "La description ne peut pas être vide")]
-    #[Assert\Length(
-        min: 10,
-        max: 255,
-        minMessage: "La description doit contenir au moins {{ limit }} caractères",
-        maxMessage: "La description ne peut pas dépasser {{ limit }} caractères"
-    )]
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -98,7 +95,7 @@ class Creation
         return $this->description;
     }
 
-    public function setDescription(string $description): static
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
         return $this;
@@ -196,4 +193,6 @@ class Creation
         }
         return $this;
     }
+
+    // Getter and setter for Utilisateur relationship removed
 }
