@@ -12,12 +12,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: PartenariatRepository::class)]
 class Partenariat
 {
+
+    /**
+     * @var Collection<int, Utilisateur>
+     */
+    #[ORM\ManyToMany(targetEntity: Utilisateur::class, mappedBy: 'partenariats')]
+    private Collection $utilisateurs;
+
     #[ORM\OneToMany(mappedBy: 'partenariat', targetEntity: Candidature::class, cascade: ['remove'])]
     private Collection $candidatures;
+    
 
     public function __construct()
     {
         $this->candidatures = new ArrayCollection();
+        $this->utilisateurs = new ArrayCollection();
     }
 
     public function getCandidatures(): Collection
@@ -34,33 +43,56 @@ class Partenariat
     #[Assert\NotBlank(message: "Le nom est obligatoire.")]
     #[Assert\Length(max: 50, maxMessage: "Le nom ne peut pas dépasser 50 caractères.")]
     #[Assert\Regex(
-        pattern: "/^[A-Z][a-zA-Z]+$/",
-        message: "Le nom doit commencer par une majuscule et contenir uniquement des lettres."
+        pattern: "/^[A-Z][a-zA-Z ]+$/",
+        message: "Le nom doit commencer par une majuscule et ne contenir que des lettres ."
     )]
-    private ?string $Nom = null;
+    private ?string $nom = null;
+
 
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message: "Le type est obligatoire.")]
     #[Assert\Length(max: 50, maxMessage: "Le type ne peut pas dépasser 50 caractères.")]
     #[Assert\Regex(
-        pattern: "/^[A-Z][a-zA-Z]+$/",
-        message: "Le type doit commencer par une majuscule et contenir uniquement des lettres."
+        pattern: "/^[A-Z][a-zA-Z ]+$/",
+        message: "Le type doit commencer par une majuscule et ne contenir que des lettres ."
     )]
-    private ?string $Type = null;
+    private ?string $type = null;
+
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "La description est obligatoire.")]
+    #[Assert\Length(
+        min: 10,
+        minMessage: "La description doit contenir au moins 10 caractères.",
+        max: 255,
+        maxMessage: "La description ne peut pas dépasser 255 caractères."
+    )]
+    #[Assert\Regex(
+        pattern: "/^[A-Z][a-zA-Z ,;.:\'\"!?-]+$/",
+        message: "La description doit commencer par une majuscule et contenir uniquement des lettres, des espaces et des signes de ponctuation."
+    )]
     private ?string $description = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)] // nullable: true pour permettre null en DB
+    #[Assert\Choice(
+        choices: ['actif', 'en cours', 'expiré'],
+        message: "Le statut doit être 'actif', 'en cours' ou 'expiré'."
+    )]
     private ?string $statut = null;
+
 
     #[ORM\Column(length: 255)]
     private ?string $image = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+   #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Assert\NotBlank(message: "La date de début est obligatoire.")]
+    #[Assert\Type("\DateTimeInterface")]
     private ?\DateTimeInterface $dateDebut = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Assert\NotBlank(message: "La date de fin est obligatoire.")]
+    #[Assert\Type("\DateTimeInterface")]
+    #[Assert\GreaterThan(propertyPath: "dateDebut", message: "La date de fin doit être supérieure à la date de début.")]
     private ?\DateTimeInterface $dateFin = null;
 
     public function getId(): ?int
@@ -70,23 +102,23 @@ class Partenariat
 
     public function getNom(): ?string
     {
-        return $this->Nom;
+        return $this->nom;
     }
 
-    public function setNom(string $Nom): static
+    public function setNom(string $nom): static
     {
-        $this->Nom = $Nom;
+        $this->nom = $nom;
         return $this;
     }
 
     public function getType(): ?string
     {
-        return $this->Type;
+        return $this->type;
     }
 
-    public function setType(string $Type): static
+    public function setType(string $type): static
     {
-        $this->Type = $Type;
+        $this->type = $type;
         return $this;
     }
 
@@ -142,6 +174,33 @@ class Partenariat
     public function setDateFin(\DateTimeInterface $dateFin): static
     {
         $this->dateFin = $dateFin;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Utilisateur>
+     */
+    public function getUtilisateurs(): Collection
+    {
+        return $this->utilisateurs;
+    }
+
+    public function addUtilisateur(Utilisateur $utilisateur): static
+    {
+        if (!$this->utilisateurs->contains($utilisateur)) {
+            $this->utilisateurs->add($utilisateur);
+            $utilisateur->addPartenariat($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUtilisateur(Utilisateur $utilisateur): static
+    {
+        if ($this->utilisateurs->removeElement($utilisateur)) {
+            $utilisateur->removePartenariat($this);
+        }
+
         return $this;
     }
 }

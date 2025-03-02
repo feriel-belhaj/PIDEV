@@ -3,22 +3,30 @@
 {% block title %}Produit index{% endblock %}
 
 {% block body %}
-
-    
-
-    <!-- Menu Start -->
     <div class="container-fluid menu bg-light py-6 my-6">
         <div class="container">
             <div class="text-center wow bounceInUp" data-wow-delay="0.1s">
-                <small class="d-inline-block fw-bold text-dark text-uppercase bg-light border border-primary rounded-pill px-4 py-1 mb-3">notre catalogue</small>
-                <h1 class="display-5 mb-5">Most Popular  artistic products</h1>
+                <small class="d-inline-block fw-bold text-dark text-uppercase bg-light border border-primary rounded-pill px-4 py-1 mb-3">Notre Catalogue</small>
+                <h1 class="display-5 mb-5">Most Popular Artistic Products</h1>
+            </div>
+
+            <!-- Champs de filtrage -->
+            <div class="text-center mb-4">
+                <label for="budget" class="form-label"><strong>Filtrer par budget :</strong></label>
+                <input type="number" id="budget" class="form-control w-25 mx-auto" placeholder="Entrez votre budget en dt" min="1">
+            </div>
+
+            <div class="text-center mb-4">
+                <label for="startDate" class="form-label"><strong>Filtrer par date d'ajout (Intervalle) :</strong></label>
+                <div>
+                    <input type="date" id="startDate" class="form-control w-25 mx-auto" placeholder="Date de début">
+                    <input type="date" id="endDate" class="form-control w-25 mx-auto mt-2" placeholder="Date de fin">
+                </div>
             </div>
 
             <div class="tab-class text-center">
-                <!-- Formulaire unique pour commander plusieurs produits -->
-                <form action="{{ path('app_commande_new') }}" method="post">
-                    
-                    <!-- Navigation par catégories -->
+                <!-- Formulaire unique pour commander et comparer -->
+                <form action="{{ path('app_produit_index') }}" method="POST">
                     <ul class="nav nav-pills d-inline-flex justify-content-center mb-5 wow bounceInUp" data-wow-delay="0.1s">
                         {% for categorie in categories %}
                             <li class="nav-item p-2">
@@ -30,14 +38,16 @@
                         {% endfor %}
                     </ul>
 
-                    <!-- Contenu des catégories -->
                     <div class="tab-content">
                         {% for categorie in categories %}
                             <div id="{{ categorie }}" class="tab-pane fade show p-0 {% if loop.index == 1 %} active {% endif %}">
+                                <h3 class="text-center text-primary mb-4">{{ categorie }}</h3>
                                 <div class="row g-4">
                                     {% for produit in produits %}
                                         {% if produit.categorie == categorie %}
-                                            <div class="col-lg-6 wow bounceInUp" data-wow-delay="0.1s">
+                                            <div class="col-lg-6 wow bounceInUp product-item" data-wow-delay="0.1s" 
+                                                 data-price="{{ produit.prix }}" data-date="{{ produit.datecreation|date('Y-m-d') }}">
+
                                                 <div class="menu-item d-flex align-items-center">
                                                     <img class="flex-shrink-0 img-fluid rounded-circle" 
                                                          src="{{ asset('uploads/' ~ produit.image) }}" 
@@ -50,12 +60,22 @@
                                                         </div>
                                                         <p class="mb-0">{{ produit.description }}</p>
 
-                                                        <!-- Champ pour sélectionner la quantité -->
-                                                        <div class="input-group mt-2">
-                                                            <input type="hidden" name="produits[{{ produit.id }}][id]" value="{{ produit.id }}">
-                                                            <input type="number" name="produits[{{ produit.id }}][quantite]" class="form-control" placeholder="Quantité" min="0">
+                                                        <div class="mb-2">
+                                                            <strong>Stock disponible :</strong> {{ produit.quantitestock }} unités
                                                         </div>
 
+                                                        <div class="input-group mt-2">
+                                                            <input type="hidden" name="produits[{{ produit.id }}][id]" value="{{ produit.id }}">
+                                                            
+                                                            <!-- Champ de quantité sans HTML5 -->
+                                                            <input type="number" name="produits[{{ produit.id }}][quantite]" class="form-control" value="0" {% if produit.quantitestock == 0 %} disabled {% endif %}>
+                                                        </div>
+
+                                                        <!-- Case à cocher "Comparer" juste à côté du texte -->
+                                                        <div class="mt-2">
+                                                            <input type="checkbox" name="produits_comparer[]" value="{{ produit.id }}" id="compare-{{ produit.id }}" class="me-2">
+                                                            <label for="compare-{{ produit.id }}">Comparer</label>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -66,20 +86,78 @@
                         {% endfor %}
                     </div>
 
-                    <!-- Bouton global pour commander tous les produits sélectionnés -->
+                    <!-- Affichage des erreurs juste au-dessus du bouton "Commander" -->
+                    {% for message in app.flashes('error') %}
+                        <div class="alert alert-danger text-center">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+
                     <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-lg btn-primary">Commander</button>
+                        <button type="submit" formaction="{{ path('app_commande_new') }}" class="btn btn-primary py-2 px-4 rounded-pill">Commander</button>
+                        <button type="submit" class="btn btn-secondary py-2 px-4 rounded-pill">Comparer</button>
                     </div>
 
-                    <!-- Nouveau bouton pour rediriger vers la liste des commandes juste en dessous du bouton "Commander" -->
+                    <!-- Nouveau bouton pour rediriger vers la liste des commandes -->
                     <div class="text-center mt-2">
-                        <a href="{{ path('app_commande_index') }}" class="btn btn-secondary btn-sm">Voir mes commandes</a>
+                        <a href="{{ path('app_commande_index') }}" class="btn btn-secondary py-2 px-4 d-none d-xl-inline-block rounded-pill">Voir mes commandes</a>
                     </div>
-
                 </form>
             </div>
+
+            <!-- Affichage des produits comparés -->
+            {% if produitsComparaison is not empty %}
+                <div class="container mt-5">
+                    <h3 class="text-center">Produits Comparés</h3>
+                    <div class="row">
+                        {% for produit in produitsComparaison %}
+                            <div class="col-lg-4">
+                                <div class="product-item">
+                                    <h5 class="text-primary">{{ produit.categorie }}</h5>
+                                    <img src="{{ asset('uploads/' ~ produit.image) }}" alt="{{ produit.nom }}" class="img-fluid" style="width: 100px; height: 100px; object-fit: cover;">
+                                    <h4>{{ produit.nom }}</h4>
+                                    <p>{{ produit.description }}</p>
+                                    <p>Prix: {{ produit.prix }} dt</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
-    <!-- Menu End -->
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const budgetInput = document.getElementById("budget");
+            const startDateInput = document.getElementById("startDate");
+            const endDateInput = document.getElementById("endDate");
+            const products = document.querySelectorAll(".product-item");
+
+            function filterProducts() {
+                const budget = parseFloat(budgetInput.value);
+                const startDate = startDateInput.value;
+                const endDate = endDateInput.value;
+
+                products.forEach(product => {
+                    const price = parseFloat(product.getAttribute("data-price"));
+                    const productDate = product.getAttribute("data-date");
+
+                    let showProduct = true;
+
+                    if (!isNaN(budget) && price > budget) showProduct = false;
+                    if (startDate && productDate < startDate) showProduct = false;
+                    if (endDate && productDate > endDate) showProduct = false;
+
+                    product.style.display = showProduct ? "block" : "none";
+                });
+            }
+
+            budgetInput.addEventListener("input", filterProducts);
+            startDateInput.addEventListener("change", filterProducts);
+            endDateInput.addEventListener("change", filterProducts);
+            filterProducts();
+        });
+    </script>
 
 {% endblock %}

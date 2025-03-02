@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-{% block title %}Events{% endblock %}
+{% block title %}Evénements{% endblock %}
 {% block body %}
 
 <!-- Hero Section -->
@@ -10,9 +10,24 @@
                 <h1 class="display-4 mb-3">Découvrez des projets créatifs</h1>
                 <p class="lead text-muted">Explorez des événements innovants et soutenez des créateurs passionnés</p>
             </div>
-            <div class="col-md-4 text-end">
-                <a href="{{ path('app_evenement_new') }}" class="btn btn-success btn-lg">Créer un projet</a>
-            </div>
+            {% if app.user %}
+                <div class="col-md-4 text-end">
+                    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_ARTISAN') %}
+                        <a href="{{ path('app_evenement_new') }}" class="btn btn-primary py-2 px-4 d-none d-xl-inline-block rounded-pill">
+                            Ajouter un événement
+                        </a>
+                    {% else %}
+                        <a href="#" class="btn btn-secondary py-2 px-4 d-none d-xl-inline-block rounded-pill disabled"
+                        data-bs-toggle="tooltip" title="Seuls les administrateurs et artisans peuvent ajouter un événement">
+                            Ajouter un événement
+                        </a>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="col-md-4 text-end">
+                    <a href="{{ path('app_login') }}" class="btn btn-primary py-2 px-4 d-none d-xl-inline-block rounded-pill">Ajouter un événement</a>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -100,10 +115,18 @@
                             <div class="d-flex align-items-center justify-content-between">
                                 <div class="d-flex align-items-center">
                                     <div class="flex-shrink-0">
-                                        <img src="{{ asset('img/user-placeholder.jpg') }}" class="rounded-circle" width="40" height="40" alt="Creator">
+                                    {% if evenement.utilisateurs is not empty %}
+                                    {% for utilisateur in evenement.utilisateurs %}
+                                        <img src="{{ asset('uploads/' ~ utilisateur.image) }}" class="rounded-circle" width="40" height="40" alt="Creator">
                                     </div>
                                     <div class="flex-grow-1 ms-3">
-                                        <p class="mb-0 small">Par <strong>{{ evenement.createur ?? 'Anonymous' }}</strong></p>
+                                        <p class="mb-0 small">Par <strong>
+                            
+                                                {{ utilisateur.prenom }}{% if not loop.last %}, {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            Anonymous
+                                        {% endif %}</strong></p>
                                         <p class="mb-0 small text-muted">{{ evenement.localisation }}</p>
                                     </div>
                                 </div>

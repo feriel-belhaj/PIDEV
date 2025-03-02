@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paiement réussi{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1 class="my-4 text-center">{{ message }}</h1>
+
+    <!-- Tableau de la commande -->
+    <h2 class="my-4">Détails de votre commande</h2>
+    <table class="table table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Produit</th>
+                <th>Quantité</th>
+                <th>Prix Unitaire</th>
+                <th>Prix Total</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for produit in commande.produit %}
+                <tr>
+                    <td>{{ commande.id }}</td>
+                    <td>{{ produit.nom }}</td>
+                    <td>{{ commande.getQuantiteProduit(produit) }}</td>
+                    <td>{{ produit.prix }} dt</td>
+                    <td>{{ commande.prix }} dt</td>
+                    <td>{{ commande.datecmd ? commande.datecmd|date('Y-m-d') : 'N/A' }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h4 class="mt-4">Informations sur le paiement</h4>
+    <p><strong>Montant total payé :</strong> {{ commande.prix }} dt</p>
+    <p><strong>Statut :</strong> {{ commande.statut }}</p>
+</div>
+{% endblock %}

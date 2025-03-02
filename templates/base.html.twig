@@ -5,7 +5,7 @@
         
         <link rel="icon" href="{{asset('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>')}}">
        
-        <title>{% block title %}ArtiZina-Home{% endblock %}</title>
+        <title>{% block title %}ArtiZina-Accueil{% endblock %}</title>
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
         <meta content="" name="keywords">
         <meta content="" name="description">
@@ -79,12 +79,12 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navbarCollapse">
                         <div class="navbar-nav mx-auto">
-                            <a href="{{asset('index.html')}}" class="nav-item nav-link active">Home</a>
+                            <a href="{{ path('app_home') }}" class="nav-item nav-link active">Accueil</a>
                             <a href="{{asset('about.html')}}" class="nav-item nav-link">About</a>
-                            <a href="{{asset('service.html')}}" class="nav-item nav-link">Services</a>
+                            <a href="{{path('app_formation_index')}}" class="nav-item nav-link">Formations</a>
                             <a href="{{ path('app_partenariat_index')}}" class="nav-item nav-link">Partenariats</a>
 
-                            <a href="{{asset('event.html')}}" class="nav-item nav-link">Events</a>
+                            <a href="{{path('app_evenement_index')}}" class="nav-item nav-link">Evénements</a>
                             <a href="{{asset('produit')}}" class="nav-item nav-link">produit</a>
                             <div class="nav-item dropdown">
                                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
@@ -98,7 +98,7 @@
                             <a href="{{asset('contact.html')}}" class="nav-item nav-link">Contact</a>
                         </div>
                         <button class="btn-search btn btn-primary btn-md-square me-4 rounded-circle d-none d-lg-inline-flex" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fas fa-search"></i></button>
-                        <a href="" class="btn btn-primary py-2 px-4 d-none d-xl-inline-block rounded-pill">Book Now</a>
+                        
                         
                         
                         <!-- User Profile Dropdown -->

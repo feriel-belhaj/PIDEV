@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormError;
+use App\Entity\FormationReservee;
 
 
 #[Route('/formation')]
@@ -148,12 +149,19 @@ public function index1(FormationRepository $formationRepository): Response
     #[Route('/{id}', name: 'app_formation_delete', methods: ['POST'])]
     public function delete(Request $request, Formation $formation, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$formation->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($formation);
-            $entityManager->flush();
+        if ($this->isCsrfTokenValid('delete'.$formation->getId(), $request->request->get('_token'))) {
+            try {
+                // La suppression en cascade s'occupera des formationsReservees
+                $entityManager->remove($formation);
+                $entityManager->flush();
+                
+                $this->addFlash('success', 'La formation a été supprimée avec succès.');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Une erreur est survenue lors de la suppression de la formation.');
+            }
         }
 
-        return $this->redirectToRoute('app_formation_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_formation_index1', [], Response::HTTP_SEE_OTHER);
     }
     #[Route('/formation/{id}/add-to-cart', name: 'app_formation_add_to_cart', methods: ['POST'])]
     public function addToCart(

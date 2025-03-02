@@ -61,6 +61,9 @@ class Evenement
     {
         $this->utilisateurs = new ArrayCollection();
         $this->dons = new ArrayCollection();
+        $this->startdate = new \DateTime();
+        $this->enddate = (new \DateTime())->modify('+1 day');
+        $this->createdat = new \DateTimeImmutable();
     }
 
     public function getId(): ?int

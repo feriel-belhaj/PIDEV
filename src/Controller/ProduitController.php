@@ -3,10 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Produit;
+use App\Entity\Utilisateur;
 use App\Form\ProduitType;
 use App\Repository\ProduitRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -18,32 +21,52 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 #[Route('/produit')]
 final class ProduitController extends AbstractController
 {
-    #[Route(name: 'app_produit_index', methods: ['GET'])]
-    public function index(ProduitRepository $produitRepository): Response
-    {
-        $produits = $produitRepository->findAll();
-        $categories = Produit::getUniqueCategories($produits);
+    #[Route(name: 'app_produit_index', methods: ['GET', 'POST'])]
+public function index(ProduitRepository $produitRepository, Request $request): Response
+{
+    $produits = $produitRepository->findAll();
+    $categories = Produit::getUniqueCategories($produits);
+    $produitsComparaison = [];
 
-        
-        return $this->render('produit/index.html.twig', [
-            'produits' => $produitRepository->findAll(),
-            'categories' => $categories
-        ]);
+    if ($request->isMethod('POST')) {
+     
+        $produitsIds = $request->request->all('produits_comparer');
+
+        if (!empty($produitsIds)) {
+            $produitsComparaison = $produitRepository->findBy(['id' => $produitsIds]);
+        }
     }
 
+    return $this->render('produit/index.html.twig', [
+        'produits' => $produits,
+        'categories' => $categories,
+        'produitsComparaison' => $produitsComparaison,
+    ]);
+}
+
+
     #[Route('/new', name: 'app_produit_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager,Security $security): Response
     {
+        
         $produit = new Produit();
         $form = $this->createForm(ProduitType::class, $produit);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($produit);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_produit_index', [], Response::HTTP_SEE_OTHER);
+            $user = $security->getUser();
+    
+        if ($user instanceof Utilisateur) {
+            // Associer l'utilisateur au produit
+            $produit->addUtilisateur($user);
         }
+
+                
+                $entityManager->persist($produit);
+                $entityManager->flush();
+
+                return $this->redirectToRoute('app_produit_index', [], Response::HTTP_SEE_OTHER);
+            }
 
         return $this->render('produit/new.html.twig', [
             'produit' => $produit,
@@ -102,20 +125,25 @@ public function adminIndex(EntityManagerInterface $entityManager): Response
     ]);
     
 }
+
 #[Route('/admin/produit', name: 'admin_produit_index')]
-public function index2(Request $request, EntityManagerInterface $entityManager): Response
+public function index2(Request $request, Security $security, EntityManagerInterface $entityManager): Response
 {
-    
     $produits = $entityManager->getRepository(Produit::class)->findAll();
 
     
+    foreach ($produits as $produit) {
+        if ($produit->isStockLow()) {
+           
+            $this->addFlash('warning', 'Le stock de ' . $produit->getNom() . ' est faible !');
+        }
+    }
+
     $produit = new Produit();
     $form = $this->createForm(ProduitType::class, $produit);
 
-    
     $form->handleRequest($request);
     if ($form->isSubmitted() && $form->isValid()) {
-        
         $imageFile = $form->get('image')->getData();
         if ($imageFile) {
             $newFilename = uniqid().'.'.$imageFile->guessExtension(); 
@@ -130,6 +158,11 @@ public function index2(Request $request, EntityManagerInterface $entityManager):
                 return $this->redirectToRoute('admin_produit_index');
             }
         }
+        $user = $security->getUser();
+        if ($user instanceof Utilisateur) {
+            // Associer l'utilisateur au produit
+            $produit->addUtilisateur($user);
+        }
 
         $entityManager->persist($produit);
         $entityManager->flush();
@@ -143,6 +176,39 @@ public function index2(Request $request, EntityManagerInterface $entityManager):
         'produits' => $produits,
         'form' => $form->createView(), 
     ]);
-
 }
+///new metier
+
+
+#[Route('/admin/appliquer-remise', name: 'admin_appliquer_remise', methods: ['POST'])]
+public function appliquerRemise(EntityManagerInterface $entityManager): Response
+{
+    
+    $produits = $entityManager->getRepository(Produit::class)->findAll();
+
+    
+    foreach ($produits as $produit) {
+        $prixInitial = $produit->getPrix();
+        $nouveauPrix = $prixInitial - ($prixInitial * 0.10);  
+        $produit->setPrix($nouveauPrix);  
+    }
+
+    
+    $entityManager->flush();
+
+    
+    $this->addFlash('success', 'La remise de 10% a été appliquée sur tous les produits.');
+
+  
+    return $this->redirectToRoute('admin_produit_index');
+}
+
+//metier
+
+
+
+
+
+
+
 }

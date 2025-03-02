@@ -94,23 +94,26 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Produit>
      */
-    #[ORM\ManyToMany(targetEntity: Produit::class, inversedBy: 'produits')]
-    private Collection $produit;
+    #[ORM\ManyToMany(targetEntity: Produit::class, inversedBy: 'utilisateurs')]
+    #[ORM\JoinTable(name: "utilisateur_produit")]
+    private Collection $produits;
 
     /**
      * @var Collection<int, Partenariat>
      */
     #[ORM\ManyToMany(targetEntity: Partenariat::class, inversedBy: 'utilisateurs')]
+    #[ORM\JoinTable(name: "utilisateur_partenariat")]
     private Collection $partenariats;
+
 
     
 
     public function __construct()
     {
-        $this->formation = new ArrayCollection();
+        $this->formations = new ArrayCollection();
         $this->creation = new ArrayCollection();
         $this->evennement = new ArrayCollection();
-        $this->produit = new ArrayCollection();
+        $this->produits = new ArrayCollection();
         $this->partenariats = new ArrayCollection();
         $this->dateInscription = new \DateTime();
     }
@@ -250,13 +253,13 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getFormation(): Collection
     {
-        return $this->formation;
+        return $this->formations;
     }
 
     public function addFormation(Formation $formation): static
     {
-        if (!$this->formation->contains($formation)) {
-            $this->formation->add($formation);
+        if (!$this->formations->contains($formation)) {
+            $this->formations->add($formation);
         }
 
         return $this;
@@ -264,7 +267,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeFormation(Formation $formation): static
     {
-        $this->formation->removeElement($formation);
+        $this->formations->removeElement($formation);
 
         return $this;
     }
@@ -326,23 +329,23 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, Produit>
      */
-    public function getProduit(): Collection
+    public function getProduits(): Collection
     {
-        return $this->produit;
+        return $this->produits;
     }
 
     public function addProduit(Produit $produit): static
-    {
-        if (!$this->produit->contains($produit)) {
-            $this->produit->add($produit);
-        }
-
-        return $this;
+{
+    if (!$this->produits->contains($produit)) {
+        $this->produits->add($produit);
+        $produit->addUtilisateur($this);
     }
+    return $this;
+}
 
     public function removeProduit(Produit $produit): static
     {
-        $this->produit->removeElement($produit);
+        $this->produits->removeElement($produit);
 
         return $this;
     }
@@ -359,6 +362,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->partenariats->contains($partenariat)) {
             $this->partenariats->add($partenariat);
+            $partenariat->addUtilisateur($this);
         }
 
         return $this;

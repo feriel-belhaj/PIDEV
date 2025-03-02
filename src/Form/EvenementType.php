@@ -64,10 +64,8 @@ class EvenementType extends AbstractType
             ->add('startdate', DateTimeType::class, [
                 'label' => 'Date de début',
                 'widget' => 'single_text',
+                'data' => new \DateTime(),
                 'constraints' => [
-                    new Assert\NotBlank([
-                        'message' => 'La date de début est obligatoire'
-                    ]),
                     new Assert\Type([
                         'type' => \DateTimeInterface::class,
                         'message' => 'La date n\'est pas valide'
@@ -81,10 +79,8 @@ class EvenementType extends AbstractType
             ->add('enddate', DateTimeType::class, [
                 'label' => 'Date de fin',
                 'widget' => 'single_text',
+                'data' => (new \DateTime())->modify('+1 day'),
                 'constraints' => [
-                    new Assert\NotBlank([
-                        'message' => 'La date de fin est obligatoire'
-                    ]),
                     new Assert\Type([
                         'type' => \DateTimeInterface::class,
                         'message' => 'La date n\'est pas valide'
@@ -92,10 +88,6 @@ class EvenementType extends AbstractType
                     new Assert\GreaterThan([
                         'propertyPath' => 'parent.all[startdate].data',
                         'message' => 'La date de fin doit être postérieure à la date de début'
-                    ]),
-                    new Assert\GreaterThan([
-                        'value' => 'today',
-                        'message' => 'La date de fin doit être ultérieure à aujourd\'hui'
                     ])
                 ]
             ])

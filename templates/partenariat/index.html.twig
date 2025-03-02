@@ -8,10 +8,13 @@
         </div>
 
              <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
+             {% if app.user %}
             <a href="{{ path('app_partenariat_new') }}" class="btn btn-custom-maj border-0 rounded-pill py-2 px-3 mb-3 wow bounceInUp" data-wow-delay="0.2s">
              <i class="fas fa-edit fa-1.5x"></i>
                 </a>
+            {% else %}
+                <a href="{{ path('app_login') }}" class="btn btn-custom-maj border-0 rounded-pill py-2 px-3 mb-3 wow bounceInUp" data-wow-delay="0.2s"><i class="fas fa-edit fa-1.5x"></i></a>
+            {% endif %}
 
    
 
@@ -59,7 +62,7 @@
                     </div>
                 </div>
             {% else %}
-                <p class="text-center">Aucun partenariat trouvé.</p>
+                <p class="text-center">Aucune partenariat trouvé.</p>
           
            
 {% endfor %}

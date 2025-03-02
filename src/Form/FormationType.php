@@ -170,6 +170,9 @@ class FormationType extends AbstractType
                 'required' => false,
                 'data_class' => null,
                 'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez sélectionner une image'
+                    ]),
                     new File([
                         'maxSize' => '1024k',
                         'mimeTypes' => [

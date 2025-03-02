@@ -40,4 +40,19 @@ class ProduitRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function getProduitsPopulaires()
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
+            SELECT p.nom, COUNT(cp.produit_id) AS commandeCount
+            FROM produit p
+            JOIN commande_produit cp ON p.id = cp.produit_id
+            GROUP BY p.nom
+            ORDER BY commandeCount DESC
+            LIMIT 5
+        ";
+        $stmt = $conn->prepare($sql);
+        return $stmt->executeQuery()->fetchAllAssociative();
+    }
+    
 }

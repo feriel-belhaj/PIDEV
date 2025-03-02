@@ -3,10 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Partenariat;
+use App\Entity\Utilisateur;
 use App\Form\PartenariatType;
 use App\Repository\PartenariatRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -24,7 +27,7 @@ final class PartenariatController extends AbstractController
     }
 
     #[Route('/new', name: 'app_partenariat_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, Security $security): Response
     {
         $partenariat = new Partenariat();
         $form = $this->createForm(PartenariatType::class, $partenariat, ['is_edit' => false]);
@@ -40,7 +43,15 @@ final class PartenariatController extends AbstractController
                 $partenariat->setImage($newFilename);
             }
 
+            
+            $utilisateur = $security->getUser(); // Récupérer l'utilisateur connecté
+
+            if ( $utilisateur instanceof Utilisateur) {
+                $partenariat->addUtilisateur($utilisateur);
+            }
+
             $entityManager->persist($partenariat);
+            $entityManager->persist($utilisateur);
             $entityManager->flush();
 
             $this->addFlash('success', 'Partenariat ajouté avec succès.');

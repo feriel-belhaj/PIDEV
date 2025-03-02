@@ -58,10 +58,26 @@
 {% endblock %}
 
 {% block body %}
+    {# Affichage des messages flash #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
     <div class="container mt-5">
+    {% if app.user %}
         <div class="text-right mb-4 animate__animated animate__fadeInUp">
             <a href="{{ path('app_formation_new') }}" class="btn btn-primary btn-lg">Créer une nouvelle formation</a>
         </div>
+        {% else %}
+        <div class="text-right mb-4 animate__animated animate__fadeInUp">
+            <a href="{{ path('app_login') }}"  class="btn btn-primary btn-lg">Créer une nouvelle formation</a>
+        </div>
+        {% endif %}
 
         <div class="row">
             {% for formation in formations %}

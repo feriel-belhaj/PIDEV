@@ -21,7 +21,7 @@ private ?\DateTimeInterface $datePostulation = null;
 
     
 
-#[ORM\ManyToOne(targetEntity: Partenariat::class, inversedBy: 'candidature')]
+#[ORM\ManyToOne(targetEntity: Partenariat::class, inversedBy: 'candidatures')]
 #[ORM\JoinColumn(onDelete: "CASCADE")]
 private ?Partenariat $partenariat = null;
 
@@ -125,4 +125,10 @@ private ?Partenariat $partenariat = null;
 
         return $this;
     }
+    public function __construct()
+    {
+        $this->datePostulation = new \DateTime(); // Date système par défaut
+    }
+
+
 } 

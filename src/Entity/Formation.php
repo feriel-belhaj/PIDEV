@@ -65,10 +65,14 @@ class Formation
     #[ORM\OneToMany(targetEntity: Certificat::class, mappedBy: 'formation', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $certificats;
 
+    #[ORM\OneToMany(mappedBy: 'formation', targetEntity: FormationReservee::class, cascade: ['remove'])]
+    private Collection $formationsReservees;
+
     public function __construct()
     {
         $this->utilisateurs = new ArrayCollection();
         $this->certificats = new ArrayCollection();
+        $this->formationsReservees = new ArrayCollection();
         $this->datedeb = new \DateTime();
         $this->datefin = new \DateTime();
     }
@@ -243,6 +247,41 @@ class Formation
     {
         if ($this->utilisateurs->removeElement($utilisateur)) {
             $utilisateur->removeFormation($this);
+        }
+
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->titre ?? '';
+    }
+
+    /**
+     * @return Collection<int, FormationReservee>
+     */
+    public function getFormationsReservees(): Collection
+    {
+        return $this->formationsReservees;
+    }
+
+    public function addFormationReservee(FormationReservee $formationReservee): self
+    {
+        if (!$this->formationsReservees->contains($formationReservee)) {
+            $this->formationsReservees->add($formationReservee);
+            $formationReservee->setFormation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFormationReservee(FormationReservee $formationReservee): self
+    {
+        if ($this->formationsReservees->removeElement($formationReservee)) {
+            // set the owning side to null (unless already changed)
+            if ($formationReservee->getFormation() === $this) {
+                $formationReservee->setFormation(null);
+            }
         }
 
         return $this;

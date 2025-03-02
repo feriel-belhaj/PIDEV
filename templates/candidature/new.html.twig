@@ -66,9 +66,19 @@
                             </div>
 
                             <div class="mb-3 text-start">
-                                <label for="{{ form.motivation.vars.id }}" class="form-label">Lettre de motivation <span class="text-danger">*</span></label>
-                                {{ form_widget(form.motivation, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light ' ~ (form.motivation.vars.errors|length > 0 ? 'is-invalid' : '')}}) }}
-                                <div class="invalid-feedback">{{ form_errors(form.motivation) }}</div>
+                                <label for="{{ form.motivation.vars.id }}" class="form-label">
+                                    Lettre de motivation <span class="text-danger">*</span>
+                                </label>
+                                {{ form_widget(form.motivation, {
+                                    'attr': {
+                                        'class': 'w-100 form-control p-3 mb-4 border-primary bg-light ' ~
+                                        (form.motivation.vars.errors|length > 0 ? 'is-invalid' : ''),
+                                        'placeholder': 'Description du Partenariat'
+                                    }
+                                }) }}
+                                {% if form.motivation.vars.errors|length > 0 %}
+                                    <div class="invalid-feedback">{{ form_errors(form.motivation) }}</div>
+                                {% endif %}
                             </div>
 
                             <div class="col-12 text-center">

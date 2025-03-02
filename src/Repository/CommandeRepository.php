@@ -40,4 +40,17 @@ class CommandeRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function getCommandesParMois()
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
+            SELECT DATE_FORMAT(datecmd, '%Y-%m') AS mois, COUNT(id) AS nombre
+            FROM commande
+            GROUP BY mois
+            ORDER BY mois ASC
+        ";
+        $stmt = $conn->prepare($sql);
+        return $stmt->executeQuery()->fetchAllAssociative();
+    }
+    
 }

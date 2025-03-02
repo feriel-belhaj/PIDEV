@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #e9ecef;
+        }
+
+        .table-header {
+            background-color: #28a745;
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            padding: 12px 0;
+            margin-bottom: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 14px;
+            color: #777;
+        }
+
+        .summary {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #555;
+            border-top: 2px solid #007bff;
+            padding-top: 10px;
+        }
+
+        .summary div {
+            margin-bottom: 10px;
+        }
+
+        .summary span {
+            font-weight: bold;
+        }
+
+        .highlight {
+            color: #ff5722;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Rapport des Commandes</h1>
+
+    <div class="table-header">Détails des Commandes</div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Produit</th>
+                <th>Quantité</th>
+                <th>Prix Unitaire</th>
+                <th>Prix Total</th>
+                <th>Date</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for commande in commandes %}
+                {% for produit in commande.produit %}
+                    <tr>
+                        <td>{{ commande.id }}</td>
+                        <td>{{ produit.nom }}</td>
+                        <td>{{ commande.getQuantiteProduit(produit) }}</td>
+                        <td>{{ produit.prix }} dt</td>
+                        <td>{{ commande.prix }} dt</td>
+                        <td>{{ commande.datecmd ? commande.datecmd|date('Y-m-d') : 'N/A' }}</td>
+                        <td>{{ commande.statut }}</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="summary">
+        <div><span>Total des commandes : </span> {{ totalCommandes }}</div>
+        <div><span>Total Chiffre d'Affaires : </span> {{ chiffreAffairesTotal }} dt</div>
+        <div><span>Commandes terminées : </span> {{ commandesTerminees }}</div>
+        <div><span>Commandes annulées : </span> {{ commandesAnnulees }}</div>
+        <div><span>Montant moyen par commande : </span> {{ montantMoyen }} dt</div>
+        <div><span>la moyenne de commandes par jour: </span> {{ commandesParJour }} </div>
+    </div>
+
+    <div class="footer">
+        <p>Exporté avec soin depuis votre système de gestion des commandes.</p>
+        <p class="highlight">Merci de faire confiance à notre service !</p>
+    </div>
+</body>
+</html>

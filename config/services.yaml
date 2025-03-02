@@ -8,6 +8,8 @@ parameters:
     uploads_directory: '%kernel.project_dir%/public/uploads'
     partenariat_images_directory: '%kernel.project_dir%/public/uploads/partenariats'
     formation_images_directory: '%kernel.project_dir%/public/uploads/formation_images'
+    stripe_public_key: 'pk_test_51QvhyiP7cyQsM3mKvIlQHhs6D8M9IugXYuKhXslzZ6ijoYc33Y4qKjEKcB2r4dpYQnn0ggQMoo86Ic9dZBaWOhBX00xs4rQYIs'
+    stripe_secret_key: 'sk_test_51QvhyiP7cyQsM3mKr0KjH8HyzdI1HNjQQuPU0sBzRdAPtfMJhFx6ECWvswwrFXe6xg8rKskkLgy5WLmbL23C6Byh00YuLdSS19'
 
 services:
     Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator: '@security.authenticator.form_login.main'
@@ -18,6 +20,9 @@ services:
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
+    App\Controller\EmailController:
+         public: true
+         tags: ['controller.service_arguments']
     App\:
         resource: '../src/'
         exclude:
@@ -27,5 +32,5 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
-
+    
 

@@ -281,82 +281,47 @@
                     </a>
                 </li>
 
-                <li class="sidebar-item {% if app.request.get('_route') == 'app_produits' %}active{% endif %}">
-                    <a class="sidebar-link" href="#">
-                        <i class="align-middle"data-feather="shopping-cart" ></i> <span class="align-middle">Prduits</span>
+                <li class="sidebar-item {% if app.request.get('_route') == 'admin_produit_index' %}active{% endif %}">
+                    <a class="sidebar-link" href="{{ path('admin_produit_index') }}">
+                        <i class="align-middle"data-feather="shopping-cart" ></i> <span class="align-middle">Produits</span>
                     </a>
                 </li>
 
-                <li class="sidebar-item {% if app.request.get('_route') == 'app_evennements' %}active{% endif %}">
-                    <a class="sidebar-link" href="#">
+                <li class="sidebar-item {% if app.request.get('_route') == 'app_evenement_admin' %}active{% endif %}">
+                    <a class="sidebar-link" href="{{ path('app_evenement_admin') }}">
                         <i class="align-middle" data-feather="calendar"></i> <span class="align-middle">Evennements</span>
                     </a>
                 </li>
 
-                <li class="sidebar-item {% if app.request.get('_route') == 'app_formations' %}active{% endif %}">
-                    <a class="sidebar-link" href="#">
+                <li class="sidebar-item {% if app.request.get('_route') == 'app_formation_index1' %}active{% endif %}">
+                    <a class="sidebar-link" href="{{ path('app_formation_index1') }}">
                         <i class="align-middle" data-feather="airplay"></i> <span class="align-middle">Formations</span>
                     </a>
                 </li>
+				<li class="sidebar-item {% if app.request.get('_route') == 'admin_commande_index' %}active{% endif %}">
+					<a class="sidebar-link" href="{{ path('admin_commande_index') }}">
+						<i class="align-middle" data-feather="box"></i> <span class="align-middle">Commande</span>
+					</a>
+				</li>
 
                 
 
                 <li class="sidebar-header">
-                    Tools & Components
+                    Données personnelles 
                 </li>
 
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{asset('ui-buttons.html')}}">
-                        <i class="align-middle" data-feather="square"></i> <span class="align-middle">Buttons</span>
-                    </a>
-                </li>
+                <li class="sidebar-item {% if app.request.get('_route') == 'app_certificat_index' %}active{% endif %}">
+					<a class="sidebar-link" href="{{ path('app_certificat_index') }}">
+						<i class="align-middle" data-feather="check-square"></i> <span class="align-middle">Certificats</span>
+					</a>
+				</li>
 
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{asset('ui-forms.html')}}">
-                        <i class="align-middle" data-feather="check-square"></i> <span class="align-middle">Forms</span>
-                    </a>
-                </li>
+				<li class="sidebar-item {% if app.request.get('_route') == 'app_don_index' %}active{% endif %}">
+					<a class="sidebar-link" href="{{ path('app_don_index') }}">
+						<i class="align-middle" data-feather="check-square"></i> <span class="align-middle">Dons</span>
+					</a>
+				</li>
 
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{asset('ui-cards.html')}}">
-                        <i class="align-middle" data-feather="grid"></i> <span class="align-middle">Cards</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-item">
-    <a class="sidebar-link" href="{{ path('admin_produit_index') }}">
-        <i class="align-middle" data-feather="box"></i> <span class="align-middle">Produits</span>
-    </a>
-</li>
-
-                <li class="sidebar-item">
-    <a class="sidebar-link" href="{{ path('admin_commande_index') }}">
-        <i class="align-middle" data-feather="box"></i> <span class="align-middle">Commande</span>
-    </a>
-</li>
-
-
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{asset('icons-feather.html')}}">
-                        <i class="align-middle" data-feather="coffee"></i> <span class="align-middle">Icons</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-header">
-                    Plugins & Addons
-                </li>
-
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{asset('charts-chartjs.html')}}">
-                        <i class="align-middle" data-feather="bar-chart-2"></i> <span class="align-middle">Charts</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{asset('maps-google.html')}}">
-                        <i class="align-middle" data-feather="map"></i> <span class="align-middle">Maps</span>
-                    </a>
-                </li>
             </ul>
 
            

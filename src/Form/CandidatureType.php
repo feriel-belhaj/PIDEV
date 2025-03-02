@@ -20,16 +20,10 @@ class CandidatureType extends AbstractType
         $isEdit = $options['is_edit'] ?? false;
 
         $builder
-            ->add('datePostulation', DateType::class, [
-                'widget' => 'single_text',
-                'data' => new \DateTime(),
-                'attr' => ['readonly' => true],
-                // Bien que la date soit automatiquement renseignée,
-                // on peut ajouter une contrainte NotBlank pour la cohérence
-                'constraints' => !$isEdit ? [
-                    new Assert\NotBlank(['message' => 'remplir champs']),
-                ] : [],
-            ])
+        ->add('datePostulation', DateType::class, [
+            'widget' => 'single_text',
+            'attr' => ['readonly' => true], 
+        ])
             ->add('typeCollab', ChoiceType::class, [
                 'choices' => [
                     'Stage' => 'Stage',
