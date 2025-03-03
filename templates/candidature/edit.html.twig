@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'baseBack.html.twig' %}
 
 {% block title %}Mettre à jour une Candidature{% endblock %}
 
@@ -7,11 +7,11 @@
     <div class="p-5 bg-light rounded contact-form position-relative">
         
         <!-- Croix pour annuler -->
-        <a href="{{ path('app_candidature_index') }}" class="position-absolute top-0 end-0 m-3 text-danger" style="font-size: 24px; text-decoration: none;">&times;</a>
+        <a href="{{ path('admin_candidature_index') }}" class="position-absolute top-0 end-0 m-3 text-danger" style="font-size: 24px; text-decoration: none;">&times;</a>
         
         <h3 class="display-5 mb-0">Mise à Jour de la Candidature</h3>
 
-        {{ form_start(form, {'attr': {'id': 'candidatureForm', 'enctype': 'multipart/form-data'}}) }}
+			{{ form_start(form ,{'attr' : {'novalidate' : 'novalidate', 'id' :"register-form"}})}}
 
         <div class="mb-3 text-start">
             {{ form_label(form.typeCollab,"Type De Collaboration") }}

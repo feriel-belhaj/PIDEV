@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Comparer les Produits{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Comparer les Produits</h1>
+
+    <div class="row">
+        {% for produit in produits %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <img src="{{ produit.image ? asset('uploads/images/' ~ produit.image) : 'default-image.jpg' }}" class="card-img-top" alt="{{ produit.nom }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ produit.nom }}</h5>
+                    <p class="card-text">{{ produit.description }}</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Prix : {{ produit.prix }} TND</li>
+                        <li class="list-group-item">Stock : {{ produit.quantitestock }} unités</li>
+                        <li class="list-group-item">Catégorie : {{ produit.categorie }}</li>
+                        <li class="list-group-item">Créé le : {{ produit.datecreation|date('Y-m-d') }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

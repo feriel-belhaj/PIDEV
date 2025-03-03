@@ -1,0 +1,109 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Formation index{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <!-- Ajout d'Animate.css pour les animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <!-- Style personnalisé pour les cartes -->
+    <style>
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+        .card-text {
+            color: #666;
+        }
+        .list-group-item {
+            border: none;
+            padding: 0.5rem 1rem;
+        }
+        .btn-info, .btn-warning {
+            border-radius: 25px;
+            padding: 0.5rem 1.5rem;
+            font-weight: bold;
+        }
+        .btn-info {
+            background-color: #D4A762;
+            color: white;
+            transition: all 0.3s ease-in-out;
+        }
+        .btn-warning {
+            background-color: #D4A762;
+            color: white;
+            transition: all 0.3s ease-in-out;
+        }
+        .alert-warning {
+            background-color: beige;
+            color: #D4A762;
+            border: 1px solid #D4A762;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+    {% if app.user %}
+        <div class="text-right mb-4 animate__animated animate__fadeInUp">
+            <a href="{{ path('app_formation_new') }}" class="btn btn-primary btn-lg">Créer une nouvelle formation</a>
+        </div>
+        {% else %}
+        <div class="text-right mb-4 animate__animated animate__fadeInUp">
+            <a href="{{ path('app_login') }}"  class="btn btn-primary btn-lg">Créer une nouvelle formation</a>
+        </div>
+        {% endif %}
+
+        <div class="row">
+            {% for formation in formations %}
+                <div class="col-md-4 mb-4 animate__animated animate__fadeInUp">
+                    <div class="card h-100">
+                        {% if formation.image %}
+                            <img src="{{ asset('uploads/formation_images/' ~ formation.image) }}" class="card-img-top" alt="{{ formation.titre }}">
+                        {% else %}
+                            <img src="{{ asset('images/default-formation.jpg') }}" class="card-img-top" alt="Default Image">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ formation.titre }}</h5>
+                            <p class="card-text">{{ formation.description|slice(0, 100) }}...</p>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>Date de début:</strong> {{ formation.datedeb ? formation.datedeb|date('Y-m-d') : 'N/A' }}</li>
+                                <li class="list-group-item"><strong>Date de fin:</strong> {{ formation.datefin ? formation.datefin|date('Y-m-d') : 'N/A' }}</li>
+                                <li class="list-group-item"><strong>Niveau:</strong> {{ formation.niveau }}</li>
+                                <li class="list-group-item"><strong>Prix:</strong> {{ formation.prix }} D</li>
+                                <li class="list-group-item"><strong>Emplacement:</strong> {{ formation.emplacement }}</li>
+                                <li class="list-group-item"><strong>Places disponibles:</strong> {{ formation.nbplace - formation.nbparticipant }}</li>
+                                <li class="list-group-item"><strong>Durée:</strong> {{ formation.duree }} heures</li>
+                            </ul>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <a href="{{ path('app_formation_show', {'id': formation.id}) }}" class="btn btn-primary py-2 px-4 d-none d-xl-inline-block rounded-pill">Voir plus</a>
+                           <!-- <a href="{{ path('app_formation_edit', {'id': formation.id}) }}" class="btn btn-primary py-2 px-4 d-none d-xl-inline-block rounded-pill">Modifier</a>-->
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12 animate__animated animate__fadeIn">
+                    <div class="alert alert-warning text-center" role="alert">
+                        Aucune formation trouvée.
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

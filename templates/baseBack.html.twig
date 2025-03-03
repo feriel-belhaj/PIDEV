@@ -18,240 +18,199 @@
 
 
         {% block javascripts %}
-             
-				<script src="{{ asset('js/app.js') }}"></script>
-				<script>
-					document.addEventListener("DOMContentLoaded", function() {
-						if (window.theme) {
-							console.log("Theme loaded:", window.theme);
-						} else {
-							console.error("Theme not loaded");
-						}
-					});
-				</script>
-					<script>
-					document.addEventListener("DOMContentLoaded", function() {
-						var ctx = document.getElementById("chartjs-dashboard-line").getContext("2d");
-						var gradient = ctx.createLinearGradient(0, 0, 0, 225);
-						gradient.addColorStop(0, "rgba(215, 227, 244, 1)");
-						gradient.addColorStop(1, "rgba(215, 227, 244, 0)");
-						// Line chart
-						new Chart(document.getElementById("chartjs-dashboard-line"), {
-							type: "line",
-							data: {
-								labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-								datasets: [{
-									label: "Sales ($)",
-									fill: true,
-									backgroundColor: gradient,
-									borderColor: window.theme.primary,
-									data: [
-										2115,
-										1562,
-										1584,
-										1892,
-										1587,
-										1923,
-										2566,
-										2448,
-										2805,
-										3438,
-										2917,
-										3327
-									]
-								}]
-							},
-							options: {
-								maintainAspectRatio: false,
-								legend: {
-									display: false
-								},
-								tooltips: {
-									intersect: false
-								},
-								hover: {
-									intersect: true
-								},
-								plugins: {
-									filler: {
-										propagate: false
-									}
-								},
-								scales: {
-									xAxes: [{
-										reverse: true,
-										gridLines: {
-											color: "rgba(0,0,0,0.0)"
-										}
-									}],
-									yAxes: [{
-										ticks: {
-											stepSize: 1000
-										},
-										display: true,
-										borderDash: [3, 3],
-										gridLines: {
-											color: "rgba(0,0,0,0.0)"
-										}
-									}]
-								}
-							}
-						});
-					});
-				</script>
-				<script>
-					document.addEventListener("DOMContentLoaded", function() {
-						// Pie chart
-						new Chart(document.getElementById("chartjs-dashboard-pie"), {
-							type: "pie",
-							data: {
-								labels: ["Chrome", "Firefox", "IE"],
-								datasets: [{
-									data: [4306, 3801, 1689],
-									backgroundColor: [
-										window.theme.primary,
-										window.theme.warning,
-										window.theme.danger
-									],
-									borderWidth: 5
-								}]
-							},
-							options: {
-								responsive: !window.MSInputMethodContext,
-								maintainAspectRatio: false,
-								legend: {
-									display: false
-								},
-								cutoutPercentage: 75
-							}
-						});
-					});
-				</script>
-				<script>
-					document.addEventListener("DOMContentLoaded", function() {
-						// Bar chart
-						new Chart(document.getElementById("chartjs-dashboard-bar"), {
-							type: "bar",
-							data: {
-								labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-								datasets: [{
-									label: "This year",
-									backgroundColor: window.theme.primary,
-									borderColor: window.theme.primary,
-									hoverBackgroundColor: window.theme.primary,
-									hoverBorderColor: window.theme.primary,
-									data: [54, 67, 41, 55, 62, 45, 55, 73, 60, 76, 48, 79],
-									barPercentage: .75,
-									categoryPercentage: .5
-								}]
-							},
-							options: {
-								maintainAspectRatio: false,
-								legend: {
-									display: false
-								},
-								scales: {
-									yAxes: [{
-										gridLines: {
-											display: false
-										},
-										stacked: false,
-										ticks: {
-											stepSize: 20
-										}
-									}],
-									xAxes: [{
-										stacked: false,
-										gridLines: {
-											color: "transparent"
-										}
-									}]
-								}
-							}
-						});
-					});
-				</script>
-				<script>
-					document.addEventListener("DOMContentLoaded", function() {
-						var markers = [{
-								coords: [31.230391, 121.473701],
-								name: "Shanghai"
-							},
-							{
-								coords: [28.704060, 77.102493],
-								name: "Delhi"
-							},
-							{
-								coords: [6.524379, 3.379206],
-								name: "Lagos"
-							},
-							{
-								coords: [35.689487, 139.691711],
-								name: "Tokyo"
-							},
-							{
-								coords: [23.129110, 113.264381],
-								name: "Guangzhou"
-							},
-							{
-								coords: [40.7127837, -74.0059413],
-								name: "New York"
-							},
-							{
-								coords: [34.052235, -118.243683],
-								name: "Los Angeles"
-							},
-							{
-								coords: [41.878113, -87.629799],
-								name: "Chicago"
-							},
-							{
-								coords: [51.507351, -0.127758],
-								name: "London"
-							},
-							{
-								coords: [40.416775, -3.703790],
-								name: "Madrid "
-							}
-						];
-						var map = new jsVectorMap({
-							map: "world",
-							selector: "#world_map",
-							zoomButtons: true,
-							markers: markers,
-							markerStyle: {
-								initial: {
-									r: 9,
-									strokeWidth: 7,
-									stokeOpacity: .4,
-									fill: window.theme.primary
-								},
-								hover: {
-									fill: window.theme.primary,
-									stroke: window.theme.primary
-								}
-							},
-							zoomOnScroll: false
-						});
-						window.addEventListener("resize", () => {
-							map.updateSize();
-						});
-					});
-				</script>
-				<script>
-					document.addEventListener("DOMContentLoaded", function() {
-						var date = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
-						var defaultDate = date.getUTCFullYear() + "-" + (date.getUTCMonth() + 1) + "-" + date.getUTCDate();
-						document.getElementById("datetimepicker-dashboard").flatpickr({
-							inline: true,
-							prevArrow: "<span title=\"Previous month\">&laquo;</span>",
-							nextArrow: "<span title=\"Next month\">&raquo;</span>",
-							defaultDate: defaultDate
-						});
-					});
-				</script>
+    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        {% endblock %}
+    <script>
+        let chartInstanceLine = null;
+        let chartInstanceBar = null;
+        let chartInstancePie = null;
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Statistiques des inscriptions
+            fetch('/utilisateur/statistiques/inscriptions')
+            .then(response => response.json())
+            .then(data => {
+                const canvasLine = document.getElementById("chartjs-dashboard-line");
+
+                // Si un graphique existe déjà, le détruire
+                if (chartInstanceLine) {
+                    chartInstanceLine.destroy(); // Détruire l'ancienne instance
+                }
+
+                // Créer un nouveau graphique pour les inscriptions
+                chartInstanceLine = new Chart(canvasLine, {
+                    type: "line",
+                    data: {
+                        labels: data.labels, // Les mois
+                        datasets: [{
+                            label: "Inscriptions", // Change "Sales" par "Inscriptions"
+                            data: data.data, // Les valeurs
+                            borderColor: "#3e95cd",
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                type: 'category', // Utilisation de type 'category' pour des données catégoriques comme des mois
+                                display: true,
+                            },
+                            y: {
+                                display: true,
+                                beginAtZero: true // Force l'axe Y à commencer à zéro
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Erreur lors du chargement des stats :', error));
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            const canvasBar = document.getElementById("chartjs-dashboard-bar");
+            if (chartInstanceBar) {
+                chartInstanceBar.destroy(); // Détruire l'ancienne instance du graphique bar
+            }
+            new Chart(canvasBar, {
+                type: "bar",
+                data: {
+                    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                    datasets: [{
+                        label: "This year",
+                        backgroundColor: window.theme.primary,
+                        borderColor: window.theme.primary,
+                        hoverBackgroundColor: window.theme.primary,
+                        hoverBorderColor: window.theme.primary,
+                        data: [54, 67, 41, 55, 62, 45, 55, 73, 60, 76, 48, 79],
+                        barPercentage: .75,
+                        categoryPercentage: .5
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    legend: {
+                        display: false
+                    },
+                    scales: {
+                        y: {
+                            gridLines: {
+                                display: false
+                            },
+                            ticks: {
+                                stepSize: 20
+                            }
+                        },
+                        x: {
+                            gridLines: {
+                                color: "transparent"
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Détruire et recréer les graphiques existants (Pie Chart)
+            const canvasPie = document.getElementById("chartjs-dashboard-pie");
+            if (chartInstancePie) {
+                chartInstancePie.destroy(); // Détruire l'ancienne instance du graphique pie
+            }
+            fetch('/utilisateur/statistiques/sexe')
+        .then(response => response.json())
+        .then(data => {
+            const canvasPie = document.getElementById("chartjs-dashboard-pie");
+
+            // Si un graphique existe déjà, le détruire
+            if (chartInstancePie) {
+                chartInstancePie.destroy(); // Détruire l'ancienne instance
+            }
+
+            // Adapter les labels et les données pour correspondre à la réponse
+            const labels = ['Homme', 'Femme'];
+            const values = [data.male || 0, data.femelle || 0]; // Utiliser "male" et "femelle" comme valeurs
+
+            // Créer un nouveau graphique pie avec les données du sexe
+            chartInstancePie = new Chart(canvasPie, {
+                type: "pie",
+                data: {
+                    labels: labels, // Les labels peuvent être "Homme", "Femme", etc.
+                    datasets: [{
+                        data: values, // Les valeurs correspondantes (nombre d'hommes, de femmes, etc.)
+                        backgroundColor: [
+                            window.theme.primary,  // Couleur pour Homme
+                            window.theme.warning   // Couleur pour Femme
+                        ],
+                        borderWidth: 5
+                    }]
+                },
+                options: {
+                    responsive: !window.MSInputMethodContext,
+                    maintainAspectRatio: false,
+                    legend: {
+                        display: true  // Afficher la légende pour mieux identifier chaque catégorie
+                    },
+                    cutoutPercentage: 75
+                }
+            });
+        })
+        .catch(error => console.error('Erreur lors du chargement des stats :', error));
+
+        });
+
+        // World map
+        document.addEventListener("DOMContentLoaded", function() {
+            var markers = [
+                { coords: [31.230391, 121.473701], name: "Shanghai" },
+                { coords: [28.704060, 77.102493], name: "Delhi" },
+                { coords: [6.524379, 3.379206], name: "Lagos" },
+                { coords: [35.689487, 139.691711], name: "Tokyo" },
+                { coords: [23.129110, 113.264381], name: "Guangzhou" },
+                { coords: [40.7127837, -74.0059413], name: "New York" },
+                { coords: [34.052235, -118.243683], name: "Los Angeles" },
+                { coords: [41.878113, -87.629799], name: "Chicago" },
+                { coords: [51.507351, -0.127758], name: "London" },
+                { coords: [40.416775, -3.703790], name: "Madrid" }
+            ];
+
+            var map = new jsVectorMap({
+                map: "world",
+                selector: "#world_map",
+                zoomButtons: true,
+                markers: markers,
+                markerStyle: {
+                    initial: {
+                        r: 9,
+                        strokeWidth: 7,
+                        stokeOpacity: .4,
+                        fill: window.theme.primary
+                    },
+                    hover: {
+                        fill: window.theme.primary,
+                        stroke: window.theme.primary
+                    }
+                },
+                zoomOnScroll: false
+            });
+
+            window.addEventListener("resize", () => {
+                map.updateSize();
+            });
+        });
+        
+        // Date picker
+        document.addEventListener("DOMContentLoaded", function() {
+            var date = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
+            var defaultDate = date.getUTCFullYear() + "-" + (date.getUTCMonth() + 1) + "-" + date.getUTCDate();
+            document.getElementById("datetimepicker-dashboard").flatpickr({
+                inline: true,
+                prevArrow: "<span title=\"Previous month\">&laquo;</span>",
+                nextArrow: "<span title=\"Next month\">&raquo;</span>",
+                defaultDate: defaultDate
+            });
+        });
+    </script>
+{% endblock %}
 
 
 
@@ -281,82 +240,50 @@
                     </a>
                 </li>
 
-                <li class="sidebar-item {% if app.request.get('_route') == 'app_produits' %}active{% endif %}">
-                    <a class="sidebar-link" href="#">
-                        <i class="align-middle"data-feather="shopping-cart" ></i> <span class="align-middle">Prduits</span>
+                <li class="sidebar-item {% if app.request.get('_route') == 'admin_produit_index' %}active{% endif %}">
+                    <a class="sidebar-link" href="{{ path('admin_produit_index') }}">
+                        <i class="align-middle"data-feather="shopping-cart" ></i> <span class="align-middle">Produits</span>
                     </a>
                 </li>
 
-                <li class="sidebar-item {% if app.request.get('_route') == 'app_evennements' %}active{% endif %}">
-                    <a class="sidebar-link" href="#">
+                <li class="sidebar-item {% if app.request.get('_route') == 'app_evenement_admin' %}active{% endif %}">
+                    <a class="sidebar-link" href="{{ path('app_evenement_admin') }}">
                         <i class="align-middle" data-feather="calendar"></i> <span class="align-middle">Evennements</span>
                     </a>
                 </li>
 
-                <li class="sidebar-item {% if app.request.get('_route') == 'app_formations' %}active{% endif %}">
-                    <a class="sidebar-link" href="#">
+                <li class="sidebar-item {% if app.request.get('_route') == 'app_formation_index1' %}active{% endif %}">
+                    <a class="sidebar-link" href="{{ path('app_formation_index1') }}">
                         <i class="align-middle" data-feather="airplay"></i> <span class="align-middle">Formations</span>
                     </a>
                 </li>
-
-                
-
+				<li class="sidebar-item {% if app.request.get('_route') == 'admin_commande_index' %}active{% endif %}">
+					<a class="sidebar-link" href="{{ path('admin_commande_index') }}">
+						<i class="align-middle" data-feather="box"></i> <span class="align-middle">Commande</span>
+					</a>
+				</li>
+				
+				<li class="sidebar-item {% if app.request.get('_route') == 'admin_candidature_index' %}active{% endif %}">
+					<a class="sidebar-link" href="{{ path('admin_candidature_index') }}">
+						<i class="align-middle" data-feather="file"></i> <span class="align-middle">Candidature</span>
+					</a>
+				</li>
                 <li class="sidebar-header">
-                    Tools & Components
+                    Données personnelles 
                 </li>
 
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{asset('ui-buttons.html')}}">
-                        <i class="align-middle" data-feather="square"></i> <span class="align-middle">Buttons</span>
-                    </a>
-                </li>
+                <li class="sidebar-item {% if app.request.get('_route') == 'app_certificat_index' %}active{% endif %}">
+					<a class="sidebar-link" href="{{ path('app_certificat_index') }}">
+						<i class="align-middle" data-feather="check-square"></i> <span class="align-middle">Certificats</span>
+					</a>
+				</li>
 
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{asset('ui-forms.html')}}">
-                        <i class="align-middle" data-feather="check-square"></i> <span class="align-middle">Forms</span>
-                    </a>
-                </li>
+				<li class="sidebar-item {% if app.request.get('_route') == 'app_don_index' %}active{% endif %}">
+					<a class="sidebar-link" href="{{ path('app_don_index') }}">
+						<i class="align-middle" data-feather="check-square"></i> <span class="align-middle">Dons</span>
+					</a>
+				</li>
 
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{asset('ui-cards.html')}}">
-                        <i class="align-middle" data-feather="grid"></i> <span class="align-middle">Cards</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-item">
-    <a class="sidebar-link" href="{{ path('admin_produit_index') }}">
-        <i class="align-middle" data-feather="box"></i> <span class="align-middle">Produits</span>
-    </a>
-</li>
-
-                <li class="sidebar-item">
-    <a class="sidebar-link" href="{{ path('admin_commande_index') }}">
-        <i class="align-middle" data-feather="box"></i> <span class="align-middle">Commande</span>
-    </a>
-</li>
-
-
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{asset('icons-feather.html')}}">
-                        <i class="align-middle" data-feather="coffee"></i> <span class="align-middle">Icons</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-header">
-                    Plugins & Addons
-                </li>
-
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{asset('charts-chartjs.html')}}">
-                        <i class="align-middle" data-feather="bar-chart-2"></i> <span class="align-middle">Charts</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{asset('maps-google.html')}}">
-                        <i class="align-middle" data-feather="map"></i> <span class="align-middle">Maps</span>
-                    </a>
-                </li>
             </ul>
 
            
@@ -650,8 +577,7 @@
 					<div class="col-xl-6 col-xxl-7">
 						<div class="card flex-fill w-100">
 							<div class="card-header">
-
-								<h5 class="card-title mb-0">Recent Movement</h5>
+								<h5 class="card-title mb-0">Nombre d'inscriptions par mois</h5>
 							</div>
 							<div class="card-body py-3">
 								<div class="chart chart-sm">
@@ -660,14 +586,13 @@
 							</div>
 						</div>
 					</div>
-					</div>
 
 							<div class="row">
 								<div class="col-12 col-md-6 col-xxl-3 d-flex order-2 order-xxl-3">
 									<div class="card flex-fill w-100">
 										<div class="card-header">
 
-											<h5 class="card-title mb-0">Browser Usage</h5>
+											<h5 class="card-title mb-0">Répartition des Utilisateurs par Sexe</h5>
 										</div>
 										<div class="card-body d-flex">
 											<div class="align-self-center w-100">
@@ -677,22 +602,7 @@
 													</div>
 												</div>
 
-												<table class="table mb-0">
-													<tbody>
-														<tr>
-															<td>Chrome</td>
-															<td class="text-end">4306</td>
-														</tr>
-														<tr>
-															<td>Firefox</td>
-															<td class="text-end">3801</td>
-														</tr>
-														<tr>
-															<td>IE</td>
-															<td class="text-end">1689</td>
-														</tr>
-													</tbody>
-												</table>
+												
 											</div>
 										</div>
 									</div>
@@ -819,6 +729,8 @@
 							</div>
 
 				
+				
+
 			{% endblock %}
 					</div>
 				</main>

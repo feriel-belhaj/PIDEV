@@ -10,6 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
 ////
 use Doctrine\ORM\EntityManagerInterface;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
 class Commande
 {
@@ -28,15 +30,30 @@ class Commande
 
     #[ORM\Column(length: 255)]
     private ?string $statut = null;
+    
 
     /**
      * @var Collection<int, Produit>
      */
-    #[ORM\ManyToMany(targetEntity: Produit::class)]
-    #[ORM\JoinTable(name: "commande_produit")]
+    #[ORM\ManyToMany(targetEntity: Produit::class, inversedBy: 'commandes')]
+    #[ORM\JoinTable(name: "commandeProduits")]
     #[ORM\JoinColumn(name: "commande_id", referencedColumnName: "id", onDelete: "CASCADE")]
     #[ORM\InverseJoinColumn(name: "produit_id", referencedColumnName: "id", onDelete: "CASCADE")]
     private Collection $produit;
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
+    private ?Utilisateur $createur = null;
+    public function getCreateur(): ?Utilisateur
+    {
+        return $this->createur;
+    }
+
+    public function setCreateur(?Utilisateur $createur): self
+    {
+        $this->createur = $createur;
+        return $this;
+    }
+
 
     public function __construct()
     {
@@ -95,6 +112,7 @@ class Commande
     {
         if (!$this->produit->contains($produit)) {
             $this->produit->add($produit);
+            
         }
         return $this;
     }
@@ -105,11 +123,11 @@ class Commande
         return $this;
     }
 
-    public function setProduit(?Produit $produit): self
-    {
-        $this->produit = $produit;
-        return $this;
-    }
+    // public function setProduit(?Produit $produit): self
+    // {
+    //     $this->produit = $produit;
+    //     return $this;
+    // }
     ///
     private ?EntityManagerInterface $entityManager = null;
 
@@ -162,5 +180,27 @@ public function getQuantiteProduit(Produit $produit): ?int
     ]);
 
     return $result->fetchOne() ?: null;
+}
+public function recalculerPrixTotal(): void
+{
+    if (!$this->entityManager) {
+        throw new \LogicException('EntityManager must be set before calling recalculerPrixTotal.');
+    }
+
+    $totalPrix = 0;
+    foreach ($this->produit as $produit) {
+        $quantite = $this->getQuantiteProduit($produit);
+        $totalPrix += $produit->getPrix() * $quantite;
+    }
+
+    $this->setPrix($totalPrix);
+
+    
+    $this->entityManager->flush();
+}
+//new
+public function verifierStockDisponible(Produit $produit, int $quantite): bool
+{
+    return $quantite <= $produit->getQuantitestock();
 }
 }

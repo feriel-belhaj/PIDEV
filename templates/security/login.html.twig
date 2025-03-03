@@ -1,23 +1,19 @@
-
-
 {% block title %}{% endblock %}
 
 {% block stylesheets %}
-		<link rel="stylesheet" href="{{ asset('css/SignUpForm.css') }}">
-        {% endblock %}
+    <link rel="stylesheet" href="{{ asset('css/SignUpForm.css') }}">
+	<style>
+	.form-container {
+    margin-bottom: 20px; /* Ajoute un peu de marge entre les formulaires */
+	}</style>
+{% endblock %}
+
 {% block body %}
     <h1>ArtiZina — Rejoignez notre équipe d'artistes !</h1>
 
-    {#{{ include('utilisateur/_form.html.twig') }}#}
-
-    {#<a href="{{ path('app_utilisateur_index') }}">back to list</a>#}
-	<br>
     <div class="container" id="container">
-
-		<div class="form-container sign-up-container">
-			
-			
-			<form method="post">
+        <div class="form-container sign-up-container">
+            <form action="{{ path('app_login') }}" method="POST">
                 {% if error %}
                     <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                 {% endif %}
@@ -27,39 +23,165 @@
                 
                 <input type="email" value="{{ last_username }}" name="_username" placeholder="Email" required>
                 <input type="password" name="_password" placeholder="Mot de passe" required>
-                
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-                
                 <button type="submit">Connexion</button>
             </form>
+            
+			<form id="face-login-form" action="{{ path('app_face_login') }}" method="POST" enctype="multipart/form-data">
+				<h1>Connexion par reconnaissance faciale</h1>
+				<span>Utilisez votre visage pour vous connecter</span>
 
-	</div>
-<div>
-    <img src="{{ asset('img/logo.png') }}"  width="400" height="auto">
-    <br>
+				<!-- Affichage de la vidéo de la webcam -->
+				<video id="video" width="640" height="480" autoplay muted></video>
 
-</div>
-	
-	<div class="overlay-container">
-		<div class="overlay">
-			<div class="overlay-panel overlay-left">
-				<h1>Bienvenue de nouveau !</h1>
-				<p>Pour rester connecté avec nous, veuillez vous connecter avec vos informations personnelles</p>
-				<h5> Vous avez déja un compte ?</h5>
-				<button class="ghost" id="signIn" onclick="window.location.href='{{ path('app_utilisateur_new') }}'">S'inscrire</button>
-			</div>
-			<div class="overlay-panel overlay-right">
-				<h1>Bonjour, Artiste !</h1>
-				<p>Entrez vos informations personnelles et commencez votre aventure avec nous</p>
-				<button class="ghost" id="signUp" >Se connecter</button>
-				
-			</div>
-		</div>
-		</div>
-	</div>
+				<!-- Canvas pour dessiner les détections de visages -->
+				<canvas id="canvas" width="640" height="480" style="position: absolute;"></canvas>
+
+                
+               
+				<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+				<input type="hidden" name="captured_image" id="captured_image">
+                <button type="submit" id="submitButton">Connexion par reconnaissance faciale</button>
+			</form>
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+        </div>
+
+        <div class="form-container sign-up-container">
+            
+        </div>
+
+        <div>
+            <img src="{{ asset('img/logo.png') }}"  width="400" height="auto">
+        </div>
+
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>Bienvenue de nouveau !</h1>
+                    <p>Pour rester connecté avec nous, veuillez vous connecter avec vos informations personnelles</p>
+                    <h5> Vous avez déjà un compte ?</h5>
+                    <button class="ghost" id="signIn" onclick="window.location.href='{{ path('app_utilisateur_new') }}'">S'inscrire</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>Bonjour, Artiste !</h1>
+                    <p>Entrez vos informations personnelles et commencez votre aventure avec nous</p>
+                    <button class="ghost" id="signUp" >Se connecter</button>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
- {% block javascripts %}
-            <script src="{{ asset('js/signUp.js') }}"></script>
+{% block javascripts %}
+    
+	<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+	<script src="{{ asset('js/signUp.js') }}"></script>
+	<script>
 
+		document.addEventListener("DOMContentLoaded", function() {
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const submitButton = document.getElementById("submitButton");
+
+    // Vérifier la compatibilité de getUserMedia
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        // Démarrer la vidéo de la webcam
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                // Associer la vidéo à la source du flux
+                video.srcObject = stream;
+                video.play(); // Lancer la lecture de la vidéo
+            })
+            .catch((err) => {
+                console.error("Erreur lors de l'accès à la webcam: ", err);
+                alert("Impossible d'accéder à la webcam. Veuillez vérifier les permissions.");
+            });
+    } else {
+        alert("getUserMedia n'est pas supporté par ce navigateur.");
+    }
+
+    // Initialiser Face-api.js
+    Promise.all([
+        faceapi.nets.ssdMobilenetv1.loadFromUri('/models'),
+        faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+        faceapi.nets.faceRecognitionNet.loadFromUri('/models')
+    ]).then(startVideo);
+
+    function startVideo() {
+        // Lancer la vidéo après que les modèles aient été chargés
+        video.play();
+    }
+    canvas.getContext('2d').willReadFrequently = true;
+    
+    // Fonction pour dessiner les détections sur le canvas
+    video.addEventListener('play', () => {
+        const displaySize = { width: video.width, height: video.height };
+        faceapi.matchDimensions(canvas, displaySize);
+
+        setInterval(async () => {
+            const detections = await faceapi.detectAllFaces(video)
+                .withFaceLandmarks()
+                .withFaceDescriptors();
+
+            // Dessiner les détections sur le canvas
+            const resizedDetections = faceapi.resizeResults(detections, displaySize);
+            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+            faceapi.draw.drawDetections(canvas, resizedDetections);
+            faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+        }, 100);
+    });
+
+    // Ajouter une logique pour traiter la soumission du formulaire avec la capture d'image
+    submitButton.addEventListener("click", async function (e) {
+    e.preventDefault();
+
+    const detections = await faceapi.detectSingleFace(video)
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+
+    if (!detections) {
+        alert("Aucun visage détecté !");
+        return;
+    }
+
+    // Ajuster la taille du canvas à la vidéo
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // Dessiner l'image de la vidéo sur le canvas
+    const context = canvas.getContext("2d");
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Vérifier si l'image capturée n'est pas blanche
+    const faceImage = canvas.toDataURL("image/jpeg");
+    console.log("Image capturée", faceImage);
+
+    if (faceImage.length < 1000) {
+        alert("Erreur : l'image capturée semble vide !");
+        return;
+    }
+
+    // Ajouter l'image capturée au formulaire
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "captured_image";
+    input.value = faceImage;
+
+    document.getElementById("face-login-form").appendChild(input);
+
+    // Vérifier si l'image est bien affichée
+    document.body.appendChild(canvas);
+
+    // Soumettre le formulaire
+    document.getElementById("face-login-form").submit();
+});
+});
+
+
+	</script>
 {% endblock %}

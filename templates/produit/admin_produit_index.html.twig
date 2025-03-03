@@ -4,10 +4,23 @@
 
 {% block body %}
     <div class="container">
-        <h1 class="my-4 text-center">Liste des Produits</h1> <!-- Modifié ici -->
+        <h1 class="my-4 text-center">Liste des Produits</h1>
+
+        <!-- Affichage des alertes flash -->
+        {% for message in app.flashes('warning') %}
+            <div class="alert alert-warning">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        <!-- Formulaire pour appliquer la remise sur tous les produits -->
+        <div class="text-center mt-4 mb-5">
+            <form action="{{ path('admin_appliquer_remise') }}" method="post">
+                <button type="submit" class="btn btn-warning py-2 px-4 rounded-pill">Appliquer la remise de 10% sur tous les produits</button>
+            </form>
+        </div>
 
         <!-- Tableau des produits -->
-     
         <table class="table table-striped">
             <thead class="table-dark">
                 <tr>
@@ -17,12 +30,12 @@
                     <th>Prix</th>
                     <th>Quantité</th>
                     <th>Catégorie</th>
-                    <th>Actions</th> <!-- Colonne Image supprimée -->
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for produit in produits %}
-                    <tr>
+                    <tr {% if produit.quantitestock <= 5 %}class="table-warning"{% endif %}>
                         <td>{{ produit.id }}</td>
                         <td>{{ produit.nom }}</td>
                         <td>{{ produit.description }}</td>
@@ -42,7 +55,7 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="7" class="text-center text-muted">Aucun produit trouvé.</td> <!-- Colspan ajusté -->
+                        <td colspan="7" class="text-center text-muted">Aucun produit trouvé.</td>
                     </tr>
                 {% endfor %}
             </tbody>

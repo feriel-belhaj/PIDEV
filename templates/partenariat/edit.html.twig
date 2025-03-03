@@ -11,7 +11,7 @@
         
         <h3 class="display-5 mb-0">Mise à Jour du Partenariat</h3>
 
-        {{ form_start(form, {'attr': {'id': 'partenariatForm', 'enctype': 'multipart/form-data'}}) }}
+			{{ form_start(form ,{'attr' : {'novalidate' : 'novalidate', 'id' :"register-form"}})}}
 
         <div class="mb-3 text-start">
             {{ form_label(form.nom) }}

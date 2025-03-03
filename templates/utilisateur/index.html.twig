@@ -3,7 +3,9 @@
 {% block title %}Utilisateur index{% endblock %}
 
 {% block body %}
-    
+    <input type="text" id="search-user" class="form-control" placeholder="Rechercher un utilisateur...">
+    <div id="search-results"></div>
+    <br>
     <div class="card flex-fill">
     <div class="card-header">
 
@@ -25,7 +27,7 @@
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="user-table-body">
         {% for utilisateur in utilisateurs.items %}
             <tr {% if app.user and app.user.id == utilisateur.id %} class="table-warning" {% endif %}>
                 <td>{{ utilisateur.id }}</td>
@@ -89,4 +91,25 @@
 </div>
 
     <a href="{{ path('app_utilisateur_newBack') }}">Create new</a>
+{% endblock %}
+
+{% block javascripts %}
+<script src="{{ asset('js/app.js') }}"></script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $("#search-user").on("keyup", function() {
+            let searchTerm = $(this).val();
+            $.ajax({
+                url: "{{ path('app_utilisateur_search') }}",
+                method: "GET",
+                data: { query: searchTerm },
+                success: function(response) {
+                    $("#user-table-body").html(response);
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

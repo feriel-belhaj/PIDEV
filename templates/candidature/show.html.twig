@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'baseBack.html.twig' %}
 
 {% block title %}Détails de la Candidature{% endblock %}
 
@@ -9,19 +9,18 @@
 
     <div class="p-5 bg-light rounded contact-form position-relative shadow-lg" style="max-width: 900px; width: 100%;">
         
-
-        <a href="{{ path('app_candidature_index') }}" class="position-absolute top-0 end-0 m-3 text-danger fs-3" style="text-decoration: none;">&times;</a>
+        <a href="{{ path('admin_candidature_index') }}" class="position-absolute top-0 end-0 m-3 text-danger fs-3" style="text-decoration: none;">&times;</a>
         
         <div class="row align-items-center">
             <div class="col-md-5 text-center">
                 {% if cvExists %}
-    <embed src="{{ asset('uploads/candidatures/' ~ candidature.cv) }}" type="application/pdf" width="100%" height="250px" />
-    <a href="{{ asset('uploads/candidatures/' ~ candidature.cv) }}" target="_blank" class="btn btn-primary">Télécharger CV</a>
-{% else %}
-    <span class="text-muted">CV non disponible</span>
-{% endif %}
-
-
+                    <embed src="{{ asset('uploads/' ~ candidature.cv) }}" type="application/pdf" width="100%" height="250px" />
+                   <a href="{{ asset('uploads/' ~ candidature.cv) }}" target="_blank" class="btn btn-primary btn-lg rounded-pill text-custom">
+    Télécharger CV
+</a>
+                {% else %}
+                    <span class="text-muted">CV non disponible</span>
+                {% endif %}
             </div>
             
             <div class="col-md-7">
@@ -45,28 +44,27 @@
         {% if candidature.portfolio %}
             <div class="mt-4 text-center">
                 <h5><i class="fas fa-folder-open"></i> Portfolio :</h5>
-<a href="{{ asset('uploads/candidatures/' ~ candidature.portfolio) }}" target="_blank" class="btn btn-success">Voir le Portfolio</a>
+                <a href="{{ asset('uploads/' ~ candidature.portfolio) }}" target="_blank" class="btn btn-success btn-lg rounded-pill text-custom custom-btn">
+                    Voir le Portfolio
+                </a>
             </div>
         {% else %}
-            <p class="text-muted text-center mt-4">Pas de portfolio fournit</p>
+            <p class="text-muted text-center mt-4">Pas de portfolio fourni</p>
         {% endif %}
         
-       <div class="d-flex justify-content-center align-items-center gap-3 mt-4">
-    <form method="post" action="{{ path('app_candidature_delete', {'id': candidature.id}) }}" 
-          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette candidature ?');">
-        
-        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ candidature.id) }}">
-        
-        <button type="submit" class="btn p-0 border-0">
-            <img src="{{ asset('img/icons/trash-icon.png') }}" alt="Supprimer" style="width: 40px; height: 40px;">
-        </button>
-    </form>
-</div>
-
-    </button>
-</form>
-
+        <div class="d-flex justify-content-center align-items-center gap-3 mt-4">
+            <form method="post" action="{{ path('app_candidature_delete', {'id': candidature.id}) }}" 
+                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette candidature ?');">
+                
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ candidature.id) }}">
+                
+                <button type="submit" class="btn p-0 border-0">
+                    <img src="{{ asset('img/icons/trash-icon.png') }}" alt="Supprimer" style="width: 40px; height: 40px;">
+                </button>
+            </form>
         </div>
+
     </div>
 </div>
+
 {% endblock %}

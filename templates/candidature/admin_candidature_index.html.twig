@@ -1,0 +1,363 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Gestion Des Candidatures{% endblock %}
+
+{% block body %}
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center wow fadeInUp" data-wow-delay="0.1s">
+            <h1 class="display-5 mb-4">Listes des Candidatures</h1>
+            <div>
+                <button type="button" class="btn icon-bg btn-sm rounded-pill text-custom border-custom"
+                        data-bs-toggle="modal" data-bs-target="#statsModal">
+                    📊 Voir Statistiques
+                </button>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            {% for candidature in pagination.items %}
+                <div class="col-lg-4 col-md-6 fadeInUp" style="animation: fadeInUp 0.6s ease-out {{ loop.index * 0.2 }}s forwards;">
+                    <div class="team-item rounded overflow-hidden position-relative shadow-lg card-effect">
+                        <div class="team-img position-relative flex-grow-1">
+                            {% if candidature.partenariat.image %}
+                                <img src="{{ asset('uploads/partenariats/' ~ candidature.partenariat.image) }}" 
+                                     class="img-fluid w-100" 
+                                     alt="Logo du partenariat">
+                            {% endif %}
+                            <div class="team-social d-flex flex-column position-absolute top-0 end-0 m-3">
+                                {% if candidature.cv %}
+                                    <div class="mt-4 text-center">
+                                        <a class="btn icon-bg btn-sm rounded-circle mb-2" href="{{ asset('uploads/' ~ candidature.cv) }}" target="_blank" data-bs-toggle="tooltip" title="Voir CV">
+                                            <i data-feather="file"></i>
+                                        </a>
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted text-center mt-4">Pas de CV fourni</p>
+                                {% endif %}
+
+                                <a class="btn icon-bg btn-sm rounded-circle" href="#" data-bs-toggle="tooltip" title="{{ candidature.datePostulation|date('d/m/Y') }}">
+                                    <i data-feather="calendar"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="text-center p-4">
+                            <h5 class="text-custom">{{ candidature.typeCollab }}</h5>
+                            {% if candidature.scoreArtistique is not null %}
+                                <p class="fw-bold text-warning">Note artistique : <span class="score">{{ candidature.scoreArtistique|round(2) }}/100</span></p>
+                            {% else %}
+                                <p class="text-muted">Score non disponible</p>
+                            {% endif %}
+
+                            <!-- Bouton pour afficher l'analyse -->
+                            <button class="btn btn-outline-custom btn-sm rounded-pill text-custom border-custom toggle-analysis mt-2" data-id="{{ candidature.id }}">
+                                📊 Voir Analyse du Texte
+                            </button>
+
+                            <!-- Conteneur de l'analyse, caché par défaut -->
+                            <div id="analysis-{{ candidature.id }}" class="analysis-container mt-4 p-4 border rounded bg-light shadow" style="display: none;">
+                                <button onclick="closeOverlay()" class="btn-close position-absolute top-0 end-0 m-3"></button>
+                                <div class="d-flex justify-content-between align-items-center bg-secondary text-white p-3 rounded sticky-top">
+                                    <h3 class="analysis-title m-0 flex-grow-1 text-center">📊 Résultats de l'Analyse de Texte</h3>
+                                    <a href="{{ path('app_candidature_pdf', {'id': candidature.id}) }}" target="_blank">
+                                        <img src="/uploads/images/pdf.png" alt="Télécharger PDF" width="50" height="50">
+                                    </a>
+                                </div>
+
+                                {% set analysis = analysisResults[candidature.id] %}
+                                {% if analysis is iterable %}
+                                    {% if analysis.entities is defined and analysis.entities is not empty %}
+                                        <h4 class="entities-title text-success mt-3 sticky-top">🔍 Entités détectées :</h4>
+                                        <ul class="list-group mb-3">
+                                            {% for entity in analysis.entities %}
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <div class="d-flex justify-content-between align-items-center w-100">
+                                                        <span class="fw-bold">{{ entity.label }}</span>
+                                                        <span class="percentage">{{ (entity.confidence * 100)|round(2) }}%</span>
+                                                        <a href="{{ entity.uri }}" target="_                                                        <a href="{{ entity.uri }}" target="_blank" class="btn btn-sm btn-primary">🔗Wikipédia</a>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item">
+                                                    <span class="categories">📂 **Catégories :** {{ entity.categories|join(', ') }}</span>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <p class="text-warning">⚠️ Aucune entité détectée.</p>
+                                    {% endif %}
+
+                                    {% if analysis.themes is defined and analysis.themes is not empty %}
+                                        <h4 class="text-info">🎭 Thèmes détectés :</h4>
+                                        <ul class="list-group mb-3">
+                                            {% for theme in analysis.themes %}
+                                                <li class="list-group-item">{{ theme.label }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <p class="text-muted">Aucun thème détecté.</p>
+                                    {% endif %}
+                                {% else %}
+                                    <p class="text-danger">❌ Erreur lors du chargement des résultats d'analyse.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="{{ path('app_candidature_show', {'id': candidature.id}) }}" class="btn btn-outline-custom btn-sm rounded-pill text-custom border-custom">Voir Détails</a>
+                            <a href="{{ path('app_candidature_edit', {'id': candidature.id}) }}" class="btn btn-outline-custom btn-sm rounded-pill text-custom border-custom">
+                                <i class="fas fa-edit"></i> Modifier
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-center">Aucune candidature disponible.</p>
+            {% endfor %}
+        </div>
+        <div class="pagination mt-4 text-center">
+            <p>Page {{ pagination.currentPageNumber }} sur {{ pagination.pageCount }}</p>
+            {{ knp_pagination_render(pagination) }}
+        </div>
+
+        <!-- Fenêtre modale pour les statistiques -->
+        <div class="modal fade full-screen-modal" id="statsModal" tabindex="-1" aria-labelledby="statsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-fullscreen">
+                <div class="modal-content">
+                    <div class="modal-header position-relative">
+                        <h5 class="modal-title text-center w-100">Répartition des Candidatures Selon Le Type De Candidatures</h5>
+                        <button type="button" class="btn-close btn-close-custom position-absolute end-0" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body d-flex justify-content-center align-items-center">
+                        <div class="chart-container">
+                            <canvas id="typeCollabChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                {% if typeCollabStats is not empty %}
+                    const labels = [
+                        {% for stat in typeCollabStats %}
+                            "{{ stat.typeCollab }}"{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    ];
+
+                    const data = [
+                        {% for stat in typeCollabStats %}
+                            {{ stat.type_count }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    ];
+
+                    var statsModal = document.getElementById('statsModal');
+                    statsModal.addEventListener('shown.bs.modal', function () {
+                        const ctx = document.getElementById('typeCollabChart').getContext('2d');
+                        new Chart(ctx, {
+                            type: 'pie',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    data: data,
+                                    backgroundColor: ['#FF5733', '#33FF57', '#3357FF', '#F4FF33', '#FF33F6'],
+                                    borderColor: '#FFF',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'top',
+                                    }
+                                }
+                            }
+                        });
+                    });
+                {% else %}
+                    console.log("Aucune donnée disponible pour les statistiques.");
+                {% endif %}
+            });
+        </script>
+
+        <!-- Overlay for Analysis -->
+        <div id="analysisOverlay" class="overlay d-none">
+            <button onclick="closeOverlay()" class="btn            <button onclick="closeOverlay()" class="btn-close position-absolute top-0 end-0 m-3"></button>
+            <div class="container" style="max-height: 80vh; overflow-y: auto;">
+                <div id="overlayContent" class="text-center"></div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                document.querySelectorAll('.toggle-analysis').forEach(button => {
+                    button.addEventListener('click', function() {
+                        let analysisId = this.getAttribute('data-id');
+                        let analysisDiv = document.getElementById('analysis-' + analysisId);
+                        let overlay = document.getElementById('analysisOverlay');
+                        let overlayContent = document.getElementById('overlayContent');
+
+                        if (analysisDiv.style.display === "none" || analysisDiv.style.display === "") {
+                            overlayContent.innerHTML = analysisDiv.innerHTML; // Copy analysis content to overlay
+                            overlay.classList.remove('d-none'); // Show overlay
+                        } else {
+                            overlay.classList.add('d-none'); // Hide overlay
+                        }
+                    });
+                });
+            });
+
+            function closeOverlay() {
+                document.getElementById('analysisOverlay').classList.add('d-none');
+            }
+        </script>
+
+        <style>
+            .icon-bg {
+                background-color: #495057;
+                color: #3b7ddd;
+                padding: 10px 20px;
+                font-size: 18px;
+                transition: background-color 0.3s, color 0.3s;
+            }
+
+            .icon-bg:hover {
+                background-color: #3b7ddd;
+                color: #495057;
+            }
+
+            /* Overlay styles */
+            .overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                backdrop-filter: blur(5px);
+            }
+
+            .overlay.d-none {
+                display: none;
+            }
+
+            .btn-close {
+                background-color: red;
+                border-radius: 50%;
+                width: 30px;
+                height: 30px;
+                color: white;
+            }
+
+            .btn-close:hover {
+                background-color: darkred;
+            }
+
+            .fadeInUp {
+                opacity: 0;
+                transform: translateY(30px);
+                animation: fadeInUp 0.6s ease-out forwards;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .card-effect {
+                background-color: #495057;
+                color: white;
+                border: 2px solid transparent;
+                transition: background-color 0.3s, border-color 0.3s;
+                display: flex;
+                flex-direction: column; /* Aligne les éléments verticalement */
+                height: 100%; /* Permet à la carte de prendre toute la hauteur disponible */
+            }
+
+            .card-effect:hover {
+                background-color: #3b7ddd;
+                color: black;
+            }
+
+            .text-custom {
+                color: #3b7ddd !important;
+                transition: color 0.3s;
+            }
+
+            .card-effect:hover .text-custom {
+                color: #495057 !important;
+            }
+
+            .btn-outline-custom {
+                color: #3b7ddd;
+                border-color: #3b7ddd;
+                transition: color 0.3s, border-color 0.3s;
+            }
+
+            .btn-outline-custom:hover {
+                color: #495057 !important;
+                border-color: #495057 !important;
+            }
+
+            .list-group-item {
+                display: flex;
+                justify-content: space-between; /* Align items to space between */
+                align-items: center; /* Center align items vertically */
+            }
+
+            .percentage {
+                margin-right: 10px; /* Space between percentage and Wikipedia button */
+                text-align: right; /* Align text to the right */
+            }
+
+            .categories {
+                margin-top: 5px; /* Space between percentage and categories */
+            }
+
+            .btn-primary {
+                margin-left: 10px; /* Space between entity label and Wikipedia button */
+            }
+
+            .analysis-container {
+                position: relative; /* Permet de positionner les éléments enfants */
+                max-height:                .analysis-container {
+                    position: relative; /* Permet de positionner les éléments enfants */
+                    max-height: 70vh; /* Limite la hauteur du conteneur d'analyse */
+                    overflow-y: auto; /* Permet le défilement vertical */
+                    padding: 20px; /* Ajoute un peu d'espace autour du contenu */
+                    border: 1px solid #ccc; /* Optionnel : ajoute une bordure pour mieux visualiser */
+                    background-color: #f8f9fa; /* Couleur de fond pour le conteneur */
+                }
+
+                .analysis-title {
+                    position: sticky; /* Reste en haut lors du défilement */
+                    top: 0; /* Positionne le titre en haut du conteneur */
+                    background-color: #f8f9fa; /* Couleur de fond pour le titre */
+                    z-index: 10; /* Assure que le titre est au-dessus du contenu */
+                    padding: 10px 0; /* Ajoute un peu d'espace autour du titre */
+                    font-weight: bold; /* Met le titre en gras */
+                    text-align: center; /* Centre le texte */
+                }
+
+                .entities-title {
+                    position: sticky; /* Reste en haut lors du défilement */
+                    top: 60px; /* Positionne le titre en dessous du titre d'analyse */
+                    background-color: #f8f9fa; /* Couleur de fond pour le titre */
+                    z-index: 10; /* Assure que le titre est au-dessus du contenu */
+                    padding: 10px 0; /* Ajoute un peu d'espace autour du titre */
+                    font-weight: bold; /* Met le titre en gras */
+                }
+            </style>
+    </div>
+{% endblock %}

@@ -9,7 +9,7 @@
         </div>
         
         <div class="row g-4">
-            {% for candidature in candidatures %}
+            {% for candidature in pagination.items %}
                 <div class="col-lg-4 col-md-6 fadeInUp" style="animation: fadeInUp 0.6s ease-out {{ loop.index * 0.2 }}s forwards;">
                     <div class="team-item rounded overflow-hidden position-relative shadow-lg card-effect">
                         <div class="team-img position-relative">
@@ -20,14 +20,14 @@
                             {% endif %}
                             <div class="team-social d-flex flex-column position-absolute top-0 end-0 m-3">
                                 {% if candidature.cv %}
-                                        <div class="mt-4 text-center">
-                                            <a class="btn icon-bg btn-sm rounded-circle mb-2" href="{{ asset('uploads/candidatures/' ~ candidature.cv) }}" target="_blank" data-bs-toggle="tooltip" title="Voir CV">
-                                                <i class="fas fa-file-alt"></i>
-                                            </a>
-                                        </div>
-                                    {% else %}
-                                        <p class="text-muted text-center mt-4">Pas de CV fourni</p>
-                                    {% endif %}
+                                    <div class="mt-4 text-center">
+                                        <a class="btn icon-bg btn-sm rounded-circle mb-2" href="{{ asset('uploads/' ~ candidature.cv) }}" target="_blank" data-bs-toggle="tooltip" title="Voir CV">
+                                            <i class="fas fa-file-alt"></i>
+                                        </a>
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted text-center mt-4">Pas de CV fourni</p>
+                                {% endif %}
 
                                 <a class="btn icon-bg btn-sm rounded-circle" href="#" data-bs-toggle="tooltip" title="{{ candidature.datePostulation|date('d/m/Y') }}">
                                     <i class="fas fa-calendar-alt"></i>
@@ -49,8 +49,13 @@
                     </div>
                 </div>
             {% else %}
-                <p class="text-center">Aucune collaboration n'a été réalisée.</p>
+                <p class="text-center">Aucune candidature trouvée.</p>
             {% endfor %}
+        </div>
+
+        <div class="pagination mt-4 text-center">
+            {# Affiche les liens de pagination #}
+            {{ knp_pagination_render(pagination) }}
         </div>
     </div>
 

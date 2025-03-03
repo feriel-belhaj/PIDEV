@@ -3,61 +3,128 @@
 {% block title %}Gestion des Commandes{% endblock %}
 
 {% block body %}
-    <div class="container">
-        <h1 class="my-4 text-center">Liste des Commandes</h1>
+<div class="container">
+    <h1 class="my-4 text-center">Liste des Commandes</h1>
 
-        <!-- Tableau des commandes -->
-        <table class="table table-striped">
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Produit</th>
-                    <th>Quantité</th>
-                    <th>Prix Produit</th>
-                    <th>Prix Total</th>
-                    <th>Date</th>
-                    <th>Statut</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% set commandesAffichees = 0 %}
-                {% for commande in commandes %}
-                    {% if commande.produit|length > 0 %}
-                        {% set commandesAffichees = commandesAffichees + 1 %}
-                        {% set rowCount = commande.produit|length %}
-                        {% for produit in commande.produit %}
-                            <tr>
-                                {% if loop.first %}
-                                    <td rowspan="{{ rowCount }}">{{ commande.id }}</td>
-                                {% endif %}
-                                <td>{{ produit.nom }}</td>
-                                <td>{{ commande.getQuantiteProduit(produit) }}</td>
-                                <td>{{ produit.prix }} dt</td> <!-- Prix unitaire du produit -->
-                                {% if loop.first %}
-                                    <td rowspan="{{ rowCount }}">{{ commande.prix }} dt</td> <!-- Prix total de la commande -->
-                                    <td rowspan="{{ rowCount }}">{{ commande.datecmd ? commande.datecmd|date('Y-m-d') : 'N/A' }}</td>
-                                    <td rowspan="{{ rowCount }}">{{ commande.statut }}</td>
-                                    <td rowspan="{{ rowCount }}">
-                                        <a href="{{ path('app_commande_edit', {'id': commande.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
-
-                                        <form method="post" action="{{ path('app_commande_delete', {'id': commande.id}) }}" class="d-inline">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ commande.id) }}">
-                                            <button class="btn btn-danger btn-sm" type="submit">Supprimer</button>
-                                        </form>
-                                    </td>
-                                {% endif %}
-                            </tr>
-                        {% endfor %}
-                    {% endif %}
-                {% endfor %}
-
-                {% if commandesAffichees == 0 %}
-                    <tr>
-                        <td colspan="8" class="text-center text-muted">Aucune commande trouvée.</td>
-                    </tr>
-                {% endif %}
-            </tbody>
-        </table>
+    <!-- Affichage des points de fidélité -->
+    <div class="alert alert-info">
+        <strong>Points de fidélité : </strong>{{ fidelite_points }} points
     </div>
+
+    <!-- Tableau des commandes -->
+    <table class="table table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Produit</th>
+                <th>Quantité</th>
+                <th>Prix Produit</th>
+                <th>Prix Total</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set commandesAffichees = 0 %}
+            {% for commande in commandes %}
+                {% if commande.produit|length > 0 %}
+                    {% set commandesAffichees = commandesAffichees + 1 %}
+                    {% set rowCount = commande.produit|length %}
+                    {% for produit in commande.produit %}
+                        <tr>
+                            {% if loop.first %}
+                                <td rowspan="{{ rowCount }}">{{ commande.id }}</td>
+                            {% endif %}
+                            <td>{{ produit.nom }}</td>
+                            <td>{{ commande.getQuantiteProduit(produit) }}</td>
+                            <td>{{ produit.prix }} dt</td>
+                            {% if loop.first %}
+                                <td rowspan="{{ rowCount }}">{{ commande.prix }} dt</td>
+                                <td rowspan="{{ rowCount }}">{{ commande.datecmd ? commande.datecmd|date('Y-m-d') : 'N/A' }}</td>
+                                <td rowspan="{{ rowCount }}">{{ commande.statut }}</td>
+                                <td rowspan="{{ rowCount }}">
+
+                                    <!-- Bouton Appliquer la fidélité -->
+                                    {% if not fidelite_utilisee %}
+                                        <form method="post" action="{{ path('app_commande_index') }}">
+                                            <input type="hidden" name="commande_id" value="{{ commande.id }}">
+                                            <input type="hidden" name="appliquer_fidelite" value="1">
+                                            <button type="submit" class="btn btn-success btn-sm">Appliquer fidélité</button>
+                                        </form>
+                                    {% else %}
+                                        <button class="btn btn-secondary btn-sm" disabled>Fidélité appliquée</button>
+                                    {% endif %}
+
+                                    <!-- Bouton Modifier -->
+                                    <a href="{{ path('app_commande_edit', {'id': commande.id}) }}" 
+                                       class="btn btn-warning btn-sm {% if commande.statut|lower != 'en attente' %} disabled {% endif %}">
+                                        Modifier
+                                    </a>
+
+                                    <!-- Bouton Supprimer -->
+                                    <form method="post" action="{{ path('app_commande_delete', {'id': commande.id}) }}" class="d-inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ commande.id) }}">
+                                        <button class="btn btn-sm {% if commande.statut|lower == 'en attente' %}btn-danger{% else %}btn-secondary{% endif %}" 
+                                                type="submit" 
+                                                {% if commande.statut|lower != 'en attente' %}disabled{% endif %}>
+                                            Supprimer
+                                        </button>
+                                    </form>
+
+                                    <!-- Bouton Payer avec Stripe -->
+                                        {% if commande.statut|lower == 'en attente' %}
+                                            <button type="button" class="btn btn-primary btn-sm checkout-button" data-commande-id="{{ commande.id }}">
+                                                Payer 
+                                            </button>
+                                        {% endif %}
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+
+            {% if commandesAffichees == 0 %}
+                <tr>
+                    <td colspan="8" class="text-center text-muted">Aucune commande trouvée.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Intégration du script Stripe -->
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".checkout-button").forEach(button => {
+        button.addEventListener("click", function () {
+            let commandeId = this.getAttribute("data-commande-id");
+
+            fetch(`/create-checkout-session/${commandeId}`, {  
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(response => response.text())  
+            .then(data => {
+                console.log("Réponse du serveur :", data); 
+                try {
+                    let session = JSON.parse(data);
+                    if (session.id) {
+                        let stripe = Stripe("pk_test_51QvhyiP7cyQsM3mKvIlQHhs6D8M9IugXYuKhXslzZ6ijoYc33Y4qKjEKcB2r4dpYQnn0ggQMoo86Ic9dZBaWOhBX00xs4rQYIs");
+                        return stripe.redirectToCheckout({ sessionId: session.id });
+                    } else {
+                        console.error("Erreur Stripe :", session);
+                    }
+                } catch (error) {
+                    console.error("Erreur JSON :", error, "Réponse reçue :", data);
+                }
+            })
+            .catch(error => console.error("Erreur :", error));
+        });
+    });
+});
+</script>
+
 {% endblock %}

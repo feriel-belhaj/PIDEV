@@ -1,62 +1,458 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Evenement{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"/>
+    <style>
+        .leaflet-control-container .leaflet-routing-container-hide {
+            display: none;
+        }
+        .custom-route-button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .custom-route-button:hover {
+            background: #0056b3;
+        }
+        #map {
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .map-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .layer-control {
+            background: white;
+            padding: 8px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .dropdown-item {
+            cursor: pointer;
+            padding: 8px 16px;
+        }
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+        .dropdown-menu {
+            min-width: 200px;
+        }
+        .route-instructions-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        .route-instructions-toggle:hover {
+            background: #0056b3;
+        }
+        .route-instructions-toggle.visible {
+            display: flex;
+        }
+        .leaflet-routing-container.hidden {
+            display: none;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+{% endblock %}
+
+{% block title %}{{ evenement.titre }}{% endblock %}
 
 {% block body %}
-    <h1>Evenement</h1>
+<!-- Project Header -->
+<div class="container-fluid bg-light py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Project Image -->
+            <div class="col-md-8">
+                {% if evenement.imageurl %}
+                    <img src="{{ asset('uploads/images/' ~ evenement.imageurl) }}" class="img-fluid rounded shadow" alt="{{ evenement.titre }}">
+                {% else %}
+                    <img src="{{ asset('img/event-default.jpg') }}" class="img-fluid rounded shadow" alt="{{ evenement.titre }}">
+                {% endif %}
+            </div>
+            
+            <!-- Project Info -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h1 class="h2 mb-4">{{ evenement.titre }}</h1>
+                        
+                        <!-- Progress Section -->
+                        <div class="progress mb-3" style="height: 8px;">
+                            {% set progress = (evenement.collectedamount / evenement.goalamount * 100)|round %}
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ progress }}%"></div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h2 class="h1 mb-0">{{ evenement.collectedamount|number_format(0, ',', ' ') }} €</h2>
+                            <p class="text-muted">collectés sur {{ evenement.goalamount|number_format(0, ',', ' ') }} €</p>
+                            
+                            <div class="d-flex justify-content-between mb-3">
+                                <div>
+                                    <h4 class="mb-0">{{ progress }}%</h4>
+                                    <small class="text-muted">financé</small>
+                                </div>
+                                <div>
+                                    {% set daysLeft = date(evenement.enddate).diff(date()).days %}
+                                    <h4 class="mb-0">{{ daysLeft }}</h4>
+                                    <small class="text-muted">jours restants</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Donation Button -->
+                        <div class="d-grid gap-2 mb-4">
+                            <a href="{{ path('app_don_new', {'id': evenement.id}) }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-heart me-2"></i>Faire un don
+                            </a>
+                        </div>
+                        
+                        <!-- Creator Info -->
+                        <div class="d-flex align-items-center mb-4">
+                            <img src="{{ asset('img/user-placeholder.jpg') }}" class="rounded-circle me-3" width="50" height="50" alt="Creator">
+                            <div>
+                                <h5 class="mb-0">{{ evenement.createur.prenom ?? 'Anonymous' }}</h5>
+                                <p class="text-muted mb-0">{{ evenement.localisation }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ evenement.id }}</td>
-            </tr>
-            <tr>
-                <th>Titre</th>
-                <td>{{ evenement.titre }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ evenement.description }}</td>
-            </tr>
-            <tr>
-                <th>Startdate</th>
-                <td>{{ evenement.startdate ? evenement.startdate|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Enddate</th>
-                <td>{{ evenement.enddate ? evenement.enddate|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Localisation</th>
-                <td>{{ evenement.localisation }}</td>
-            </tr>
-            <tr>
-                <th>Goalamount</th>
-                <td>{{ evenement.goalamount }}</td>
-            </tr>
-            <tr>
-                <th>Collectedamount</th>
-                <td>{{ evenement.collectedamount }}</td>
-            </tr>
-            <tr>
-                <th>Status</th>
-                <td>{{ evenement.status }}</td>
-            </tr>
-            <tr>
-                <th>Imageurl</th>
-                <td>{{ evenement.imageurl }}</td>
-            </tr>
-            <tr>
-                <th>Createdat</th>
-                <td>{{ evenement.createdat ? evenement.createdat|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+<!-- Project Details -->
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Description -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h3 class="mb-4">À propos du projet</h3>
+                    <div class="project-description">
+                        {{ evenement.description|nl2br }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Map Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h3 class="mb-4">Localisation</h3>
+                    <div class="map-controls">
+                        <div class="dropdown">
+                            <button class="custom-route-button dropdown-toggle" type="button" id="routeDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-directions"></i>
+                                Itinéraire
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="routeDropdown">
+                                <li><a class="dropdown-item" href="#" id="currentLocationRoute">
+                                    <i class="fas fa-location-arrow me-2"></i>Depuis ma position
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" id="customLocationRoute">
+                                    <i class="fas fa-map-marker-alt me-2"></i>Choisir le point de départ
+                                </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="map" style="height: 500px;"></div>
+                    <button id="toggleInstructions" class="route-instructions-toggle" title="Afficher/Masquer les instructions">
+                        <i class="fas fa-directions"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <!-- Timeline -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="mb-3">Calendrier</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-calendar-check me-2 text-primary"></i>
+                            Début: {{ evenement.startdate|date('d/m/Y') }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-calendar-times me-2 text-primary"></i>
+                            Fin: {{ evenement.enddate|date('d/m/Y') }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
 
-    <a href="{{ path('app_evenement_index') }}">back to list</a>
+            <!-- Project Stats -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="mb-3">Statistiques du projet</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-calendar-alt me-2 text-primary"></i>
+                            Créé le {{ evenement.createdat|date('d/m/Y') }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-map-marker-alt me-2 text-primary"></i>
+                            {{ evenement.localisation }}
+                        </li>
+                        <li>
+                            <i class="fas fa-tag me-2 text-primary"></i>
+                            Status: {{ evenement.status }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <a href="{{ path('app_evenement_edit', {'id': evenement.id}) }}">edit</a>
+<script>
+    // Initialisation de la carte avec un style amélioré
+    var map = L.map('map').setView([0, 0], 13);
+    
+    // Créer un nouveau pane pour les labels
+    map.createPane('labels');
+    map.getPane('labels').style.zIndex = 650;
+    map.getPane('labels').style.pointerEvents = 'none';
 
-    {{ include('evenement/_delete_form.html.twig') }}
+    // Définition des différentes couches de carte
+    var baseMaps = {
+        "Standard": L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap contributors, © CARTO'
+        }),
+        "Satellite": L.layerGroup([
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: '© Esri'
+            }),
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+                attribution: '© Esri',
+                pane: 'labels'
+            })
+        ]),
+        "Relief": L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenTopoMap'
+        }),
+        "Sombre": L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap contributors, © CARTO'
+        }),
+        "Transport": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        })
+    };
+
+    // Ajout de la couche par défaut
+    baseMaps["Standard"].addTo(map);
+
+    // Ajout du contrôle des couches
+    L.control.layers(baseMaps, null, {
+        position: 'topright',
+        collapsed: false
+    }).addTo(map);
+
+    var eventMarker = null;
+    var routingControl = null;
+    var userMarker = null;
+    var startMarker = null;
+    var isSettingStart = false;
+
+    // Fonction pour géocoder l'adresse
+    function geocodeAddress(address) {
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    const lat = parseFloat(data[0].lat);
+                    const lon = parseFloat(data[0].lon);
+                    
+                    // Centrer la carte sur la localisation
+                    map.setView([lat, lon], 13);
+                    
+                    // Ajouter un marqueur personnalisé
+                    eventMarker = L.marker([lat, lon], {
+                        title: "{{ evenement.titre }}"
+                    }).addTo(map)
+                    .bindPopup(`
+                        <div style="min-width: 200px;">
+                            <h5 style="margin: 0 0 8px 0;">{{ evenement.titre }}</h5>
+                            <p style="margin: 0;"><i class="fas fa-map-marker-alt"></i> {{ evenement.localisation }}</p>
+                        </div>
+                    `, {
+                        closeButton: false
+                    }).openPopup();
+                }
+            })
+            .catch(error => console.error('Erreur de géocodage:', error));
+    }
+
+    // Fonction pour gérer le clic sur la carte
+    function onMapClick(e) {
+        if (isSettingStart) {
+            if (startMarker) {
+                map.removeLayer(startMarker);
+            }
+            startMarker = L.marker(e.latlng, {
+                icon: L.divIcon({
+                    className: 'custom-div-icon',
+                    html: '<div style="background-color: #28a745; width: 15px; height: 15px; border-radius: 50%; border: 2px solid white;"></div>',
+                    iconSize: [15, 15]
+                }),
+                draggable: true
+            }).addTo(map);
+
+            // Obtenir l'itinéraire depuis le point sélectionné
+            getRoute(e.latlng.lat, e.latlng.lng, eventMarker.getLatLng().lat, eventMarker.getLatLng().lng);
+            
+            // Désactiver le mode sélection
+            isSettingStart = false;
+            map.off('click', onMapClick);
+            map.getContainer().style.cursor = '';
+        }
+    }
+
+    // Gestionnaire pour l'itinéraire depuis la position actuelle
+    document.getElementById('currentLocationRoute').addEventListener('click', function() {
+        if (!eventMarker) {
+            alert("La localisation de l'événement n'est pas encore chargée.");
+            return;
+        }
+
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const userLat = position.coords.latitude;
+                const userLon = position.coords.longitude;
+
+                if (startMarker) {
+                    map.removeLayer(startMarker);
+                }
+                
+                startMarker = L.marker([userLat, userLon], {
+                    icon: L.divIcon({
+                        className: 'custom-div-icon',
+                        html: '<div style="background-color: #28a745; width: 15px; height: 15px; border-radius: 50%; border: 2px solid white;"></div>',
+                        iconSize: [15, 15]
+                    })
+                }).addTo(map);
+
+                getRoute(userLat, userLon, eventMarker.getLatLng().lat, eventMarker.getLatLng().lng);
+            }, function(error) {
+                alert("Impossible d'obtenir votre position. Veuillez vérifier vos paramètres de localisation.");
+            });
+        } else {
+            alert("La géolocalisation n'est pas supportée par votre navigateur.");
+        }
+    });
+
+    // Gestionnaire pour le choix du point de départ personnalisé
+    document.getElementById('customLocationRoute').addEventListener('click', function() {
+        if (!eventMarker) {
+            alert("La localisation de l'événement n'est pas encore chargée.");
+            return;
+        }
+
+        isSettingStart = true;
+        map.getContainer().style.cursor = 'crosshair';
+        map.on('click', onMapClick);
+        alert("Cliquez sur la carte pour choisir votre point de départ");
+    });
+
+    // Modification de la fonction getRoute pour supporter le marqueur de départ draggable
+    function getRoute(startLat, startLon, destLat, destLon) {
+        if (routingControl) {
+            map.removeControl(routingControl);
+        }
+
+        routingControl = L.Routing.control({
+            waypoints: [
+                L.latLng(startLat, startLon),
+                L.latLng(destLat, destLon)
+            ],
+            routeWhileDragging: true,
+            language: 'fr',
+            showAlternatives: true,
+            lineOptions: {
+                styles: [{color: '#007bff', opacity: 0.8, weight: 6}]
+            },
+            createMarker: function(i, wp) {
+                if (i === 0) {
+                    return startMarker;
+                }
+                return null;
+            },
+            router: L.Routing.osrmv1({
+                language: 'fr',
+                profile: 'car'
+            }),
+            collapsible: true,
+            formatter: new L.Routing.Formatter({
+                language: 'fr',
+                roundingSensitivity: 100
+            })
+        }).addTo(map);
+
+        // Afficher le bouton toggle une fois que l'itinéraire est créé
+        document.getElementById('toggleInstructions').classList.add('visible');
+        
+        // Ajuster la vue pour voir l'itinéraire complet
+        setTimeout(function() {
+            map.fitBounds(L.latLngBounds([
+                [startLat, startLon],
+                [destLat, destLon]
+            ]).pad(0.5));
+        }, 500);
+    }
+
+    // Gestionnaire pour le bouton toggle
+    document.getElementById('toggleInstructions').addEventListener('click', function() {
+        const container = document.querySelector('.leaflet-routing-container');
+        if (container) {
+            container.classList.toggle('hidden');
+            this.innerHTML = container.classList.contains('hidden') 
+                ? '<i class="fas fa-eye"></i>' 
+                : '<i class="fas fa-directions"></i>';
+            this.title = container.classList.contains('hidden')
+                ? 'Afficher les instructions'
+                : 'Masquer les instructions';
+        }
+    });
+
+    // Géocoder la localisation de l'événement
+    geocodeAddress("{{ evenement.localisation }}");
+</script>
+
+<!-- Custom CSS -->
+<style>
+.project-description {
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+</style>
 {% endblock %}

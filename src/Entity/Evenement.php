@@ -24,25 +24,25 @@ class Evenement
     #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $startdate = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $enddate = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $localisation = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?float $goalamount = null;
 
     #[ORM\Column]
     private ?float $collectedamount = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $status = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $imageurl = null;
 
     #[ORM\Column]
@@ -54,9 +54,32 @@ class Evenement
     #[ORM\ManyToMany(targetEntity: Utilisateur::class, mappedBy: 'evennement')]
     private Collection $utilisateurs;
 
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
+    private ?Utilisateur $createur = null;
+
+   
+    public function getCreateur(): ?Utilisateur
+    {
+        return $this->createur;
+    }
+
+    public function setCreateur(?Utilisateur $createur): self
+    {
+        $this->createur = $createur;
+        return $this;
+    }
+
+    #[ORM\OneToMany(mappedBy: 'evenement', targetEntity: Don::class, cascade: ['remove'])]
+    private Collection $dons;
+
     public function __construct()
     {
         $this->utilisateurs = new ArrayCollection();
+        $this->dons = new ArrayCollection();
+        $this->startdate = new \DateTime();
+        $this->enddate = (new \DateTime())->modify('+1 day');
+        $this->createdat = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -208,6 +231,36 @@ class Evenement
     {
         if ($this->utilisateurs->removeElement($utilisateur)) {
             $utilisateur->removeEvennement($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Don>
+     */
+    public function getDons(): Collection
+    {
+        return $this->dons;
+    }
+
+    public function addDon(Don $don): static
+    {
+        if (!$this->dons->contains($don)) {
+            $this->dons->add($don);
+            $don->setEvenement($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDon(Don $don): static
+    {
+        if ($this->dons->removeElement($don)) {
+            // set the owning side to null (unless already changed)
+            if ($don->getEvenement() === $this) {
+                $don->setEvenement(null);
+            }
         }
 
         return $this;

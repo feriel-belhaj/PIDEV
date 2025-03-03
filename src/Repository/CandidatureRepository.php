@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Candidature;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query;
 
 /**
  * @extends ServiceEntityRepository<Candidature>
@@ -16,6 +17,28 @@ class CandidatureRepository extends ServiceEntityRepository
         parent::__construct($registry, Candidature::class);
     }
 
+    public function findAllOrderedByIdDesc(): array
+    {
+        return $this->createQueryBuilder('c')
+            ->orderBy('c.id', 'DESC') // Trie par ID décroissant (le plus grand en premier)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllOrderedByIdDescQuery(): Query
+    {
+        return $this->createQueryBuilder('c')
+            ->orderBy('c.id', 'DESC')
+            ->getQuery();
+    }
+    public function getTypeCollabStats()
+    {
+        return $this->createQueryBuilder('c')
+            ->select('c.typeCollab, COUNT(c.id) as type_count')
+            ->groupBy('c.typeCollab')
+            ->getQuery()
+            ->getResult();
+    }
     //    /**
     //     * @return Candidature[] Returns an array of Candidature objects
     //     */

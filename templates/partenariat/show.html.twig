@@ -55,14 +55,15 @@
         <!-- Boutons alignés sur la même ligne -->
         <div class="d-flex justify-content-center align-items-center gap-3 mt-4">
 <a href="{{ path('app_candidature_new', {'id': partenariat.id}) }}" class="btn btn-primary">Postuler</a>
-
-          <form method="post" action="{{ path('app_partenariat_delete', {'id': partenariat.id}) }}" 
-      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce partenariat ?');">
-    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ partenariat.id) }}">
-    <button type="submit" class="btn p-0 border-0">
-        <img src="{{ asset('img/icons/trash-icon.png') }}" alt="Supprimer" style="width: 40px; height: 40px;">
-    </button>
-</form>
+            {% if app.user == partenariat.createur %}           
+            <form method="post" action="{{ path('app_partenariat_delete', {'id': partenariat.id}) }}" 
+                onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce partenariat ?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ partenariat.id) }}">
+                <button type="submit" class="btn p-0 border-0">
+                    <img src="{{ asset('img/icons/trash-icon.png') }}" alt="Supprimer" style="width: 40px; height: 40px;">
+                </button>
+            </form>
+            {% endif %}
 
         </div>
     </div>

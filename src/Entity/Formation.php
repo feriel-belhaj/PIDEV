@@ -56,8 +56,23 @@ class Formation
     /**
      * @var Collection<int, Utilisateur>
      */
-    #[ORM\ManyToMany(targetEntity: Utilisateur::class, mappedBy: 'formations')]
+    #[ORM\ManyToMany(targetEntity: Utilisateur::class, mappedBy: 'formation')]
     private Collection $utilisateurs;
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
+    private ?Utilisateur $createur = null;
+
+   
+    public function getCreateur(): ?Utilisateur
+    {
+        return $this->createur;
+    }
+
+    public function setCreateur(?Utilisateur $createur): self
+    {
+        $this->createur = $createur;
+        return $this;
+    }
 
      /**
      * @var Collection<int, Certificat>
@@ -65,10 +80,27 @@ class Formation
     #[ORM\OneToMany(targetEntity: Certificat::class, mappedBy: 'formation', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $certificats;
 
+    #[ORM\OneToMany(mappedBy: 'formation', targetEntity: FormationReservee::class, cascade: ['remove'])]
+    private Collection $formationsReservees;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $latitude;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $longitude;
+
+    #[ORM\Column(name: "model3d_url", length: 255, nullable: true)]
+    private ?string $model3d_url = null;
+
     public function __construct()
     {
         $this->utilisateurs = new ArrayCollection();
         $this->certificats = new ArrayCollection();
+        $this->formationsReservees = new ArrayCollection();
         $this->datedeb = new \DateTime();
         $this->datefin = new \DateTime();
     }
@@ -245,6 +277,74 @@ class Formation
             $utilisateur->removeFormation($this);
         }
 
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->titre ?? '';
+    }
+
+    /**
+     * @return Collection<int, FormationReservee>
+     */
+    public function getFormationsReservees(): Collection
+    {
+        return $this->formationsReservees;
+    }
+
+    public function addFormationReservee(FormationReservee $formationReservee): self
+    {
+        if (!$this->formationsReservees->contains($formationReservee)) {
+            $this->formationsReservees->add($formationReservee);
+            $formationReservee->setFormation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFormationReservee(FormationReservee $formationReservee): self
+    {
+        if ($this->formationsReservees->removeElement($formationReservee)) {
+            // set the owning side to null (unless already changed)
+            if ($formationReservee->getFormation() === $this) {
+                $formationReservee->setFormation(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getLatitude(): ?float
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(float $latitude): self
+    {
+        $this->latitude = $latitude;
+        return $this;
+    }
+
+    public function getLongitude(): ?float
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(float $longitude): self
+    {
+        $this->longitude = $longitude;
+        return $this;
+    }
+
+    public function getModel3dUrl(): ?string
+    {
+        return $this->model3d_url;
+    }
+
+    public function setModel3dUrl(?string $model3d_url): self
+    {
+        $this->model3d_url = $model3d_url;
         return $this;
     }
 }

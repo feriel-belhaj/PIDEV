@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Partenariat;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query;
 
 /**
  * @extends ServiceEntityRepository<Partenariat>
@@ -16,28 +17,20 @@ class PartenariatRepository extends ServiceEntityRepository
         parent::__construct($registry, Partenariat::class);
     }
 
-    //    /**
-    //     * @return Partenariat[] Returns an array of Partenariat objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findAllOrderedByIdDescQuery(?string $dateDebut, ?string $dateFin): Query
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->orderBy('p.id', 'DESC');
 
-    //    public function findOneBySomeField($value): ?Partenariat
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if ($dateDebut) {
+            $qb->andWhere('p.dateDebut >= :dateDebut')
+               ->setParameter('dateDebut', $dateDebut);
+        }
+        if ($dateFin) {
+            $qb->andWhere('p.dateFin <= :dateFin')
+               ->setParameter('dateFin', $dateFin);
+        }
+
+        return $qb->getQuery();
+    }
 }

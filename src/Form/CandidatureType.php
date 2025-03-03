@@ -38,13 +38,11 @@ class CandidatureType extends AbstractType
                 ],
                 'placeholder' => 'Choisir le Type de Collaboration',
                 'attr' => ['class' => 'form-select border-primary p-2'],
-                'required' => !$isEdit,
                 'constraints' => !$isEdit ? [
                     new Assert\NotBlank(['message' => 'remplir champs']),
                 ] : [],
             ])
             ->add('cv', FileType::class, [
-                'required' => !$isEdit,
                 'mapped' => false,
                 'constraints' => array_merge(
                     [
@@ -60,7 +58,6 @@ class CandidatureType extends AbstractType
                 ),
             ])
             ->add('portfolio', FileType::class, [
-                'required' => !$isEdit,
                 'mapped' => false,
                 'constraints' => array_merge(
                     [
@@ -76,7 +73,6 @@ class CandidatureType extends AbstractType
                 ),
             ])
             ->add('motivation', TextareaType::class, [
-                'required' => !$isEdit,
                 'constraints' => !$isEdit ? [
                     new Assert\NotBlank(['message' => 'remplir champs']),
                 ] : [],

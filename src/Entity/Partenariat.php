@@ -12,13 +12,40 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: PartenariatRepository::class)]
 class Partenariat
 {
+
+    /**
+     * @var Collection<int, Utilisateur>
+     */
+    #[ORM\ManyToMany(targetEntity: Utilisateur::class, mappedBy: 'partenariats')]
+    private Collection $utilisateurs;
+
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
+    private ?Utilisateur $createur = null;
+
+   
+    public function getCreateur(): ?Utilisateur
+    {
+        return $this->createur;
+    }
+
+    public function setCreateur(?Utilisateur $createur): self
+    {
+        $this->createur = $createur;
+        return $this;
+    }
+    
     #[ORM\OneToMany(mappedBy: 'partenariat', targetEntity: Candidature::class, cascade: ['remove'])]
     private Collection $candidatures;
 
     public function __construct()
     {
+        $this->dateDebut = new \DateTime(); // ou toute autre date par défaut
+    $this->dateFin = new \DateTime();   // ou toute autre date par défaut
         $this->candidatures = new ArrayCollection();
+        $this->utilisateurs = new ArrayCollection();
     }
+
 
     public function getCandidatures(): Collection
     {
@@ -31,28 +58,33 @@ class Partenariat
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
-    #[Assert\NotBlank(message: "Le nom est obligatoire.")]
-    #[Assert\Length(max: 50, maxMessage: "Le nom ne peut pas dépasser 50 caractères.")]
-    #[Assert\Regex(
-        pattern: "/^[A-Z][a-zA-Z]+$/",
-        message: "Le nom doit commencer par une majuscule et contenir uniquement des lettres."
-    )]
-    private ?string $Nom = null;
+#[Assert\NotBlank(message: "Le nom est obligatoire.")]
+#[Assert\Length(max: 50, maxMessage: "Le nom ne peut pas dépasser 50 caractères.")]
+#[Assert\Regex(
+    pattern: "/^[A-ZÀ-ÿ][a-zA-ZÀ-ÿéèêëàâäçôùùîï]+( [a-zA-ZÀ-ÿéèêëàâäçôùùîï]+)*$/",
+    message: "Le nom doit commencer par une majuscule et peut contenir des lettres accentuées et des espaces."
+)]
+private ?string $Nom = null;
 
-    #[ORM\Column(length: 50)]
-    #[Assert\NotBlank(message: "Le type est obligatoire.")]
-    #[Assert\Length(max: 50, maxMessage: "Le type ne peut pas dépasser 50 caractères.")]
-    #[Assert\Regex(
-        pattern: "/^[A-Z][a-zA-Z]+$/",
-        message: "Le type doit commencer par une majuscule et contenir uniquement des lettres."
-    )]
-    private ?string $Type = null;
+
+#[ORM\Column(length: 50)]
+#[Assert\NotBlank(message: "Le type est obligatoire.")]
+#[Assert\Length(max: 50, maxMessage: "Le type ne peut pas dépasser 50 caractères.")]
+#[Assert\Regex(
+    pattern: "/^[A-ZÀ-ÿ][a-zA-ZÀ-ÿéèêëàâäçôùùîï]+( [a-zA-ZÀ-ÿéèêëàâäçôùùîï]+)*$/",
+    message: "Le type doit commencer par une majuscule et peut contenir des lettres accentuées et des espaces."
+)]
+private ?string $Type = null;
+
 
     #[ORM\Column(length: 255)]
     private ?string $description = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $statut = null;
+    
+    #[Assert\NotNull(message: "Le statut ne peut pas être null.")]
+#[ORM\Column(length: 255)]
+    private ?string $statut = 'actif';  // Définir une valeur par défaut, par exemple "actif"
+    
 
     #[ORM\Column(length: 255)]
     private ?string $image = null;
@@ -142,6 +174,33 @@ class Partenariat
     public function setDateFin(\DateTimeInterface $dateFin): static
     {
         $this->dateFin = $dateFin;
+        return $this;
+    }
+    
+    /**
+     * @return Collection<int, Utilisateur>
+     */
+    public function getUtilisateurs(): Collection
+    {
+        return $this->utilisateurs;
+    }
+
+    public function addUtilisateur(Utilisateur $utilisateur): static
+    {
+        if (!$this->utilisateurs->contains($utilisateur)) {
+            $this->utilisateurs->add($utilisateur);
+            $utilisateur->addPartenariat($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUtilisateur(Utilisateur $utilisateur): static
+    {
+        if ($this->utilisateurs->removeElement($utilisateur)) {
+            $utilisateur->removePartenariat($this);
+        }
+
         return $this;
     }
 }

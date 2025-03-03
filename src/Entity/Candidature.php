@@ -16,15 +16,25 @@ class Candidature
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-private ?\DateTimeInterface $datePostulation = null;
+    private ?\DateTimeInterface $datePostulation = null;
 
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
+    private ?Utilisateur $createur = null;
+    public function getCreateur(): ?Utilisateur
+    {
+        return $this->createur;
+    }
 
-    
+    public function setCreateur(?Utilisateur $createur): self
+    {
+        $this->createur = $createur;
+        return $this;
+    }
 
-#[ORM\ManyToOne(targetEntity: Partenariat::class, inversedBy: 'candidature')]
-#[ORM\JoinColumn(onDelete: "CASCADE")]
-private ?Partenariat $partenariat = null;
-
+    #[ORM\ManyToOne(targetEntity: Partenariat::class, inversedBy: 'candidature')]
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
+    private ?Partenariat $partenariat = null;
 
     #[ORM\Column(length: 255)]
     private ?string $cv = null;
@@ -37,14 +47,52 @@ private ?Partenariat $partenariat = null;
         min: 10,
         minMessage: "Le texte de motivation doit contenir au moins 10 caractères."
     )]
-    #[Assert\Regex(
-        pattern: "/^[A-Z][A-Za-zÀ-ÖØ-öø-ÿ0-9 .,!?'-]*$/",
-        message: "La motivation doit commencer par une majuscule et ne contenir que des lettres, chiffres, espaces et ponctuations."
-    )]
     private ?string $motivation = null;
 
     #[ORM\Column(length: 255)]
     private ?string $typeCollab = null;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $scoreNLP = null;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $scoreArtistique = null;
+
+    #[ORM\Column(type: "text", nullable: true)]
+    private ?string $analysisResult = null;
+
+
+    public function getAnalysisResult(): ?string
+    {
+        return $this->analysisResult;
+    }
+
+    public function getAnalysisResultDecoded(): array
+    {
+        $decoded = json_decode($this->analysisResult, true);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    public function setAnalysisResult(?array $analysisResult): static
+    {
+        // Vérifie que le tableau est valide avant de l'encoder
+        if ($analysisResult !== null) {
+            $jsonResult = json_encode($analysisResult);
+    
+            // Vérifie si l'encodage JSON a réussi
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception('Erreur lors de l\'encodage JSON : ' . json_last_error_msg());
+            }
+    
+            $this->analysisResult = $jsonResult;
+        } else {
+            $this->analysisResult = null;
+        }
+    
+        return $this;
+    }
+
+    // Getters et Setters pour les autres propriétés...
 
     public function getId(): ?int
     {
@@ -59,11 +107,9 @@ private ?Partenariat $partenariat = null;
     public function setDatePostulation(\DateTimeInterface $datePostulation): static
     {
         $this->datePostulation = $datePostulation;
-
         return $this;
     }
 
-   
     public function getPartenariat(): ?Partenariat
     {
         return $this->partenariat;
@@ -72,7 +118,6 @@ private ?Partenariat $partenariat = null;
     public function setPartenariat(?Partenariat $partenariat): static
     {
         $this->partenariat = $partenariat;
-
         return $this;
     }
 
@@ -84,7 +129,6 @@ private ?Partenariat $partenariat = null;
     public function setCv(string $cv): static
     {
         $this->cv = $cv;
-
         return $this;
     }
 
@@ -96,7 +140,6 @@ private ?Partenariat $partenariat = null;
     public function setPortfolio(string $portfolio): static
     {
         $this->portfolio = $portfolio;
-
         return $this;
     }
 
@@ -108,11 +151,8 @@ private ?Partenariat $partenariat = null;
     public function setMotivation(string $motivation): static
     {
         $this->motivation = $motivation;
-
         return $this;
     }
-
-    
 
     public function getTypeCollab(): ?string
     {
@@ -121,8 +161,29 @@ private ?Partenariat $partenariat = null;
 
     public function setTypeCollab(string $typeCollab): static
     {
-        $this->typeCollab = $typeCollab;
-
+        $this->typeCollab = $typeCollab;        
         return $this;
     }
-} 
+
+    public function getScoreNLP(): ?float
+    {
+        return $this->scoreNLP;
+    }
+
+    public function setScoreNLP(?float $scoreNLP): static
+    {
+        $this->scoreNLP = $scoreNLP;
+        return $this;
+    }
+
+    public function getScoreArtistique(): ?float
+    {
+        return $this->scoreArtistique;
+    }
+
+    public function setScoreArtistique(?float $scoreArtistique): static
+    {
+        $this->scoreArtistique = $scoreArtistique;
+        return $this;
+    }
+}

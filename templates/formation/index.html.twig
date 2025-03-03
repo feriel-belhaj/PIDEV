@@ -54,14 +54,57 @@
             color: #D4A762;
             border: 1px solid #D4A762;
         }
+        /* Styles pour le formulaire de recherche et les filtres */
+        .search-bar {
+            margin-bottom: 20px;
+        }
+        .filter-group {
+            margin-bottom: 20px;
+        }
     </style>
 {% endblock %}
 
 {% block body %}
+    {# Affichage des messages flash #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
     <div class="container mt-5">
-        <div class="text-right mb-4 animate__animated animate__fadeInUp">
-            <a href="{{ path('app_formation_new') }}" class="btn btn-primary btn-lg">Créer une nouvelle formation</a>
+        <div class="search-bar">
+            <form method="GET" action="{{ path('app_formation_index') }}">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="search" placeholder="Rechercher une formation..." value="{{ app.request.get('search') }}">
+                    <button class="btn btn-primary" type="submit">Rechercher</button>
+                </div>
+            </form>
         </div>
+
+        <div class="filter-group">
+            <form method="GET" action="{{ path('app_formation_index') }}">
+                <select name="niveau" class="form-select" onchange="this.form.submit()">
+                    <option value="">Tous les niveaux</option>
+                    <option value="Débutant" {% if app.request.get('niveau') == 'Débutant' %}selected{% endif %}>Débutant</option>
+                    <option value="Intermédiaire" {% if app.request.get('niveau') == 'Intermédiaire' %}selected{% endif %}>Intermédiaire</option>
+                    <option value="Avancé" {% if app.request.get('niveau') == 'Avancé' %}selected{% endif %}>Avancé</option>
+                </select>
+            </form>
+        </div>
+
+        {% if app.user %}
+            <div class="text-right mb-4 animate__animated animate__fadeInUp">
+                <a href="{{ path('app_formation_new') }}" class="btn btn-primary btn-lg">Créer une nouvelle formation</a>
+            </div>
+        {% else %}
+            <div class="text-right mb-4 animate__animated animate__fadeInUp">
+                <a href="{{ path('app_login') }}"  class="btn btn-primary btn-lg">Créer une nouvelle formation</a>
+            </div>
+        {% endif %}
 
         <div class="row">
             {% for formation in formations %}

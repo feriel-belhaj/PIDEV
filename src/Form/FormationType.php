@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class FormationType extends AbstractType
 {
@@ -170,6 +171,9 @@ class FormationType extends AbstractType
                 'required' => false,
                 'data_class' => null,
                 'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez sélectionner une image'
+                    ]),
                     new File([
                         'maxSize' => '1024k',
                         'mimeTypes' => [
@@ -180,6 +184,21 @@ class FormationType extends AbstractType
                         'mimeTypesMessage' => 'Veuillez uploader une image valide (JPG, PNG, GIF)',
                     ])
                 ]
+            ])
+            ->add('model3dFile', FileType::class, [
+                'label' => 'Modèle 3D (fichier .glb)',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '10M',
+                        'mimeTypes' => [
+                            'model/gltf-binary',
+                            'application/octet-stream' // Pour les fichiers .glb
+                        ],
+                        'mimeTypesMessage' => 'Veuillez uploader un fichier .glb valide',
+                    ])
+                ],
             ])
             ->add('save', SubmitType::class, [
                 'label' => 'Enregistrer',

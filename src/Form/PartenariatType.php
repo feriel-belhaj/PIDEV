@@ -17,50 +17,55 @@ class PartenariatType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $isEditMode = $options['is_edit']; // Récupérer la variable is_edit passée à l'option
+
         $builder
-            ->add('nom', TextType::class, [
-                'attr' => ['class' => 'form-control mb-3 rounded-pill', 'placeholder' => 'Nom du Partenariat'],
-                'constraints' => [
-                    new Assert\NotBlank(['message' => 'Le nom est obligatoire.']),
-                    new Assert\Length([
-                        'max' => 50,
-                        'maxMessage' => 'Le nom ne peut pas dépasser 50 caractères.'
-                    ]),
-                    new Assert\Regex([
-                        'pattern' => '/^[A-Z][a-zA-Z]+$/',
-                        'message' => 'Le nom doit commencer par une majuscule et contenir uniquement des lettres.'
-                    ]),
-                ],
-            ])
-            ->add('type', TextType::class, [
-                'attr' => ['class' => 'form-control mb-3 rounded-pill', 'placeholder' => 'Type de Partenariat'],
-                'constraints' => [
-                    new Assert\NotBlank(['message' => 'Le type est obligatoire.']),
-                    new Assert\Length([
-                        'max' => 50,
-                        'maxMessage' => 'Le type ne peut pas dépasser 50 caractères.'
-                    ]),
-                    new Assert\Regex([
-                        'pattern' => '/^[A-Z][a-zA-Z]+$/',
-                        'message' => 'Le type doit commencer par une majuscule et contenir uniquement des lettres.'
-                    ]),
-                ],
-            ])
+        ->add('nom', TextType::class, [
+            'attr' => ['class' => 'form-control mb-3 rounded-pill', 'placeholder' => 'Nom du Partenariat'],
+            'constraints' => [
+                new Assert\NotBlank(['message' => 'remplir champs.']),
+                new Assert\Length([
+                    'max' => 50,
+                    'maxMessage' => 'Le nom ne peut pas dépasser 50 caractères.'
+                ]),
+                new Assert\Regex([
+                    'pattern' => '/^[A-ZÀ-ÿ][a-zA-ZÀ-ÿéèêëàâäçôùùîï ]+$/',
+                    'message' => 'Le nom doit commencer par une majuscule et contenir uniquement des lettres accentuées et des espaces.',
+                ]),
+            ],
+        ])
+        
+        ->add('type', TextType::class, [
+            'attr' => ['class' => 'form-control mb-3 rounded-pill', 'placeholder' => 'Type de Partenariat'],
+            'constraints' => [
+                new Assert\NotBlank(['message' => 'remplir champs.']),
+                new Assert\Length([
+                    'max' => 50,
+                    'maxMessage' => 'Le type ne peut pas dépasser 50 caractères.'
+                ]),
+                new Assert\Regex([
+                    'pattern' => '/^[A-ZÀ-ÿ][a-zA-ZÀ-ÿéèêëàâäçôùùîï ]+$/',
+                    'message' => 'Le type doit commencer par une majuscule et contenir uniquement des lettres accentuées et des espaces.',
+                ]),
+            ],
+        ])
+        
             ->add('description', TextareaType::class, [
                 'attr' => ['class' => 'form-control mb-3 rounded', 'placeholder' => 'Description du Partenariat'],
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'La description est obligatoire.']),
+                    new Assert\NotBlank(['message' => 'remplir champs.']),
                     new Assert\Length([
                         'min' => 10,
                         'minMessage' => 'La description doit contenir au moins 10 caractères.',
                         'max' => 255,
                     ]),
                     new Assert\Regex([
-                        'pattern' => '/^[A-Z][a-zA-Z ,;.:\'"!?-]+$/',
-                        'message' => 'La description doit commencer par une majuscule et contenir uniquement des lettres, des espaces et des signes de ponctuation.',
+                        'pattern' => '/^[A-ZÀ-ÿ][a-zA-ZÀ-ÿéèêëàâäçôùùîï ,;.:\'"!?-]*$/',
+                        'message' => 'La description doit commencer par une majuscule et contenir uniquement des lettres accentuées, des espaces et des signes de ponctuation.',
                     ]),
                 ],
             ])
+            
             ->add('dateDebut', DateType::class, [
                 'widget' => 'single_text',
                 'attr' => ['class' => 'form-control mb-3 rounded-pill'],
@@ -88,22 +93,23 @@ class PartenariatType extends AbstractType
                 ],
             ])
             ->add('statut', ChoiceType::class, [
-                'choices'  => [
+                'choices' => [
                     'Actif' => 'actif',
-                    'En cours' => 'en cours',
-                    'Expiré' => 'expiré',
+                'En cours' => 'en cours',
+                'Expiré' => 'expiré',
                 ],
-                'required' => true,
-                'placeholder' => 'Choisir le statut',
-                'attr' => ['class' => 'form-control mb-3 rounded-pill'],
+                'placeholder' => 'Choisir un statut',  // Assurez-vous qu'il n'y ait pas de valeur vide envoyée
+                'required' => !$isEditMode, // Si c'est en mode ajout, rendre obligatoire
+                'empty_data' => 'actif', // Définir une valeur par défaut si rien n'est sélectionné
             ])
+            
             ->add('image', FileType::class, [
                 'label' => 'Image du Partenariat',
                 'mapped' => false, // Ne correspond pas directement à une propriété de l'entité
-                'required' => $options['is_edit'] ? false : true, // Obligatoire en ajout, facultatif en edit
+                'required' => $isEditMode ? false : true, // Obligatoire en ajout, facultatif en edit
                 'attr' => ['class' => 'form-control mb-3 rounded-pill'],
-                'constraints' => $options['is_edit'] ? [] : [
-                    new Assert\NotBlank(['message' => 'L\'image est obligatoire.']),
+                'constraints' => $isEditMode ? [] : [
+                    new Assert\NotBlank(['message' => 'remplir champs.']),
                     new Assert\File([
                         'maxSize' => '2M', // ✅ Taille max de 2 Mo
                         'mimeTypes' => ['image/png', 'image/jpeg', 'image/jpg'], // ✅ Formats autorisés
@@ -112,8 +118,6 @@ class PartenariatType extends AbstractType
                 ],
             ]);
     }
-    
-
 
     public function configureOptions(OptionsResolver $resolver): void
     {

@@ -37,13 +37,33 @@ class Produit
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $datecreation = null;
+////new 
+    const SEUIL_STOCK = 10;
+    /**
+     * @var Collection<int, Utilisateur>
+     */
+    #[ORM\ManyToMany(targetEntity: Utilisateur::class, mappedBy: 'produits')]
+    private Collection $utilisateurs;
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
+    private ?Utilisateur $createur = null;
 
-    #[ORM\ManyToMany(targetEntity: Utilisateur::class, mappedBy: 'produit')]
-    private Collection $produits;
+   
+    public function getCreateur(): ?Utilisateur
+    {
+        return $this->createur;
+    }
+
+    public function setCreateur(?Utilisateur $createur): self
+    {
+        $this->createur = $createur;
+        return $this;
+    }
 
     public function __construct()
     {
-        $this->produits = new ArrayCollection();
+        $this->utilisateurs = new ArrayCollection();
+       
     }
 
     public function getId(): ?int
@@ -127,25 +147,27 @@ class Produit
         $this->datecreation = $datecreation;
         return $this;
     }
-
-    public function getProduits(): Collection
+    /**
+     * @return Collection<int, Utilisateur>
+     */
+    public function getUtilisateurs(): Collection
     {
-        return $this->produits;
+        return $this->utilisateurs;
     }
 
-    public function addProduit(Utilisateur $produit): static
+    public function addUtilisateur(Utilisateur $utilisateur): static
     {
-        if (!$this->produits->contains($produit)) {
-            $this->produits->add($produit);
-            $produit->addProduit($this);
+        if (!$this->utilisateurs->contains($utilisateur)) {
+            $this->utilisateurs->add($utilisateur);
+            $utilisateur->addProduit($this);
         }
         return $this;
     }
 
-    public function removeProduit(Utilisateur $produit): static
+    public function removeUtilisateur(Utilisateur $utilisateur): static
     {
-        if ($this->produits->removeElement($produit)) {
-            $produit->removeProduit($this);
+        if ($this->utilisateurs->removeElement($utilisateur)) {
+            $utilisateur->removeProduit($this);
         }
         return $this;
     }
@@ -162,4 +184,11 @@ class Produit
         $uniqueCategories = array_unique($categories);
         return array_map(fn($category) => ['key' => $category, 'value' => $category], array_values($uniqueCategories));
     }
+
+   //new 
+   public function isStockLow(): bool
+    {
+        return $this->quantitestock <= self::SEUIL_STOCK;
+    }
+
 }

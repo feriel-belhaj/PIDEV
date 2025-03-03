@@ -39,37 +39,52 @@
                         {% endif %}
 
                         <!-- Début du Formulaire -->
-                        {{ form_start(form, {'attr': {'class': 'row g-3', 'enctype': 'multipart/form-data'}}) }}
+                        {{ form_start(form ,{'attr' : {'novalidate' : 'novalidate', 'id' :"register-form"}}) }}
 
-                            <div class="col-lg-6 col-md-6">
-                                <label for="{{ form.datePostulation.vars.id }}" class="form-label">Date de Postulation</label>
-                                {{ form_widget(form.datePostulation, {'attr': {'class': 'form-control border-primary p-2 bg-light', 'readonly': 'readonly'}}) }}
-                                <div class="invalid-feedback">{{ form_errors(form.datePostulation) }}</div>
+                            <div class="row mb-3">
+                                <div class="col-lg-6 col-md-6">
+                                    <label for="{{ form.datePostulation.vars.id }}" class="form-label">Date de Postulation</label>
+                                    {{ form_widget(form.datePostulation, {'attr': {'class': 'form-control border-primary p-2 bg-light', 'readonly': 'readonly'}}) }}
+                                    <div class="invalid-feedback">{{ form_errors(form.datePostulation) }}</div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-6">
+                                    <label for="{{ form.cv.vars.id }}" class="form-label">Veuillez Mettre Votre CV <span class="text-danger">*</span></label>
+                                    {{ form_widget(form.cv, {'attr': {'class': 'form-control border-primary p-2 ' ~ (form.cv.vars.errors|length > 0 ? 'is-invalid' : '')}}) }}
+                                    <div class="invalid-feedback">{{ form_errors(form.cv) }}</div>
+                                </div>
                             </div>
 
-                            <div class="col-lg-6 col-md-6">
-                                <label for="{{ form.cv.vars.id }}" class="form-label">Veuillez Mettre Votre CV <span class="text-danger">*</span></label>
-                                {{ form_widget(form.cv, {'attr': {'class': 'form-control border-primary p-2 ' ~ (form.cv.vars.errors|length > 0 ? 'is-invalid' : '')}}) }}
-                                <div class="invalid-feedback">{{ form_errors(form.cv) }}</div>
+                            <div class="row mb-3">
+                                <div class="col-lg-6 col-md-6">
+                                    <label for="{{ form.portfolio.vars.id }}" class="form-label">Portfolio <span class="text-danger">*</span></label>
+                                    {{ form_widget(form.portfolio, {'attr': {'class': 'form-control border-primary p-2 ' ~ (form.portfolio.vars.errors|length > 0 ? 'is-invalid' : '')}}) }}
+                                    <div class="invalid-feedback">{{ form_errors(form.portfolio) }}</div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-6">
+                                    <label for="{{ form.typeCollab.vars.id }}" class="form-label">Type de Collaboration <span class="text-danger">*</span></label>
+                                    {{ form_widget(form.typeCollab, {'attr': {'class': 'form-select border-primary p-2 ' ~ (form.typeCollab.vars.errors|length > 0 ? 'is-invalid' : '')}}) }}
+                                    <div class="invalid-feedback">{{ form_errors(form.typeCollab) }}</div>
+                                </div>
                             </div>
 
-                            <div class="col-lg-6 col-md-6">
-                                <label for="{{ form.portfolio.vars.id }}" class="form-label">Portfolio <span class="text-danger">*</span></label>
-                                {{ form_widget(form.portfolio, {'attr': {'class': 'form-control border-primary p-2 ' ~ (form.portfolio.vars.errors|length > 0 ? 'is-invalid' : '')}}) }}
-                                <div class="invalid-feedback">{{ form_errors(form.portfolio) }}</div>
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label for="{{ form.motivation.vars.id }}" class="form-label">Lettre de motivation <span class="text-danger">*</span></label>
+                                    {{ form_widget(form.motivation, {
+                                        'attr': {
+                                            'class': 'w-100 form-control p-3 mb-4 border-primary bg-light ' ~
+                                            (form.motivation.vars.errors|length > 0 ? 'is-invalid' : ''),
+                                            'placeholder': 'Description du Partenariat'
+                                        }
+                                    }) }}
+                                    {% if form.motivation.vars.errors|length > 0 %}
+                                        <div class="invalid-feedback">{{ form_errors(form.motivation) }}</div>
+                                    {% endif %}
+                                </div>
                             </div>
-
-                            <div class="col-lg-6 col-md-6">
-                                <label for="{{ form.typeCollab.vars.id }}" class="form-label">Type de Collaboration <span class="text-danger">*</span></label>
-                                {{ form_widget(form.typeCollab, {'attr': {'class': 'form-select border-primary p-2 ' ~ (form.typeCollab.vars.errors|length > 0 ? 'is-invalid' : '')}}) }}
-                                <div class="invalid-feedback">{{ form_errors(form.typeCollab) }}</div>
-                            </div>
-
-                            <div class="mb-3 text-start">
-                                <label for="{{ form.motivation.vars.id }}" class="form-label">Lettre de motivation <span class="text-danger">*</span></label>
-                                {{ form_widget(form.motivation, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light ' ~ (form.motivation.vars.errors|length > 0 ? 'is-invalid' : '')}}) }}
-                                <div class="invalid-feedback">{{ form_errors(form.motivation) }}</div>
-                            </div>
+                            
 
                             <div class="col-12 text-center">
                                 <button type="submit" class="btn btn-primary px-5 py-3 rounded-pill">Enregistrer</button>

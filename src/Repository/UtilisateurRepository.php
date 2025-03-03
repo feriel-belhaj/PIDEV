@@ -40,4 +40,36 @@ class UtilisateurRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+    public function countUsersByMonth(): array
+    {
+        $qb = $this->createQueryBuilder('u')
+            ->select("DATE_FORMAT(u.dateInscription, '%Y-%m') as mois, COUNT(u.id) as total")
+            ->groupBy('mois')
+            ->orderBy('mois', 'ASC');
+
+        return $qb->getQuery()->getResult();
+    }
+    public function countSexes()
+    {
+        // Compter le nombre d'hommes et de femmes
+        $qb = $this->createQueryBuilder('u')
+            ->select('u.Sexe, COUNT(u.id) as count')
+            ->groupBy('u.Sexe');
+
+        $result = $qb->getQuery()->getResult();
+
+        // Préparer les données sous forme d'un tableau associatif
+        $sexes = [
+            'H' => 0,
+            'F' => 0
+        ];
+
+        foreach ($result as $row) {
+            $sexes[$row['Sexe']] = $row['count'];
+        }
+
+        return $sexes;
+    }
+
 }

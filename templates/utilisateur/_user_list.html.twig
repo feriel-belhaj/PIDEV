@@ -1,0 +1,53 @@
+{% for utilisateur in utilisateurs %}
+    <tr {% if app.user and app.user.id == utilisateur.id %} class="table-warning" {% endif %}>
+        <td>{{ utilisateur.id }}</td>
+        <td>
+            {% if utilisateur.image %}
+                <img src="{{ asset('uploads/' ~ utilisateur.image) }}" alt="User Photo" class="img-fluid" style="max-width: 60px; height: auto;">
+            {% else %}
+                <p>No photo available</p>
+            {% endif %}
+        </td>
+        <td>{{ utilisateur.nom }}</td>
+        <td>{{ utilisateur.prenom }}</td>
+        <td>{{ utilisateur.email }}</td>
+        <td>{{ utilisateur.adresse }}</td>
+        <td>{{ utilisateur.telephone }}</td>
+        <td>{{ utilisateur.dateInscription ? utilisateur.dateInscription|date('Y-m-d H:i:s') : '' }}</td>
+        <td>
+            {% if utilisateur.sexe == 'male' %}
+                <span class="badge bg-dark">Homme</span>
+            {% elseif utilisateur.sexe == 'femelle' %}
+                <span class="badge bg-danger">Femme</span>
+            {% else %}
+                <span class="badge bg-secondary">Inconnu</span>
+            {% endif %}
+        </td>
+        <td>
+            {% if utilisateur.role == 'ROLE_ADMIN' %}
+                <span class="badge bg-danger">Admin</span>
+            {% elseif utilisateur.role == 'ROLE_CLIENT' %}
+                <span class="badge bg-warning">Client</span>
+                <a href="{{ path('app_utilisateur_make_admin', {'id': utilisateur.id}) }}" class="btn btn-link text-dark p-0"> Rendre Admin </a>
+            {% elseif utilisateur.role == 'ROLE_ARTISAN' %}
+                <span class="badge bg-success">Artisan</span>
+                <a href="{{ path('app_utilisateur_make_admin', {'id': utilisateur.id}) }}" class="btn btn-link text-dark p-0"> Rendre Admin </a>
+            {% else %}
+                <span class="badge bg-secondary">Inconnu</span>
+                <a href="{{ path('app_utilisateur_make_admin', {'id': utilisateur.id}) }}" class="btn btn-link text-dark p-0"> Rendre Admin </a>
+            {% endif %}
+        </td>
+        <td>
+            <div class="action-line">
+                <a href="{{ path('app_utilisateur_show', {'id': utilisateur.id}) }}" class="action-btn">
+                    <img src="{{ asset('img/avatars/show.png') }}" width="25px" height="25px" alt="Voir">
+                </a>
+            </div>
+        </td>
+    </tr>
+{% else %}
+    <tr>
+        <td colspan="11">Aucun utilisateur trouvé</td>
+    </tr>
+{% endfor %}
+

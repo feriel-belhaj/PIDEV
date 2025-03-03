@@ -25,13 +25,29 @@ class Don
     #[ORM\Column(length: 255)]
     private ?string $paymentref = null;
 
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $message = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'dons')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Evenement $evenement = null;
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Utilisateur $user = null;
 
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
+    private ?Utilisateur $createur = null;
+    public function getCreateur(): ?Utilisateur
+    {
+        return $this->createur;
+    }
+
+    public function setCreateur(?Utilisateur $createur): self
+    {
+        $this->createur = $createur;
+        return $this;
+    }
     public function getId(): ?int
     {
         return $this->id;
@@ -79,22 +95,32 @@ class Don
         return $this->message;
     }
 
-    public function setMessage(string $message): static
+    public function setMessage(?string $message): self
     {
         $this->message = $message;
-
         return $this;
     }
 
-    public function getEvenement(): ?evenement
+    public function getEvenement(): ?Evenement
     {
         return $this->evenement;
     }
 
-    public function setEvenement(?evenement $evenement): static
+    public function setEvenement(?Evenement $evenement): static
     {
         $this->evenement = $evenement;
 
         return $this;
     }
+    public function getUser(): ?Utilisateur
+    {
+        return $this->user;
+    }
+
+    public function setUser(?Utilisateur $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
+    
 }

@@ -6,6 +6,131 @@
     <div class="container">
         <h1 class="my-4 text-center">Liste des Commandes</h1>
 
+       <!-- Statistiques -->
+<div class="row text-center">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white p-3 shadow">
+            <h4>Total Commandes</h4>
+            <p class="fs-3 fw-bold">{{ totalCommandes }}</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white p-3 shadow">
+            <h4>Chiffre d'Affaires Total</h4>
+            <p class="fs-3 fw-bold">{{ chiffreAffairesTotal|number_format(2, '.', ',') }} dt</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white p-3 shadow">
+            <h4>Produits Moyens par Commande</h4>
+            <p class="fs-3 fw-bold">{{ produitsParCommande|number_format(2, '.', ',') }}</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white p-3 shadow">
+             <h4>Produit le Plus Commandé</h4>
+            <p class="fs-3 fw-bold">{{ nomProduitLePlusCommande }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="row text-center mt-3">
+    <div class="col-md-4">
+        <div class="card bg-info text-white p-3 shadow">
+            <h4>Commandes En Attente</h4>
+            <p class="fs-3 fw-bold">{{ commandesEnAttente }}</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-secondary text-white p-3 shadow">
+            <h4>Montant Moyen par Commande</h4>
+            <p class="fs-3 fw-bold">{{ montantMoyen ? montantMoyen|number_format(2, '.', ',') : 'N/A' }} dt</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-danger text-white p-3 shadow">
+            <h4>Taux d'Annulation</h4>
+            <p class="fs-3 fw-bold">{{ tauxAnnulation|number_format(2, '.', ',') }}%</p>
+        </div>
+    </div>
+</div>
+
+
+        <!-- Graphiques -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card p-3 shadow">
+                    <h4 class="text-center">Répartition des Commandes</h4>
+                    <canvas id="commandesStatutChart" style="max-height: 250px;"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card p-3 shadow">
+                    <h4 class="text-center">Comparaison des Statuts</h4>
+                    <canvas id="commandesBarChart" style="max-height: 250px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card p-3 shadow">
+                    <h4 class="text-center">Top 5 Produits les Plus Commandés</h4>
+                    <canvas id="topProduitsChart" style="max-height: 250px;"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card p-3 shadow">
+                    <h4 class="text-center">Top 5 Catégories les Plus Commandées</h4>
+                    <canvas id="topCategoriesChart" style="max-height: 250px;"></canvas>
+                </div>
+            </div>
+        </div>
+     <!-- Nouveau graphique Doughnut -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card p-3 shadow">
+                    <h4 class="text-center">Chiffre d'Affaires par Statut</h4>
+                    <canvas id="doughnutChart" style="max-height: 250px;"></canvas>
+                </div>
+            </div>
+       
+            <div class="col-md-6">
+                <div class="card p-3 shadow">
+                 <h4 class="text-center">Nombre Moyen de Produits par Commande</h4>
+                     <canvas id="produitsParCommandeChart" style="max-height: 250px;"></canvas>
+                </div>
+            </div>
+               
+        </div>  
+            <!-- Formulaire de recherche -->
+        <form method="GET" action="{{ path('admin_commande_index') }}" class="mb-4">
+            <div class="input-group">
+                <select name="statut" class="form-select">
+                    <option value="">Tous les statuts</option>
+                    <option value="En attente" {% if app.request.get('statut') == 'En attente' %}selected{% endif %}>En attente</option>
+                    <option value="En cours" {% if app.request.get('statut') == 'En cours' %}selected{% endif %}>En cours</option>
+                    <option value="Terminée" {% if app.request.get('statut') == 'Terminée' %}selected{% endif %}>Terminée</option>
+                    <option value="Annulée" {% if app.request.get('statut') == 'Annulée' %}selected{% endif %}>Annulée</option>
+                </select>
+
+                <input type="number" name="prixMin" class="form-control" placeholder="Prix Min" value="{{ app.request.get('prixMin') }}">
+
+                 <!-- Champs de recherche par date -->
+                <input type="date" name="dateDebut" class="form-control" value="{{ app.request.get('dateDebut') }}">
+                <input type="date" name="dateFin" class="form-control" value="{{ app.request.get('dateFin') }}">
+
+                 <!-- Champ de tri -->
+                 <select name="tri" class="form-select">
+                    <option value="id" {% if app.request.get('tri') == 'id' %}selected{% endif %}>ID</option>
+                    <option value="prix" {% if app.request.get('tri') == 'prix' %}selected{% endif %}>Prix Total</option>
+                    <option value="datecmd" {% if app.request.get('tri') == 'datecmd' %}selected{% endif %}>Date</option>
+                    <option value="statut" {% if app.request.get('tri') == 'statut' %}selected{% endif %}>Statut</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Rechercher</button>
+            </div>
+        </form>
+
         <!-- Tableau des commandes -->
         <table class="table table-striped">
             <thead class="table-dark">
@@ -59,5 +184,142 @@
                 {% endif %}
             </tbody>
         </table>
-    </div>
+    <!-- Pagination -->
+       <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="flex-grow-1 d-flex justify-content-center">
+                {{ knp_pagination_render(commandes) }}
+            </div>
+                <a href="{{ path('admin_commande_export_pdf') }}" class="btn btn-primary btn-sm">Exportation PDF</a>
+        </div>
+    
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var commandesStatutCtx = document.getElementById('commandesStatutChart').getContext('2d');
+        new Chart(commandesStatutCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Terminées', 'En Cours', 'Annulées', 'En Attente'],
+                datasets: [{
+                    data: [{{ commandesTerminees }}, {{ commandesEnCours }}, {{ commandesAnnulees }}, {{ commandesEnAttente }}],
+                    backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#17a2b8']
+                }]
+            }
+        });
+
+        var commandesBarCtx = document.getElementById('commandesBarChart').getContext('2d');
+        new Chart(commandesBarCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Terminées', 'En Cours', 'Annulées', 'En Attente'],
+                datasets: [{
+                    label: 'Nombre de Commandes',
+                    data: [{{ commandesTerminees }}, {{ commandesEnCours }}, {{ commandesAnnulees }}, {{ commandesEnAttente }}],
+                    backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#17a2b8']
+                }]
+            },
+            options: { scales: { y: { beginAtZero: true } } }
+        });
+        
+    });
+       var topProduitsCtx = document.getElementById('topProduitsChart').getContext('2d');
+new Chart(topProduitsCtx, {
+    type: 'pie',  // Changer le type de 'bar' à 'pie'
+    data: {
+        labels: [
+            {% for produit in topProduits %}
+                '{{ produit.nom }}'{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        ],
+        datasets: [{
+            label: 'Quantité Commandée',
+            data: [
+                {% for produit in topProduits %}
+                    {{ produit.total }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            ],
+            backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#17a2b8']
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(tooltipItem) {
+                        return tooltipItem.label + ': ' + tooltipItem.raw + ' commandes';
+                    }
+                }
+            }
+        }
+    }
+});
+        var doughnutChartCtx = document.getElementById('doughnutChart').getContext('2d');
+        new Chart(doughnutChartCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Terminées', 'En Cours', 'Annulées', 'En Attente'],
+                datasets: [{
+                    label: 'Chiffre d\'Affaires',
+                    data: [{{ chiffreAffairesTerminees }}, {{ chiffreAffairesEnCours }}, {{ chiffreAffairesAnnulees }}, {{ chiffreAffairesEnAttente }}],
+                    backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#17a2b8']
+                }]
+            },
+            options: {
+                responsive: true,
+                cutoutPercentage: 50
+            }
+        });
+
+    // Graphique des Top 5 Catégories les Plus Commandées
+    var topCategoriesCtx = document.getElementById('topCategoriesChart').getContext('2d');
+    new Chart(topCategoriesCtx, {
+        type: 'bar',
+        data: {
+            labels: [
+                {% for categorie in topCategories %}
+                    '{{ categorie.categorie }}'{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Quantité Commandée',
+                data: [
+                    {% for categorie in topCategories %}
+                        {{ categorie.total }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#17a2b8']
+            }]
+        },
+        options: { scales: { y: { beginAtZero: true } } }
+    });
+    
+    var produitsParCommandeCtx = document.getElementById('produitsParCommandeChart').getContext('2d');
+    new Chart(produitsParCommandeCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Nombre moyen'],
+            datasets: [{
+                label: 'Produits par commande',
+                data: [{{ produitsParCommande }}],
+                backgroundColor: ['#17a2b8']
+            }]
+        },
+        options: { 
+            scales: { x: { beginAtZero: true } },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+    
+    
+
+        
+    </script>
 {% endblock %}

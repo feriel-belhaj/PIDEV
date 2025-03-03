@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Analyse de la Candidature</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; }
+        h1 { text-align: center; color: #333; }
+        .container { width: 90%; margin: 0 auto; }
+        .section { margin-bottom: 20px; padding: 10px; border: 1px solid #ddd; }
+        .section-title { font-size: 16px; font-weight: bold; margin-bottom: 5px; }
+        .entity { font-size: 14px; margin-bottom: 3px; }
+        .close-btn { display: block; width: 100px; margin: 20px auto; padding: 10px; background-color: #f44336; color: white; text-align: center; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+    <img src="{{ asset('assets/img/icons/analyse-exploratoire.png') }}" alt="Analyse" width="30" height="30">
+    Analyse de la Candidature
+</h1>
+
+
+        <div class="section">
+            <div class="section-title">🆔 ID Candidature :</div>
+            <p>{{ candidature.id }}</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">📅 Date de Postulation :</div>
+            <p>{{ candidature.datePostulation|date('d/m/Y') }}</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">🏷️ Catégorie :</div>
+            <p>{{ candidature.typeCollab }}</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">📂 Catégories détectées :</div>
+            {% if analysis.categories is defined and analysis.categories is not empty %}
+                <ul>
+                    {% for category in analysis.categories %}
+                        <li>{{ category.label }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Aucune catégorie détectée.</p>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <div class="section-title">🔍 Entités détectées :</div>
+            {% if analysis.entities is defined and analysis.entities is not empty %}
+                <ul>
+                    {% for entity in analysis.entities %}
+                        <li class="entity">
+                            {{ entity.label }} ({{ (entity.confidence * 100)|round(2) }}%)
+                            <ul>
+                                <li class="list-group-item">
+                                    <span class="categories">📂 <strong>Catégories :</strong> {{ entity.categories|join(', ') }}</span>
+                                </li>
+                            </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Aucune entité détectée.</p>
+            {% endif %}
+        </div>
+
+     
+
+    </div>
+</body>
+</html>

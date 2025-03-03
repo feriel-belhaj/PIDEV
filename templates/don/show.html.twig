@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'baseBack.html.twig' %}
 
 {% block title %}Don{% endblock %}
 
@@ -32,7 +32,7 @@
 
     <a href="{{ path('app_don_index') }}">back to list</a>
 
-    <a href="{{ path('app_don_edit', {'id': don.id}) }}">edit</a>
+    {# <a href="{{ path('app_don_edit', {'id': don.id}) }}">edit</a>
 
-    {{ include('don/_delete_form.html.twig') }}
+    {{ include('don/_delete_form.html.twig') }} #}
 {% endblock %}

@@ -130,7 +130,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
     <script>
-        // Datepicker initialization
+        // Datepicker initialization uniquement
         $(document).ready(function() {
             $('.js-datepicker').datepicker({
                 dateFormat: 'dd/mm/yy',
@@ -142,59 +142,6 @@
                 dayNamesMin: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
                 monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
                 monthNamesShort: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
-            });
-        });
-
-        // Form validation
-        document.addEventListener('DOMContentLoaded', function() {
-            function validateField(field) {
-                const value = field.value;
-                const fieldName = field.getAttribute('name').replace('certificat[', '').replace(']', '');
-                
-                const rules = {
-                    'nom': /^[a-zA-ZÀ-ÿ\s]{3,}$/.test(value), // Lettres uniquement, min 3 caractères
-                    'prenom': /^[a-zA-ZÀ-ÿ\s]{3,}$/.test(value), // Lettres uniquement, min 3 caractères
-                    'niveau': value !== '',
-                    'nomorganisme': value.length >= 3,
-                    'formation': value !== ''
-                };
-
-                const errorMessages = {
-                    'nom': 'Le nom doit contenir au moins 3 lettres et ne peut contenir que des lettres.',
-                    'prenom': 'Le prénom doit contenir au moins 3 lettres et ne peut contenir que des lettres.',
-                    'niveau': 'Veuillez sélectionner un niveau.',
-                    'nomorganisme': 'Le nom de l\'organisme doit contenir au moins 3 caractères.',
-                    'formation': 'Veuillez sélectionner une formation.'
-                };
-
-                const errorContainer = field.closest('tr').querySelector('.form-error');
-                
-                if (rules[fieldName] !== undefined) {
-                    if (rules[fieldName]) {
-                        field.classList.remove('is-invalid');
-                        field.classList.add('is-valid');
-                        if (errorContainer) {
-                            errorContainer.textContent = '';
-                        }
-                    } else {
-                        field.classList.remove('is-valid');
-                        field.classList.add('is-invalid');
-                        if (errorContainer) {
-                            errorContainer.textContent = errorMessages[fieldName];
-                        }
-                    }
-                }
-            }
-
-            const form = document.querySelector('form');
-            const inputs = form.querySelectorAll('input, select');
-            
-            inputs.forEach(input => {
-                ['input', 'change'].forEach(eventType => {
-                    input.addEventListener(eventType, function() {
-                        validateField(this);
-                    });
-                });
             });
         });
     </script>

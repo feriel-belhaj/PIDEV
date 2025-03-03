@@ -15,16 +15,17 @@
 
             {% for produit in produits %}
                 <div class="mb-3 text-start">
-                    <label class="fw-bold">{{ produit.nom }}</label>
-                    {{ form_widget(form.quantites[loop.index0]) }}
+                    <label class="fw-bold">{{ produit.nom }} (Stock : {{ produit.quantitestock }})</label>
 
-                    {% if form.quantites[loop.index0].vars.errors|length > 0 %}
-                        <div class="text-danger">
-                            {% for error in form.quantites[loop.index0].vars.errors %}
-                                <p>{{ error.message }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
+                    {{ form_widget(form.quantites[produit.id], {
+                        'attr': {
+                            'class': 'form-control',
+                            'min': 1,
+                            'max': produit.quantitestock
+                        }
+                    }) }}
+
+                    {{ form_errors(form.quantites[produit.id]) }}
                 </div>
             {% endfor %}
 
@@ -40,5 +41,10 @@
         .text-start label {
             font-weight: bold;
         }
+        .text-danger p {
+            font-size: 14px;
+            margin: 0;
+        }
     </style>
+
 {% endblock %}

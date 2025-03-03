@@ -18,7 +18,7 @@ class CertificatType extends AbstractType
     {
         $builder
             ->add('nom', null, [
-                'required' => false,
+                'required' => true,
                 'constraints' => [
                     new Assert\NotBlank(['message' => 'Le nom ne peut pas être vide.']),
                     new Assert\Length([
@@ -26,11 +26,15 @@ class CertificatType extends AbstractType
                         'max' => 255,
                         'minMessage' => 'Le nom doit contenir au moins {{ limit }} caractères.',
                         'maxMessage' => 'Le nom ne peut pas dépasser {{ limit }} caractères.',
+                    ]),
+                    new Assert\Regex([
+                        'pattern' => '/^[a-zA-ZÀ-ÿ\s\'-]+$/',
+                        'message' => 'Le nom ne doit contenir que des lettres'
                     ])
                 ],
             ])
             ->add('prenom', null, [
-                'required' => false,
+                'required' => true,
                 'constraints' => [
                     new Assert\NotBlank(['message' => 'Le prénom ne peut pas être vide.']),
                     new Assert\Length([
@@ -38,6 +42,10 @@ class CertificatType extends AbstractType
                         'max' => 255,
                         'minMessage' => 'Le prénom doit contenir au moins {{ limit }} caractères.',
                         'maxMessage' => 'Le prénom ne peut pas dépasser {{ limit }} caractères.',
+                    ]),
+                    new Assert\Regex([
+                        'pattern' => '/^[a-zA-ZÀ-ÿ\s\'-]+$/',
+                        'message' => 'Le prénom ne doit contenir que des lettres'
                     ])
                 ],
             ])
@@ -54,17 +62,20 @@ class CertificatType extends AbstractType
                     new Assert\Type([
                         'type' => \DateTimeInterface::class,
                         'message' => 'La date n\'est pas valide.'
+                    ]),
+                    new Assert\LessThanOrEqual([
+                        'value' => 'today',
+                        'message' => 'La date ne peut pas être dans le futur.'
                     ])
                 ]
             ])
             ->add('niveau', ChoiceType::class, [
                 'choices' => [
-                    'Sélectionnez un niveau' => '',  // Option par défaut
+                    'Sélectionnez un niveau' => '',
                     'Débutant' => 'debutant',
                     'Intermédiaire' => 'intermediaire',
                     'Avancé' => 'avance',
                 ],
-                'attr' => ['class' => 'form-select'],
                 'constraints' => [
                     new Assert\NotBlank(['message' => 'Veuillez sélectionner un niveau.']),
                     new Assert\Choice([
@@ -81,6 +92,10 @@ class CertificatType extends AbstractType
                         'max' => 255,
                         'minMessage' => 'Le nom de l\'organisme doit contenir au moins {{ limit }} caractères.',
                         'maxMessage' => 'Le nom de l\'organisme ne peut pas dépasser {{ limit }} caractères.',
+                    ]),
+                    new Assert\Regex([
+                        'pattern' => '/^[a-zA-ZÀ-ÿ\s\'-]+$/',
+                        'message' => 'Le nom de l\'organisme ne doit contenir que des lettres'
                     ])
                 ]
             ])

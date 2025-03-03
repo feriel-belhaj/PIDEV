@@ -11,61 +11,61 @@
         
         <h3 class="display-5 mb-0">Ajouter un Partenariat</h3>
 
-        {{ form_start(form, {'attr': {'id': 'partenariatForm', 'enctype': 'multipart/form-data'}}) }}
+        {{ form_start(form, {'attr': {'id': 'partenariatForm', 'enctype': 'multipart/form-data', 'novalidate': 'novalidate'}}) }}
 
         <div class="mb-3 text-start">
-            {{ form_label(form.nom) }}
-            {{ form_widget(form.nom, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Nom du Partenariat'}}) }}
+            {{ form_label(form.nom, null, {'attr': {'class': form.nom.vars.errors|length > 0 ? 'text-danger' : ''}}) }}
+            {{ form_widget(form.nom, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light ' ~ (form.nom.vars.errors|length > 0 ? 'is-invalid' : '')}}) }}
             {% if form.nom.vars.errors|length > 0 %}
-                <div class="text-danger">{{ form_errors(form.nom) }}</div>
+                <div class="text-danger mb-2">{{ form_errors(form.nom) }}</div>
             {% endif %}
         </div>
 
         <div class="mb-3 text-start">
-            {{ form_label(form.type) }}
-            {{ form_widget(form.type, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Type de Partenariat'}}) }}
+            {{ form_label(form.type, null, {'attr': {'class': form.type.vars.errors|length > 0 ? 'text-danger' : ''}}) }}
+            {{ form_widget(form.type, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light ' ~ (form.type.vars.errors|length > 0 ? 'is-invalid' : '')}}) }}
             {% if form.type.vars.errors|length > 0 %}
-                <div class="text-danger">{{ form_errors(form.type) }}</div>
+                <div class="text-danger mb-2">{{ form_errors(form.type) }}</div>
             {% endif %}
         </div>
 
         <div class="mb-3 text-start">
-            {{ form_label(form.description) }}
-            {{ form_widget(form.description, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light', 'placeholder': 'Description du Partenariat'}}) }}
+            {{ form_label(form.description, null, {'attr': {'class': form.description.vars.errors|length > 0 ? 'text-danger' : ''}}) }}
+            {{ form_widget(form.description, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light ' ~ (form.description.vars.errors|length > 0 ? 'is-invalid' : '')}}) }}
             {% if form.description.vars.errors|length > 0 %}
-                <div class="text-danger">{{ form_errors(form.description) }}</div>
+                <div class="text-danger mb-2">{{ form_errors(form.description) }}</div>
             {% endif %}
         </div>
 
         <div class="mb-3 text-start">
-            {{ form_label(form.dateDebut) }}
-            {{ form_widget(form.dateDebut, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light'}}) }}
+            {{ form_label(form.dateDebut, null, {'attr': {'class': form.dateDebut.vars.errors|length > 0 ? 'text-danger' : ''}}) }}
+            {{ form_widget(form.dateDebut, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light ' ~ (form.dateDebut.vars.errors|length > 0 ? 'is-invalid' : '')}}) }}
             {% if form.dateDebut.vars.errors|length > 0 %}
-                <div class="text-danger">{{ form_errors(form.dateDebut) }}</div>
+                <div class="text-danger mb-2">{{ form_errors(form.dateDebut) }}</div>
             {% endif %}
         </div>
 
         <div class="mb-3 text-start">
-            {{ form_label(form.dateFin) }}
-            {{ form_widget(form.dateFin, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light'}}) }}
+            {{ form_label(form.dateFin, null, {'attr': {'class': form.dateFin.vars.errors|length > 0 ? 'text-danger' : ''}}) }}
+            {{ form_widget(form.dateFin, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light ' ~ (form.dateFin.vars.errors|length > 0 ? 'is-invalid' : '')}}) }}
             {% if form.dateFin.vars.errors|length > 0 %}
-                <div class="text-danger">{{ form_errors(form.dateFin) }}</div>
+                <div class="text-danger mb-2">{{ form_errors(form.dateFin) }}</div>
             {% endif %}
         </div>
 
         <div class="mb-3 text-start">
-            {{ form_label(form.statut) }}
-            {{ form_widget(form.statut, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light'}}) }}
+            {{ form_label(form.statut, null, {'attr': {'class': form.statut.vars.errors|length > 0 ? 'text-danger' : ''}}) }}
+            {{ form_widget(form.statut, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light ' ~ (form.statut.vars.errors|length > 0 ? 'is-invalid' : '')}}) }}
             {% if form.statut.vars.errors|length > 0 %}
-                <div class="text-danger">{{ form_errors(form.statut) }}</div>
+                <div class="text-danger mb-2">{{ form_errors(form.statut) }}</div>
             {% endif %}
         </div>
 
         <div class="mb-3 text-start">
-            {{ form_label(form.image) }}
-            {{ form_widget(form.image, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light'}}) }}
+            {{ form_label(form.image, null, {'attr': {'class': form.image.vars.errors|length > 0 ? 'text-danger' : ''}}) }}
+            {{ form_widget(form.image, {'attr': {'class': 'w-100 form-control p-3 mb-4 border-primary bg-light ' ~ (form.image.vars.errors|length > 0 ? 'is-invalid' : '')}}) }}
             {% if form.image.vars.errors|length > 0 %}
-                <div class="text-danger">{{ form_errors(form.image) }}</div>
+                <div class="text-danger mb-2">{{ form_errors(form.image) }}</div>
             {% endif %}
         </div>
 
@@ -77,9 +77,20 @@
 </div>
 
 <style>
-    /* Alignement du texte à gauche */
+    /* Alignement du texte à gauche pour les labels */
     .text-start label {
         font-weight: bold;
+    }
+
+    /* Messages d'erreur */
+    .text-danger {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    /* Bordure rouge des champs invalides */
+    .is-invalid {
+        border-color: red !important;
     }
 
     /* Réduction du bouton Ajouter */
