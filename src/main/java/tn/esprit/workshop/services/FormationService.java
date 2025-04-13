@@ -6,12 +6,30 @@ import tn.esprit.workshop.utils.MyDbConnexion;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.net.URL;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 public class FormationService {
     private Connection connection;
+    private static final String RESOURCES_PATH = "src/main/resources/";
+    private static final String IMAGES_PATH = "uploads/images/";
 
     public FormationService() {
         connection = MyDbConnexion.getInstance().getCnx();
+        // Créer le dossier des images s'il n'existe pas
+        try {
+            Path uploadPath = Paths.get(RESOURCES_PATH + IMAGES_PATH);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+                System.out.println("Dossier d'images créé: " + uploadPath);
+            }
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la création du dossier d'images: " + e.getMessage());
+        }
     }
 
     public void ajouter(Formation formation) throws SQLException {
@@ -59,6 +77,17 @@ public class FormationService {
     }
 
     public void supprimer(int id) throws SQLException {
+        // D'abord, récupérer l'image pour la supprimer si elle existe
+        Formation formation = getById(id);
+        if (formation != null && formation.getImage() != null) {
+            try {
+                Path imagePath = Paths.get(RESOURCES_PATH + formation.getImage());
+                Files.deleteIfExists(imagePath);
+            } catch (Exception e) {
+                System.err.println("Erreur lors de la suppression de l'image: " + e.getMessage());
+            }
+        }
+
         String query = "DELETE FROM formation WHERE id=?";
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setInt(1, id);
@@ -84,7 +113,8 @@ public class FormationService {
         try (Statement st = connection.createStatement();
              ResultSet rs = st.executeQuery(query)) {
             while (rs.next()) {
-                formations.add(extractFormationFromResultSet(rs));
+                Formation formation = extractFormationFromResultSet(rs);
+                formations.add(formation);
             }
         }
         return formations;
@@ -106,5 +136,18 @@ public class FormationService {
         formation.setDuree(rs.getString("duree"));
         formation.setImage(rs.getString("image"));
         return formation;
+    }
+
+    // Méthode utilitaire pour copier une image vers le dossier des ressources
+    public String copyImageToResources(File sourceFile, String fileName) {
+        try {
+            String targetPath = IMAGES_PATH + fileName;
+            Path destination = Paths.get(RESOURCES_PATH + targetPath);
+            Files.copy(sourceFile.toPath(), destination, StandardCopyOption.REPLACE_EXISTING);
+            return targetPath;
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la copie de l'image: " + e.getMessage());
+            return null;
+        }
     }
 } 

@@ -16,9 +16,11 @@ import javafx.scene.layout.VBox;
 import tn.esprit.workshop.entities.Formation;
 import tn.esprit.workshop.services.FormationService;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class ClientController implements Initializable {
@@ -35,9 +37,18 @@ public class ClientController implements Initializable {
     private void loadFormations() {
         try {
             formationsContainer.getChildren().clear();
-            for (Formation formation : formationService.getAll()) {
-                formationsContainer.getChildren().add(createFormationCard(formation));
+            List<Formation> formations = formationService.getAll();
+            
+            System.out.println("\n=== Formations chargées depuis la base de données ===");
+            for (Formation formation : formations) {
+                System.out.println("Formation: " + formation.getTitre());
+                System.out.println("Image path: " + formation.getImage());
+                System.out.println("------------------------");
+                
+                VBox card = createFormationCard(formation);
+                formationsContainer.getChildren().add(card);
             }
+            System.out.println("=== Fin du chargement des formations ===\n");
         } catch (SQLException e) {
             showAlert(Alert.AlertType.ERROR, "Erreur", "Erreur lors du chargement des formations: " + e.getMessage());
         }
@@ -59,31 +70,60 @@ public class ClientController implements Initializable {
         ImageView imageView = new ImageView();
         imageView.setFitWidth(250);
         imageView.setFitHeight(150);
-        imageView.setPreserveRatio(false);
+        imageView.setPreserveRatio(true);
         
         try {
+            System.out.println("=== Début du chargement de l'image pour la formation: " + formation.getTitre() + " ===");
+            System.out.println("Chemin de l'image dans la base de données: " + formation.getImage());
+            
             if (formation.getImage() != null && !formation.getImage().isEmpty()) {
-                URL imageUrl = getClass().getResource("/" + formation.getImage());
-                if (imageUrl != null) {
-                    imageView.setImage(new Image(imageUrl.toExternalForm()));
+                // Essayer depuis les ressources
+                URL resourceUrl = getClass().getResource("/" + formation.getImage());
+                System.out.println("Tentative de chargement depuis les ressources: " + resourceUrl);
+                
+                if (resourceUrl != null) {
+                    System.out.println("Image trouvée dans les ressources!");
+                    Image image = new Image(resourceUrl.toExternalForm());
+                    imageView.setImage(image);
+                    
+                    // Ajouter un listener pour vérifier si l'image est chargée correctement
+                    image.errorProperty().addListener((obs, oldValue, newValue) -> {
+                        if (newValue) {
+                            System.err.println("Erreur lors du chargement de l'image: " + image.getException());
+                        }
+                    });
+                    
+                    image.progressProperty().addListener((obs, oldValue, newValue) -> {
+                        System.out.println("Progression du chargement: " + (newValue.doubleValue() * 100) + "%");
+                    });
+                    
                     imageContainer.getChildren().add(imageView);
                 } else {
-                    // Si l'image n'est pas trouvée, afficher un message
-                    Label noImageLabel = new Label("Pas d'image");
-                    noImageLabel.setStyle("-fx-text-fill: #666666;");
-                    imageContainer.getChildren().add(noImageLabel);
+                    System.out.println("Image non trouvée dans les ressources, tentative depuis le système de fichiers...");
+                    // Essayer depuis le système de fichiers
+                    File resourceFile = new File("src/main/resources/" + formation.getImage());
+                    System.out.println("Chemin complet du fichier: " + resourceFile.getAbsolutePath());
+                    System.out.println("Le fichier existe? " + resourceFile.exists());
+                    
+                    if (resourceFile.exists()) {
+                        System.out.println("Image trouvée dans le système de fichiers!");
+                        Image image = new Image(resourceFile.toURI().toString());
+                        imageView.setImage(image);
+                        imageContainer.getChildren().add(imageView);
+                    } else {
+                        System.out.println("Image non trouvée dans le système de fichiers non plus.");
+                        showNoImageLabel(imageContainer);
+                    }
                 }
             } else {
-                // Si aucune image n'est spécifiée
-                Label noImageLabel = new Label("Pas d'image");
-                noImageLabel.setStyle("-fx-text-fill: #666666;");
-                imageContainer.getChildren().add(noImageLabel);
+                System.out.println("Aucun chemin d'image spécifié pour cette formation.");
+                showNoImageLabel(imageContainer);
             }
+            System.out.println("=== Fin du chargement de l'image ===\n");
         } catch (Exception e) {
-            // En cas d'erreur, afficher un message
-            Label noImageLabel = new Label("Pas d'image");
-            noImageLabel.setStyle("-fx-text-fill: #666666;");
-            imageContainer.getChildren().add(noImageLabel);
+            System.err.println("Exception lors du chargement de l'image:");
+            e.printStackTrace();
+            showNoImageLabel(imageContainer);
         }
 
         // Titre de la formation
@@ -112,6 +152,19 @@ public class ClientController implements Initializable {
 
         card.getChildren().addAll(imageContainer, titleLabel, descriptionLabel, levelLabel, priceLabel, detailsButton);
         return card;
+    }
+
+    private void showNoImageLabel(StackPane container) {
+        container.getChildren().clear();
+        Label noImageLabel = new Label("Pas d'image");
+        noImageLabel.setStyle("-fx-text-fill: #666666;");
+        container.getChildren().add(noImageLabel);
+        
+        // Ajouter plus de détails dans les logs
+        System.out.println("INFO: Affichage du label 'Pas d'image' pour le conteneur: " + container);
+        System.out.println("INFO: État du conteneur - Largeur: " + container.getWidth() + 
+                         ", Hauteur: " + container.getHeight() +
+                         ", Nombre d'enfants: " + container.getChildren().size());
     }
 
     @FXML
