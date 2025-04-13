@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.ImageView?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="tn.esprit.workshop.gui.FormationDetailsController"
+      fx:id="root"
+      spacing="20"
+      styleClass="details-container">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Button text="Retour" onAction="#handleReturn" styleClass="return-button"/>
+        <Button text="Réserver" onAction="#handleReserve" styleClass="reserve-button"/>
+    </HBox>
+
+    <VBox spacing="15">
+        <StackPane>
+            <ImageView fx:id="formationImage" 
+                      fitWidth="300" 
+                      fitHeight="200" 
+                      preserveRatio="true"/>
+        </StackPane>
+        <Label fx:id="lblTitre" styleClass="title-label"/>
+        <Label fx:id="lblDescription" wrapText="true"/>
+        <Label fx:id="lblDuree"/>
+        <Label fx:id="lblPrix"/>
+        <Label fx:id="lblNiveau"/>
+        <Label fx:id="lblDateDebut"/>
+        <Label fx:id="lblDateFin"/>
+        <Label fx:id="lblLieu"/>
+        <Label fx:id="lblFormateur"/>
+    </VBox>
+
+</VBox> 

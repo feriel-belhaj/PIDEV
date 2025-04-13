@@ -10,6 +10,8 @@
             <MenuItem text="Gestion des Formations" onAction="#showFormations"/>
             <MenuItem text="Gestion des Certificats" onAction="#showCertificats"/>
             <SeparatorMenuItem />
+            <MenuItem text="Partie Client" onAction="#showClientView"/>
+            <SeparatorMenuItem />
             <MenuItem text="Quitter" onAction="#quit"/>
         </Menu>
     </MenuBar>

@@ -32,6 +32,11 @@ public class MainMenuController implements Initializable {
     }
 
     @FXML
+    private void showClientView() {
+        loadPage("/fxml/ClientView.fxml");
+    }
+
+    @FXML
     private void quit() {
         Platform.exit();
     }
