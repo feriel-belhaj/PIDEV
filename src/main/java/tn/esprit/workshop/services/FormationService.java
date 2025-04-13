@@ -1,7 +1,7 @@
 package tn.esprit.workshop.services;
 
 import tn.esprit.workshop.entities.Formation;
-import tn.esprit.workshop.utils.DatabaseConnection;
+import tn.esprit.workshop.utils.MyDbConnexion;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ public class FormationService {
     private Connection connection;
 
     public FormationService() {
-        connection = DatabaseConnection.getInstance().getConnection();
+        connection = MyDbConnexion.getInstance().getCnx();
     }
 
     public void ajouter(Formation formation) throws SQLException {

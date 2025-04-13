@@ -1,7 +1,7 @@
 package tn.esprit.workshop.services;
 
 import tn.esprit.workshop.entities.Utilisateur;
-import tn.esprit.workshop.utils.DatabaseConnection;
+import tn.esprit.workshop.utils.MyDbConnexion;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -11,7 +11,7 @@ public class UtilisateurService {
     private static Utilisateur currentUser;
 
     public UtilisateurService() {
-        connection = DatabaseConnection.getInstance().getConnection();
+        connection = MyDbConnexion.getInstance().getCnx();
         // Simuler un utilisateur connecté
         if (currentUser == null) {
             currentUser = new Utilisateur();

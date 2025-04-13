@@ -1,7 +1,7 @@
 package tn.esprit.workshop.services;
 
 import tn.esprit.workshop.entities.FormationReservee;
-import tn.esprit.workshop.utils.DatabaseConnection;
+import tn.esprit.workshop.utils.MyDbConnexion;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -10,7 +10,7 @@ public class FormationReserveeService {
     private Connection connection;
 
     public FormationReserveeService() {
-        connection = DatabaseConnection.getInstance().getConnection();
+        connection = MyDbConnexion.getInstance().getCnx();
     }
 
     public void reserverFormation(int formationId, int utilisateurId, String nom, String prenom) {

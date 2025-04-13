@@ -2,7 +2,7 @@ package tn.esprit.workshop.services;
 
 import tn.esprit.workshop.entities.Certificat;
 import tn.esprit.workshop.entities.Formation;
-import tn.esprit.workshop.utils.DatabaseConnection;
+import tn.esprit.workshop.utils.MyDbConnexion;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ public class CertificatService {
     private Connection connection;
 
     public CertificatService() {
-        connection = DatabaseConnection.getInstance().getConnection();
+        connection = MyDbConnexion.getInstance().getCnx();
     }
 
     public void ajouter(Certificat certificat) throws SQLException {
