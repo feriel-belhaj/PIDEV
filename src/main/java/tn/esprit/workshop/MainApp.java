@@ -9,9 +9,10 @@ import javafx.stage.Stage;
 public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/MainMenu.fxml"));
+        // Load Creation.fxml directly instead of MainMenu.fxml
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/Creation.fxml"));
         Scene scene = new Scene(root);
-        primaryStage.setTitle("Gestion des Formations");
+        primaryStage.setTitle("Gestion des Créations");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -19,4 +20,4 @@ public class MainApp extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-} 
+}
